@@ -9,6 +9,7 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	theme.addEntry("PacketOld", 3);
 	theme.addEntry("Tenacity", 4);
 	theme.addEntry("TANA", 5);
+	theme.addEntry("TANA2", 6);
 	registerEnumSetting("Color", &color, 2);
 	color.addEntry("Rainbow", 0);
 	color.addEntry("Astolfo", 1);
@@ -19,6 +20,8 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	Fonts.addEntry("Notosans", 1);
 	Fonts.addEntry("TEN", 2);
 	Fonts.addEntry("Unicod", 3);
+	registerFloatSetting("TextHeight", &txtheight, txtheight, 1.f, 17.f);
+	registerFloatSetting("TextSize", &txtsize, txtsize, 0.f, 2.f);
 	registerBoolSetting("CategoryColors", &categoryColors, categoryColors);
 	registerBoolSetting("HudEditor", &showHudEditor, showHudEditor);
 	registerBoolSetting("ToolTips", &showTooltips, showTooltips);
