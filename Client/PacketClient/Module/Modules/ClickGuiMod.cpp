@@ -14,6 +14,11 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	color.addEntry("Astolfo", 1);
 	color.addEntry("Wave", 2);
 	color.addEntry("RGBWave", 3);
+	registerEnumSetting("Fonts", &Fonts, 3);
+	Fonts.addEntry("Mojangles", 0);
+	Fonts.addEntry("Notosans", 1);
+	Fonts.addEntry("TEN", 2);
+	Fonts.addEntry("Unicod", 3);
 	registerBoolSetting("CategoryColors", &categoryColors, categoryColors);
 	registerBoolSetting("HudEditor", &showHudEditor, showHudEditor);
 	registerBoolSetting("ToolTips", &showTooltips, showTooltips);
