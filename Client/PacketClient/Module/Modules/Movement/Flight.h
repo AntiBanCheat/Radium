@@ -8,6 +8,7 @@ private:
 	bool speedWasEnabled = false;
 	float speedDuration = 1.f;
 	bool hasJumped = false;
+	bool clip = false;
 	float currSpeed = 1.f;
 	int enabledHeight = 0;
 	float duration = 1.f;
