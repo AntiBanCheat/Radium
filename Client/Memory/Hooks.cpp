@@ -655,94 +655,136 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 
 	// Draw Notifications
 	if (notificationsMod->isEnabled()) {
-		vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
-		auto& notifications = g_Data.getInfoBoxList();
-		int index = 0;
-		index++; int curIndex = -index * interfaceMod->spacing;
-		auto interfaceColor = ColorUtil::interfaceColor(curIndex);
-		float yPos = windowSize.y - 15;
-		for (auto& notification : notifications) {
-			notification->fade();
-			if (notification->fadeTarget == 1 && notification->duration <= 0 && notification->duration > -1)
-				notification->fadeTarget = 0;
-			else if (notification->duration > 0)
-				notification->duration -= 1.f / 45;
-			const float titleTextSize = notification->fadeVal * 1;
-			const float messageTextSize = notification->fadeVal * 1;
-			const float titleTextHeight = DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight() * titleTextSize;
-			vec2_t* pos;
-			int lines = 1;
+		if (notificationsMod->mode.getSelectedValue() == 0) {
+			vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+			auto& notifications = g_Data.getInfoBoxList();
+			int index = 0;
+			index++; int curIndex = -index * interfaceMod->spacing;
+			auto interfaceColor = ColorUtil::interfaceColor(curIndex);
+			float yPos = windowSize.y - 15;
+			for (auto& notification : notifications) {
+				notification->fade();
+				if (notification->fadeTarget == 1 && notification->duration <= 0 && notification->duration > -1)
+					notification->fadeTarget = 0;
+				else if (notification->duration > 0)
+					notification->duration -= 1.f / 45;
+				const float titleTextSize = notification->fadeVal * 1;
+				const float messageTextSize = notification->fadeVal * 1;
+				const float titleTextHeight = DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight() * titleTextSize;
+				vec2_t* pos;
+				int lines = 1;
 
-			std::string substring = notification->message;
+				std::string substring = notification->message;
 
-			while (lines < 5) {
-				auto brea = substring.find("\n");
-				if (brea == std::string::npos || brea + 1 >= substring.size())
-					break;
-				substring = substring.substr(brea + 1);
-				lines++;
-			}
-			if (notification->message.size() == 0)
-				lines = 0;
+				while (lines < 5) {
+					auto brea = substring.find("\n");
+					if (brea == std::string::npos || brea + 1 >= substring.size())
+						break;
+					substring = substring.substr(brea + 1);
+					lines++;
+				}
+				if (notification->message.size() == 0)
+					lines = 0;
 
-			constexpr float notificationMessage = 1;
-			constexpr float unused = 0.7f;
-			static const float textHeight = (notificationMessage + unused * 1) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
-			constexpr float borderPadding = 10;
-			constexpr float margin = 6;
-			float nameLength = DrawUtils::getTextWidth(&substring, notificationMessage);
-			float fullTextLength = nameLength;
-			std::string message = notification->message + " (" + std::to_string((int)notification->duration) + std::string(".") + std::to_string((int)(notification->duration * 10) - ((int)notification->duration * 10)) + ")";
-			std::string title = std::string(BOLD) + notification->title + std::string(RESET);
-			std::string textStr = " " + title + "\n" + message;
+				constexpr float notificationMessage = 1;
+				constexpr float unused = 0.7f;
+				static const float textHeight = (notificationMessage + unused * 1) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
+				constexpr float borderPadding = 10;
+				constexpr float margin = 6;
+				float nameLength = DrawUtils::getTextWidth(&substring, notificationMessage);
+				float fullTextLength = nameLength;
+				std::string message = notification->message + " (" + std::to_string((int)notification->duration) + std::string(".") + std::to_string((int)(notification->duration * 10) - ((int)notification->duration * 10)) + ")";
+				std::string title = std::string(BOLD) + notification->title + std::string(RESET);
+				std::string textStr = " " + title + "\n" + message;
 
-			static float duration = 0;
-			if (notification->duration > 1) {
-				duration++* notification->duration;
-			}
-			else {
-				duration = 0;
-			}
+				static float duration = 0;
+				if (notification->duration > 1) {
+					duration++* notification->duration;
+				}
+				else {
+					duration = 0;
+				}
 
 
 
-			vec4_t rect = vec4_t(
-				windowSize.x - margin - fullTextLength - 2 - borderPadding * 2,
-				yPos - margin - textHeight - 4,
-				windowSize.x - margin + borderPadding - 2,
-				yPos - margin);
-
-			if (notification->duration <= 1 && notification->duration > -1) {
-				vec4_t rect2 = vec4_t(
-					windowSize.x - notification->duration * 110,
-					yPos - margin - textHeight - 5,
+				vec4_t rect = vec4_t(
+					windowSize.x - margin - fullTextLength - 2 - borderPadding * 2,
+					yPos - margin - textHeight - 4,
 					windowSize.x - margin + borderPadding - 2,
 					yPos - margin);
 
-				vec2_t textPos = vec2_t(rect2.x + 9, rect2.y + 1);
-				vec2_t titlePos = vec2_t(rect2.x + 9, rect2.y + 1);
-				DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &textStr, MC_Color(100, 100, 100), 0.8, 1, true);
-				auto n = moduleMgr->getModule<Notifications>();
-				DrawUtils::fillRoundRectangle(rect2, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
-			}
+				if (notification->duration <= 1 && notification->duration > -1) {
+					vec4_t rect2 = vec4_t(
+						windowSize.x - notification->duration * 110,
+						yPos - margin - textHeight - 5,
+						windowSize.x - margin + borderPadding - 2,
+						yPos - margin);
 
-			if (notification->duration > 1) {
-				//deq pls add some math to this to make the line good and decrese with the timer without it being gay
-				// - steal the code from drawline and improve on that
-				// no i got enough aids from making a shitty rectangle 
-				// colors:
-				// success: 50, 255, 50
-			warning: 255, 200, 50;
-			error: 255, 50, 50;
-				vec2_t textPos = vec2_t(rect.x + 9, rect.y + 1);
-				vec2_t titlePos = vec2_t(rect.x + 9, rect.y + 1);
+					vec2_t textPos = vec2_t(rect2.x + 9, rect2.y + 1);
+					vec2_t titlePos = vec2_t(rect2.x + 9, rect2.y + 1);
+					DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &textStr, MC_Color(100, 100, 100), 0.8, 1, true);
+					auto n = moduleMgr->getModule<Notifications>();
+					DrawUtils::fillRoundRectangle(rect2, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
+				}
 
-				DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &textStr, MC_Color(255, 255, 255), 0.8, 1, true);
-				auto n = moduleMgr->getModule<Notifications>();
-				DrawUtils::fillRoundRectangle(rect, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
-				DrawUtils::drawBottomLine(vec4_t{ rect.x + 1.5f, rect.y, rect.z - duration, rect.w + 0.5f }, MC_Color(interfaceColor), 1);
+				if (notification->duration > 1) {
+					//deq pls add some math to this to make the line good and decrese with the timer without it being gay
+					// - steal the code from drawline and improve on that
+					// no i got enough aids from making a shitty rectangle 
+					// colors:
+					// success: 50, 255, 50
+				warning: 255, 200, 50;
+				error: 255, 50, 50;
+					vec2_t textPos = vec2_t(rect.x + 9, rect.y + 1);
+					vec2_t titlePos = vec2_t(rect.x + 9, rect.y + 1);
+
+					DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &textStr, MC_Color(255, 255, 255), 0.8, 1, true);
+					auto n = moduleMgr->getModule<Notifications>();
+					DrawUtils::fillRoundRectangle(rect, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
+					DrawUtils::drawBottomLine(vec4_t{ rect.x + 1.5f, rect.y, rect.z - duration, rect.w + 0.5f }, MC_Color(interfaceColor), 1);
+				}
+				yPos -= margin + 30;
 			}
-			yPos -= margin + 30;
+		}
+		else
+		{
+			vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+			vec2_t pos;
+
+			auto notifications = g_Data.getInfoBoxList();
+			float yOffset = windowSize.y;
+
+			if (arraylist->invert) yOffset = 60;
+			if (arraylist->invert && !interfaceMod->release) yOffset = 30;
+			if (!arraylist->invert && !interfaceMod->release) yOffset = windowSize.y - 30;
+
+			for (auto& notification : notifications) {
+				notification->fade();
+				if (notification->fadeTarget == 1 && notification->duration <= 0 && notification->duration > -1) notification->fadeTarget = 0;
+				else if (notification->duration > 0) notification->duration -= 1.f / 60;
+
+				float textSize = 1.f;
+				float textPadding = 1.f * textSize;
+				float textHeight = 22.0f * textSize;
+
+				string message = notification->message + " (" + to_string((int)notification->duration) + string(".") + to_string((int)(notification->duration * 10) - ((int)notification->duration * 10)) + ")";
+				string title = string(BOLD) + notification->title + string(RESET);
+				string textStr = " " + title + "\n" + message;
+
+				float textWidth = DrawUtils::getTextWidth(&message, textSize);
+				float xOffset = windowSize.x - textWidth;
+
+				vec4_t rectPos = vec4_t(xOffset - 6.f, yOffset, windowSize.x + (textPadding * 2.f), yOffset + textPadding * 2.f + textHeight);
+				vec2_t textPos = vec2_t(rectPos.x + 4.f, rectPos.y + 2.f);
+				if (notification->duration > 1.f) {
+					DrawUtils::fillRoundRectangle(rectPos, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
+					DrawUtils::drawText(textPos, &textStr, MC_Color(255, 255, 255), textSize, 1.f, true);
+				}
+
+				if (notification->isOpen) {
+					if (arraylist->invert) yOffset += 36; else yOffset -= 36;
+				}
+			}
 		}
 	}
 	DrawUtils::flush();
