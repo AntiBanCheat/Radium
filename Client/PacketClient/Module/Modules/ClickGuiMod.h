@@ -28,7 +28,8 @@ public:
 	float openAnim = 1.f;
 	int opacity = 175;
 	int t = 0;
-
+	
+	SettingEnum Fonts = this;
 	SettingEnum theme = this;
 	SettingEnum color = this;
 
