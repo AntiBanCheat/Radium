@@ -4947,7 +4947,7 @@ void ClickGui::render() {
 		renderTenacityCategory(Category::EXPLOIT, MC_Color(52, 152, 219), MC_Color(52 - 20, 152 - 20, 219 - 20));
 		renderTenacityCategory(Category::OTHER, MC_Color(243, 156, 18), MC_Color(243 - 20, 156 - 20, 20 - 20));
 		break;
-	case 5: // TANA
+	case 6: // TANA
 		renderTANACategory(Category::COMBAT, MC_Color(255, 255, 255));
 		renderTANACategory(Category::VISUAL, MC_Color(255, 255, 255));
 		renderTANACategory(Category::MOVEMENT, MC_Color(255, 255, 255));
@@ -4955,7 +4955,7 @@ void ClickGui::render() {
 		renderTANACategory(Category::EXPLOIT, MC_Color(255, 255, 255));
 		renderTANACategory(Category::OTHER, MC_Color(255, 255, 255));
 		break;
-	case 6: // tena2
+	case 5: // tena2
 		rendertenaCategory(Category::COMBAT);
 		rendertenaCategory(Category::VISUAL);
 		rendertenaCategory(Category::MOVEMENT);
