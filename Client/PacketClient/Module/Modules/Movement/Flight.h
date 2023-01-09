@@ -10,6 +10,7 @@ private:
 	bool hasJumped = false;
 	bool clip = false;
 	float currSpeed = 1.f;
+	float clipHeight = 0;
 	int enabledHeight = 0;
 	float duration = 1.f;
 	bool damage = false;
