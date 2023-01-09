@@ -45,7 +45,7 @@ private:
 	static void renderAstolfoCategory(Category category, MC_Color categoryColor, MC_Color categoryColor2);
 	static void renderTenacityCategory(Category category, MC_Color categoryColor, MC_Color categoryColor2);
 	static void renderTANACategory(Category category, MC_Color categoryColor);
-
+	static void rendertenaCategory(Category category);
 	inline static void getModuleListByCategory(Category category, std::vector<std::shared_ptr<IModule>>* modList);
 
 	inline static const char* catToName(Category cat) {
