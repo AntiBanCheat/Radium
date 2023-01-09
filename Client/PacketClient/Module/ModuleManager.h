@@ -79,6 +79,7 @@
 #include "Modules/Movement/Jesus.h"
 #include "Modules/Movement/KBFly.h"
 #include "Modules/Movement/Step.h"
+#include "Modules/Movement/HiveFlytwo.h"
 
 // Player
 #include "Modules/Player/ChestStealer.h"
