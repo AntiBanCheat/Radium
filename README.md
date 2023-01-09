@@ -1,2 +1,2 @@
 # Radium
-ミスって消しちゃった
+Let's ADD remote trojan
