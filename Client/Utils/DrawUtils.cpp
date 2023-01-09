@@ -101,9 +101,36 @@ void DrawUtils::setColor(float r, float g, float b, float a) {
 }
 
 C_Font* DrawUtils::getFont(Fonts font) {
-	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	if (clickGUI->isEnabled() && clickGUI->theme.getSelectedValue() == 2 && clickGUI->cFont) return g_Data.getClientInstance()->minecraftGame->getTheGoodFontThankYou();
-	else return g_Data.getClientInstance()->minecraftGame->mcFont;
+	if (true) {
+		static auto fontChangerModule = moduleMgr->getModule<ClickGUIMod>();
+
+		if (fontChangerModule->Fonts.selected == 1) {
+			return g_Data.getClientInstance()->minecraftGame->getTheGoodFontThankYou();
+		}
+		if (fontChangerModule->Fonts.selected == 2) {
+			return g_Data.getClientInstance()->minecraftGame->fontRepository->fontList->fontEntries[6].font;
+		}
+		if (fontChangerModule->Fonts.selected == 3) {
+			return g_Data.getClientInstance()->minecraftGame->fontRepository->fontList->fontEntries[3].font;
+		}
+		if (fontChangerModule->Fonts.selected == 0) {
+			return g_Data.getClientInstance()->minecraftGame->mcFont;
+		}
+		switch (font) {
+		case Fonts::SMOOTH:
+			return g_Data.getClientInstance()->minecraftGame->getTheGoodFontThankYou();
+			break;
+		case Fonts::UNICOD:
+			return g_Data.getClientInstance()->minecraftGame->getTheBetterFontYes();
+			break;
+		case Fonts::RUNE:
+			return g_Data.getClientInstance()->_getRuneFont();
+			break;
+		default:
+			return g_Data.getClientInstance()->_getFont();
+			break;
+		}
+	}
 }
 
 Tessellator* DrawUtils::get3dTessellator() {
