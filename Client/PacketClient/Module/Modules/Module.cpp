@@ -593,7 +593,9 @@ void IModule::setEnabled(bool enabled) {
 		if (notifications->showToggle && shouldShow && !((GameData::isKeyDown('L') && GameData::isKeyDown(VK_CONTROL)) || GameData::shouldTerminate())) {
 			if (notifications->isEnabled()) {
 				auto state = enabled ? " Enabled" : " Disabled";
-				auto notification = g_Data.addNotification("Notification:", string(string(state) + " " + this->getRawModuleName())); notification->duration = 3.f; if (notifications->color) {
+				string noftitle = "Notification:";
+				if (notifications->mode.getSelectedValue() == 1) noftitle = "Toggled:";
+				auto notification = g_Data.addNotification(noftitle, string(string(state) + " " + this->getRawModuleName())); notification->duration = 3.f; if (notifications->color) {
 					if (enabled) { notification->colorR = 42; notification->colorG = 113; notification->colorB = 47; }
 					else { notification->colorR = 127; notification->colorG = 34; notification->colorB = 25; }
 				}
