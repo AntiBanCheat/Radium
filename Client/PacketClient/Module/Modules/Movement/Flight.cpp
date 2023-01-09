@@ -21,10 +21,12 @@ Flight::Flight() : IModule(0, Category::MOVEMENT, "Allows you to fly") {
 	mode.addEntry("CubeCraft", 9);
 	mode.addEntry("HiveJump", 10);
 	//mode.addEntry("Cubecraft", 5);
+	registerBoolSetting("Clip Up", &clip, clip);
 	registerBoolSetting("ViewBobbing", &viewBobbing, viewBobbing);
 	registerBoolSetting("Damage", &damage, damage);
 	registerBoolSetting("Boost", &boost, boost);
 	registerBoolSetting("Blink", &blink, blink);
+	registerFloatSetting("Clip Height", &clipHeight, clipHeight, -3.f, 4.f);
 	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.05f);
 	registerIntSetting("HiveDelay", &HiveDelay, HiveDelay, 0, 10);
 	registerFloatSetting("HiveVelocity", &HiveVelocity, HiveVelocity, -1.00f, -0.00f);
@@ -80,7 +82,11 @@ void Flight::onEnable() {
 	enabledpos = player->currentPos;
 
 	alground = false;
-
+		if (clip) {
+			vec3_t myPos = *player->getPos();
+			myPos.y += clipHeight;
+			player->setPos(myPos);
+		}
 	// Variables
 	auto speedMod = moduleMgr->getModule<Speed>();
 	auto blinkMod = moduleMgr->getModule<Blink>();
