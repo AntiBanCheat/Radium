@@ -28,6 +28,8 @@ public:
 	float openAnim = 1.f;
 	int opacity = 175;
 	int t = 0;
+	float txtsize = 0.9f;
+	float txtheight = 9;
 	
 	SettingEnum Fonts = this;
 	SettingEnum theme = this;
