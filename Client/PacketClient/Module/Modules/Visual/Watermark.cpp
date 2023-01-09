@@ -35,7 +35,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
 		string name = player->getNameTag()->getText(); name = Utils::sanitize(name); name = name.substr(0, name.find('\n')); string clientName = interfaceMod->getClientName(); string fpsText = to_string(g_Data.getFPS()) + " fps"; string skeetLen = "Packetsense | " + name + " | " + fpsText; string t = "Packet         | " + name + " | " + fpsText; string sense = "sense"; string newText = clientName + GRAY + "| " + RESET + WHITE + name; string idk = "Packet "; string idk2 = string(GRAY) + clientName; string len = idk + idk2; // why u lookin over here
-		string cn = "Celsius";
+		string cn = "Radium";
 		float textHeight = 12.f * scale;
 		float textPadding = 1.f * scale;
 
