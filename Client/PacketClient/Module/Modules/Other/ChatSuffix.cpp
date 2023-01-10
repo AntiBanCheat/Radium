@@ -16,7 +16,7 @@ void ChatSuffix::onSendPacket(C_Packet* packet) {
 		std::string Sentence;
 		std::string end;
 
-		end = " | Celsius";
+		end = " | Radium";
 		Sentence = funy->message.getText() + end;
 		funy->message.resetWithoutDelete();
 		funy->message = Sentence;
