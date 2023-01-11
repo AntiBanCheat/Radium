@@ -471,7 +471,7 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
 				EquipPacket->hotbarSlot = n;
-				if (quipPacket->hotbarSlot = n) clientMessageF("Sended Packet");//test
+				if (EquipPacket->hotbarSlot = n) clientMessageF("Sended Packet");//test
 			}
 		}
 	}
@@ -673,7 +673,7 @@ bool Scaffold::selectBlock() {
 				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
 					int blockCount = stack->count;
 					if (blockCount > BlockCounts) {
-						BlockCounts=blockcount;
+						BlockCounts=blockCount;
 						supplies->selectedHotbarSlot = n;
 					}
 					return true;
