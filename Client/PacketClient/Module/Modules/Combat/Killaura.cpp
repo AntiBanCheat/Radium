@@ -172,8 +172,12 @@ void Killaura::onTick(C_GameMode* gm) {
 				player->swing();
 
 			for (auto& i : targetList) {
-				if (mode.getSelectedValue() == 0) gm->attack(i);
-				else gm->attack(targetList[0]);
+				if (!targetListEmpty) atk = true;
+				if (atk) {
+					if (mode.getSelectedValue() == 0) gm->attack(i);
+					else gm->attack(targetList[0]);
+					atk = false;
+				}
 			}
 		}
 
