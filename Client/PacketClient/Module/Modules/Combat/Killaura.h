@@ -17,6 +17,7 @@ public:
     float animYaw = 0.f;
     float animPitch = 0.f;
     bool strafe = false;
+    bool atk = false;
     float random = 1.f;
     bool click = false;
     bool hold = false;
