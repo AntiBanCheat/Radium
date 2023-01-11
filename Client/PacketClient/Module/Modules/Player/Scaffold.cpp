@@ -471,7 +471,7 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
 				EquipPacket->hotbarSlot = n;
-				//clientMessageF("Sended Packet");
+				if (quipPacket->hotbarSlot = n) clientMessageF("Sended Packet");//test
 			}
 		}
 	}
@@ -666,38 +666,21 @@ bool Scaffold::selectBlock() {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
 	auto prevSlot = supplies->selectedHotbarSlot;
-	if (spoof) {
-		for (int n = 0; n < 9; n++) {
+	int BlockCounts = 0;
+		for (int n = 1; n < 64; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
 				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-					if (prevSlot != n) {
+					int blockCount = stack->count;
+					if (blockCount > BlockCounts) {
+						BlockCounts=blockcount;
 						supplies->selectedHotbarSlot = n;
-						/*__int64 id = *g_Data.getLocalPlayer()->getUniqueId();
-						C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
-						C_Inventory* inv = supplies->inventory;
-						if (type.getSelectedValue() == 1) {
-							C_MobEquipmentPacket a(id, *g_Data.getLocalPlayer()->getSelectedItem(), n, n);
-							g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&a);
-						}*/
 					}
 					return true;
 				}
 			}
 		}
-	}
-	else {
-		for (int n = 0; n < 9; n++) {
-			C_ItemStack* stack = inv->getItemStack(n);
-			if (stack->item != nullptr) {
-				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-					if (prevSlot != n)
-						supplies->selectedHotbarSlot = n;
-					return true;
-				}
-			}
-		}
-	}
+	
 	return false;
 }
 
