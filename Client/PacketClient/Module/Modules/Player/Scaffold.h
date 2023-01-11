@@ -63,6 +63,7 @@ public:
 	float scX = 10.f;
 	float extend = 1;
 
+	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
 	std::vector<vec3_t> exposee;
 	std::string name = ("Scaffold");
