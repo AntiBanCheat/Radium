@@ -665,21 +665,20 @@ bool Scaffold::predictBlock(vec3_t blockBelow) {
 bool Scaffold::selectBlock() {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
-	auto prevSlot = supplies->selectedHotbarSlot;
-	int BlockCounts = 0;
-		for (int n = 1; n < 64; n++) {
-			C_ItemStack* stack = inv->getItemStack(n);
-			if (stack->item != nullptr) {
-				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-					int blockCount = stack->count;
-					if (blockCount > BlockCounts) {
-						BlockCounts=blockCount;
-						supplies->selectedHotbarSlot = n;
-					}
-					return true;
-				}
+	float have = 0;
+	int slot = supplies->selectedHotbarSlot;
+	for (int n = 0; n < 9; n++) {
+		C_ItemStack* stack = inv->getItemStack(n);
+		if (stack->item != nullptr) {
+			float currentHave = stack->count;
+			if (currentHave > have) {
+				have = currentHave;
+				supplies->selectedHotbarSlot = n;
+				return true;
 			}
 		}
+	}
+	
 	
 	return false;
 }
