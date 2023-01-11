@@ -193,29 +193,44 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		//extend
-		int extend2 = currExtend;
-		vec3_t defaultblockBelow = blockBelow;
-		for (int i = 0; i < extend2; i++) {
-			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * i; blockBelow.z += vel.z * i; }
+		if (!jumping && velocityxz >= 0.01) {
+			for (int i = 0; i <= currExtend; i++) {
+				int tempx = vel.x * i;
+				int tempz = vel.z * i;
 
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else if (!buildBlock(blockBelow)) {
-				if (velocityxz > 0.f) {  // Are we actually walking?
-					blockBelow.x -= vel.x;
-					blockBelow.z -= vel.z;
-					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-						blockBelow.x += vel.x;
-						blockBelow.z += vel.z;
-						buildBlock(blockBelow);
+				vec3_t temp = blockBelow;
+				temp.x += tempx;
+				temp.z += tempz;
+				if (!placed.empty()) {
+					bool skip = false;
+					for (auto& i : placed) {
+						if (i == temp) {
+							skip = true;
+						}
+					}
+
+					if (skip) {
+						clientMessageF("Skipped due same block");
+						continue;
 					}
 				}
+
+				if (isBlockReplacable(temp)) predictBlock(temp);
+				else if (buildBlock(temp)) {
+					placed.push_back(temp);
+					clientMessageF("Breaked due placed");
+					break;
+				}
 			}
+
+			placed.clear();
 		}
-		blockBelow = defaultblockBelow;
+		else {
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else buildBlock(blockBelow);
+		}
 
-		if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
-
+		/*
 		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 		else if (!buildBlock(blockBelow)) {
 			if (velocityxz > 0.f) {  // Are we actually walking?
@@ -228,6 +243,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 				}
 			}
 		}
+		*/
 	}
 	oldpos = blockBelow.floor();
 
