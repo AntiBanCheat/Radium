@@ -20,6 +20,7 @@ public:
 	int timer = 20;
 	int ticks = 0;
 	bool clientmessage = false;
+	bool dboost = false;
 
 	// Hive
 	float speedFriction = 0.65f;
