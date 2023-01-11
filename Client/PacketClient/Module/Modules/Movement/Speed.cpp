@@ -31,6 +31,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 35);
 	registerBoolSetting("NoSlabs", &noslabs, noslabs);
+	registerBoolSetting("DesnycBoost", &dbost, dbost);
 
 	// Friction
 	registerFloatSetting("SpeedMax", &speedMax, speedMax, 0.f, 2.f);
@@ -82,6 +83,21 @@ void Speed::onTick(C_GameMode* gm) {
 	case 3: // Cubecraft
 		ticks++;
 		break;
+	}
+		if (dbost) {
+		if (player->onGround) {
+			moduleMgr->getModule<Blink>()->setEnabled(false);
+		}
+	}
+	if (dbost) {
+		if (GameData::isKeyDown(*input->spaceBarKey)) {
+			moduleMgr->getModule<Blink>()->setEnabled(true);
+		}
+	}
+	if (dbost) {
+		if (!GameData::isKeyDown(*input->spaceBarKey)) {
+			moduleMgr->getModule<Blink>()->setEnabled(false);
+		}
 	}
 }
 
