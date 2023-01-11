@@ -9,7 +9,7 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	theme.addEntry("PacketOld", 3);
 	theme.addEntry("Tenacity", 4);
 	theme.addEntry("TANA", 5);
-	theme.addEntry("TANA2", 6);
+	//theme.addEntry("TANA2", 6); //Broken Click GUI
 	registerEnumSetting("Color", &color, 2);
 	color.addEntry("Rainbow", 0);
 	color.addEntry("Astolfo", 1);
