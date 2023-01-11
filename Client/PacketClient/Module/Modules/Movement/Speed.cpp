@@ -90,6 +90,7 @@ void Speed::onTick(C_GameMode* gm) {
 		}
 	}
 	if (dboost) {
+		if (GameData::isKeyDown(*input->spaceBarKey))g_Data.getClientInstance()->minecraft->testss(boosttimer);
 		if (GameData::isKeyDown(*input->spaceBarKey)) {
 			moduleMgr->getModule<Blink>()->setEnabled(true);
 		}
