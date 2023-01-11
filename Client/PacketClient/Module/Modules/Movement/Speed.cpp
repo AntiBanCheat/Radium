@@ -31,7 +31,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 35);
 	registerBoolSetting("NoSlabs", &noslabs, noslabs);
-	registerBoolSetting("DesnycBoost", &dbost, dboost);
+	registerBoolSetting("DesnycBoost", &dboost, dboost);
 
 	// Friction
 	registerFloatSetting("SpeedMax", &speedMax, speedMax, 0.f, 2.f);
@@ -90,7 +90,7 @@ void Speed::onTick(C_GameMode* gm) {
 		}
 	}
 	if (dboost) {
-		if (GameData::isKeyDown(*input->spaceBarKey))g_Data.getClientInstance()->minecraft->testss(boosttimer);
+		if (GameData::isKeyDown(*input->spaceBarKey))g_Data.getClientInstance()->minecraft->setTimerSpeed(boosttimer);
 		if (GameData::isKeyDown(*input->spaceBarKey)) {
 			moduleMgr->getModule<Blink>()->setEnabled(true);
 		}
