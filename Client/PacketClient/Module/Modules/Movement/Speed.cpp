@@ -87,7 +87,7 @@ void Speed::onTick(C_GameMode* gm) {
 if (dboost) {
 		if (player->onGround) {
 			moduleMgr->getModule<Blink>()->setEnabled(false);
-			auto notification = g_Data.addNotification("Speed:", "IKA HA BAKA"); notification->duration = 3;
+			//auto notification = g_Data.addNotification("Speed:", "IKA HA BAKA"); notification->duration = 3;
 		}
 	}
 	if (dboost) {
@@ -96,7 +96,7 @@ if (dboost) {
 		if (GameData::isKeyDown(*input->spaceBarKey)) {
 			if (player->onGround) {
 				moduleMgr->getModule<Blink>()->setEnabled(false);
-				auto notification = g_Data.addNotification("Speed:", "INSANE BYPASS"); notification->duration = 3;
+				//auto notification = g_Data.addNotification("Speed:", "INSANE BYPASS"); notification->duration = 3;
 			}
 			else
 			{
