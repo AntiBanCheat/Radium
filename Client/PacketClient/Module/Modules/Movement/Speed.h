@@ -7,6 +7,7 @@ class Speed : public IModule {
 private:
 	int offGroundTicks = 0;
 	int groundTicks = 0;
+	int boosttimer = 35;
 	bool groundcheck;
 	float oldx;
 	float oldz;
