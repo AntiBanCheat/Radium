@@ -84,15 +84,24 @@ void Speed::onTick(C_GameMode* gm) {
 		ticks++;
 		break;
 	}
-		if (dboost) {
+if (dboost) {
 		if (player->onGround) {
 			moduleMgr->getModule<Blink>()->setEnabled(false);
+			auto notification = g_Data.addNotification("Speed:", "IKA HA BAKA"); notification->duration = 3;
 		}
 	}
 	if (dboost) {
+
 		if (GameData::isKeyDown(*input->spaceBarKey))g_Data.getClientInstance()->minecraft->setTimerSpeed(boosttimer);
 		if (GameData::isKeyDown(*input->spaceBarKey)) {
-			moduleMgr->getModule<Blink>()->setEnabled(true);
+			if (player->onGround) {
+				moduleMgr->getModule<Blink>()->setEnabled(false);
+				auto notification = g_Data.addNotification("Speed:", "INSANE BYPASS"); notification->duration = 3;
+			}
+			else
+			{
+				moduleMgr->getModule<Blink>()->setEnabled(true);
+			}
 		}
 	}
 	if (dboost) {
