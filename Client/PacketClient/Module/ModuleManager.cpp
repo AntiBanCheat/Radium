@@ -86,7 +86,7 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new Speed()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Bhop()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Step()));
-		moduleList.push_back(std::shared_ptr<IModule>(new HiveFly()));
+		//moduleList.push_back(std::shared_ptr<IModule>(new HiveFly()));
 		moduleList.push_back(std::shared_ptr<IModule>(new HiveFlytwo()));
 #ifdef _DEBUG
 		moduleList.push_back(std::shared_ptr<IModule>(new HiveFly()));
@@ -143,7 +143,7 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new Nuker()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Derp()));
 		moduleList.push_back(std::shared_ptr<IModule>(new MCF()));
-		moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
+		//moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
 
 #ifdef _DEBUG
 		moduleList.push_back(std::shared_ptr<IModule>(new PacketLogger()));
