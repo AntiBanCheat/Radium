@@ -6,6 +6,7 @@
 #include "../Utils/Utils.h"
 #include "CBlockLegacy.h"
 #include "CEntityList.h"
+#include "CAttribute.h"
 #include "CInventory.h"
 #include "CInventoryTransaction.h"
 #include "TextHolder.h"
