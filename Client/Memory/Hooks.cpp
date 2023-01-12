@@ -983,13 +983,14 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 		return;
 
 	if (blinkMod->isEnabled() || freeTP->isEnabled() || (freecam->isEnabled() && freecam->cancelPackets) || speed->needblink) {
-		if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>()) {
+		if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() || packet->isInstanceOf<C_PlayerActionPacket>()) {
 			if (blinkMod->isEnabled()) {
 				if (packet->isInstanceOf<C_MovePlayerPacket>()) {
 					C_MovePlayerPacket* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet); movePacket->onGround = true;
 					blinkMod->getMovePlayerPacketHolder()->push_back(new C_MovePlayerPacket(*movePacket));
 				}
-				else blinkMod->getPlayerAuthInputPacketHolder()->push_back(new PlayerAuthInputPacket(*reinterpret_cast<PlayerAuthInputPacket*>(packet)));
+				if (packet->isInstanceOf<PlayerAuthInputPacket>()) blinkMod->getPlayerAuthInputPacketHolder()->push_back(new PlayerAuthInputPacket(*reinterpret_cast<PlayerAuthInputPacket*>(packet)));
+				else blinkMod->getPlayerActionPacketHolder()->push_back(new C_PlayerActionPacket(*reinterpret_cast<C_PlayerActionPacket*>(packet)))
 				return;
 			}
 		}
@@ -1011,6 +1012,15 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 				it = nullptr;
 			}
 			blinkMod->getPlayerAuthInputPacketHolder()->clear();
+			return;
+		}
+		if (blinkMod->getPlayerActionPacketHolder()->size() > 0) {
+			for (auto it : *blinkMod->getPlayerActionPacketHolder()) {
+				oFunc(a, (it));
+				delete it;
+				it = nullptr;
+			}
+			blinkMod->getPlayerActionPacketHolder()->clear();
 			return;
 		}
 	}
