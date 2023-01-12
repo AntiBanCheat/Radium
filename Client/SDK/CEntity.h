@@ -773,7 +773,7 @@ public:
 	virtual __int64 getCommandPermissionLevel(void);                                        // 204
 	virtual bool isClientSide(void);                                                        // 205
 	virtual class AttributeInstance* getMutableAttribute(class Attribute* Attribute);
-	virtual __int64 getAttribute(int*) const;                                      // 207
+	virtual class AttributeInstance* getAttribute(class Attribute Attribute);    
 	virtual __int64 getDeathTime(void);                                             // 208
 	virtual __int64 heal(int);                                                      // 209
 	virtual bool isInvertedHealAndHarm(void);                                       // 210
@@ -1012,14 +1012,20 @@ public:
 	}
 
 	float getHealth() {
-		static int* healthAttribute = 0x0;
+	
+		auto health = getAttribute(25769804032);
+		return health->currentValue;
+	}
 
-		if (healthAttribute == 0x0) {
-			uintptr_t sigOffset = FindSignature("48 8D 15 ?? ?? ?? ?? FF 90 ?? ?? ?? ?? F3 ?? ?? 88 ?? ?? ?? ?? 85 C9 7E ??");
-			healthAttribute = (int*)(sigOffset + (*(int*)(sigOffset + 3)) + 7);
-		}
+	float getAbsorption() {
 
-		return *(float*)(getAttribute(healthAttribute) + 0x84);
+		auto health = getAttribute(55834575105);
+		return health->currentValue;
+	}
+	float getMaximumHealth() {
+
+		auto health = getAttribute(25769804032);
+		return health->maximumValue;
 	}
 };
 #pragma pack(pop)
@@ -1079,7 +1085,6 @@ public:
 	virtual __int64 getCurrentStructureFeature(void);                                                    // 370
 	virtual bool isAutoJumpEnabled(void);       // 371
 	virtual __int64 respawn(void);                                                                       // 372
-	virtual  __int64  getAbsorption(void);
 	virtual __int64 resetRot(void);                                                                      // 373
 	virtual __int64 resetPos(bool);                                                                      // 374
 	virtual bool isInTrialMode(void);                                                                    // 375
