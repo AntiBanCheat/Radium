@@ -1077,8 +1077,9 @@ public:
 	virtual __int64 setName(TextHolder*);                                                               // 368
 	virtual __int64 checkMovementStats(vec3_t const&);                                                  // 369
 	virtual __int64 getCurrentStructureFeature(void);                                                    // 370
-	virtual bool isAutoJumpEnabled(void);                                                                // 371
+	virtual bool isAutoJumpEnabled(void);       // 371
 	virtual __int64 respawn(void);                                                                       // 372
+	virtual  __int64  getAbsorption(void);
 	virtual __int64 resetRot(void);                                                                      // 373
 	virtual __int64 resetPos(bool);                                                                      // 374
 	virtual bool isInTrialMode(void);                                                                    // 375
@@ -1190,6 +1191,7 @@ public:
 
 	void applyTurnDelta(vec2_t* viewAngleDelta);
 	void setGameModeType(int gma);
+
 
 	auto getSwingState() {
 		static unsigned int offset = *reinterpret_cast<int*>(FindSignature("80 BB ? ? ? ? 00 74 1A FF 83") + 2);
