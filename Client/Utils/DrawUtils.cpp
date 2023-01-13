@@ -433,16 +433,28 @@ void DrawUtils::drawSystemImage(std::string filePath, vec2_t& imagePos, vec2_t& 
 }
 
 void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, bool useUnicodeFont) {
+	static auto nameTagsMod = moduleMgr->getModule<NameTags>();
 	vec2_t textPos;
 	vec4_t rectPos;
 	std::string text = ent->getNameTag()->getText();
 	text = Utils::sanitize(text);
 	text = text.substr(0, text.find('\n'));
 
+	if (nameTagsMod->health) {
+		int dmg;
+		int maxHealth = 20;
+		float green = (maxHealth - (float)ent->getHealth()) / maxHealth;
+		float red = 1.0f - green;
+		dmg = (int)(red * 100.0f);
+		text = text + " | " + std::to_string(dmg) + "%";
+	}
+
 	float textWidth = getTextWidth(&text, textSize);
 	float textHeight = DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight() * textSize;
 
 	if (refdef->OWorldToScreen(origin, ent->eyePos0.add(0, 0.5f, 0), textPos, fov, screenSize)) {
+		auto i = ColorUtil::interfaceColor(1);
+
 		textPos.y -= textHeight;
 		textPos.x -= textWidth / 2.f;
 		rectPos.x = textPos.x - 1.f * textSize;
@@ -453,12 +465,12 @@ void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, boo
 		subRectPos.y = subRectPos.w - 1.f * textSize;
 		auto nametagsMod = moduleMgr->getModule<NameTags>();
 		fillRoundRectangle(rectPos, MC_Color(0, 0, 0, nametagsMod->opacity), false);
-		if (nametagsMod->underline) {
-			fillRectangle(subRectPos, MC_Color(255, 255, 255), 1.f);
+		if (nametagsMod->health) {
+			float health = ent->getHealth();
+			subRectPos.z = textPos.x + ((textWidth) / 20) * health;
+			fillRectangle(subRectPos, i, 1.f);
 		}
 		drawText(textPos, &text, MC_Color(255, 255, 255), textSize, 1.f, true);
-
-		static auto nameTagsMod = moduleMgr->getModule<NameTags>();
 
 		if (ent->getEntityTypeId() == 319 && nameTagsMod->displayArmor) { // animals dont hav amor :rage:
 			auto* player = reinterpret_cast<C_Player*>(ent);
