@@ -10,7 +10,8 @@ public:
 	bool displayArmor = true;
 	bool underline = true;
 	int opacity = 150;
-
+	bool health = true;
+         
 	bool* ingameNametagSetting = nullptr;
 	bool gotPrevSetting = false;
 	bool lastSetting = true;
