@@ -2,11 +2,13 @@
 #include "../pch.h"
 
 Blink::Blink() : IModule(0, Category::PLAYER, "Lags you server-sided") {
+	registerBoolSetting("AllPackets", &allpackets, allpackets);
 }
 
 Blink::~Blink() {
 	getMovePlayerPacketHolder()->clear();
 	getPlayerAuthInputPacketHolder()->clear();
+	getPacketHolder()->clear();
 }
 
 const char* Blink::getModuleName() {
