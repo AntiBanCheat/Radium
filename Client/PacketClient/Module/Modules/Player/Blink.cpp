@@ -8,6 +8,7 @@ Blink::Blink() : IModule(0, Category::PLAYER, "Lags you server-sided") {
 Blink::~Blink() {
 	getMovePlayerPacketHolder()->clear();
 	getPlayerAuthInputPacketHolder()->clear();
+	getPlayerActionPacketHolder()->clear();
 	getPacketHolder()->clear();
 }
 
