@@ -1,8 +1,8 @@
-#include "TargetHUD.h"
+#include "CelsiusHUD.h"
 #include "../pch.h"
 
 using namespace std;
-TargetHUD::TargetHUD() : IModule(0, Category::VISUAL, "Displays information about your target") {
+CelsiusHUD::CelsiusHUD() : IModule(0, Category::VISUAL, "Displays information about your target") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("New", 0);
 	mode.addEntry("Old", 1);
@@ -16,17 +16,17 @@ TargetHUD::TargetHUD() : IModule(0, Category::VISUAL, "Displays information abou
 	registerBoolSetting("Animation", &animation, animation);
 	registerBoolSetting("Items", &showItems, showItems);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
-	registerIntSetting("RiseQuality", &RiseQuality, RiseQuality, 1, 20);
+	registerIntSetting("RiseQuality", &RiseQuality, RiseQuality, 1, 100);
 }
 
-const char* TargetHUD::getModuleName() { return ("TargetHUD"); }
+const char* CelsiusHUD::getModuleName() { return ("CelsiusHUD"); }
 
 #pragma region TargetList
 static bool entityChanged = false;
 static vector<C_Entity*> targetList;
-void findPlayers_TargetHUD(C_Entity* currentEntity, bool isRegularEntity) {
+void findPlayers_CelsiusHUD(C_Entity* currentEntity, bool isRegularEntity) {
 	if (currentEntity == nullptr) return;
-	if (currentEntity == g_Data.getLocalPlayer()) return;
+//	if (currentEntity == g_Data.getLocalPlayer()) return;
 	if (!g_Data.getLocalPlayer()->canAttack(currentEntity, false)) return;
 	if (!g_Data.getLocalPlayer()->isAlive()) return;
 	if (!currentEntity->isAlive()) return;
@@ -47,9 +47,9 @@ struct CompareTargetEnArray {
 };
 #pragma endregion
 
-void TargetHUD::onTick(C_GameMode* gm) {
+void CelsiusHUD::onTick(C_GameMode* gm) {
 	targetList.clear();
-	g_Data.forEachEntity(findPlayers_TargetHUD);
+	g_Data.forEachEntity(findPlayers_CelsiusHUD);
 	targetListEmpty = targetList.empty();
 	sort(targetList.begin(), targetList.end(), CompareTargetEnArray());
 
@@ -64,7 +64,7 @@ void TargetHUD::onTick(C_GameMode* gm) {
 	}
 }
 
-void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
+void CelsiusHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 
@@ -117,11 +117,11 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
-					if (showItems) testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 16.3f, positionY + defaultRectHeight);
+					if (showItems) testRect = vec4_t(positionX, positionY, targetLen + positionX + 16.3f, positionY + defaultRectHeight + 10.5);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), false);
-					vec4_t healthRect = vec4_t(testRect.x + 39, testRect.y + 32, testRect.x + ((targetLen - 4) / 20) * health, testRect.y + 34);
-					if (showItems) healthRect = vec4_t(testRect.x + 4, testRect.y + 44, testRect.x + ((targetLen - 4) / 20) * health, testRect.y + 47);
+					vec4_t healthRect = vec4_t(testRect.x + 39, testRect.y + 32, testRect.x + ((targetLen + 8.5) / 20) * health, testRect.y + 34);
+					if (showItems) healthRect = vec4_t(testRect.x + 4, testRect.y + 44, testRect.x + ((targetLen + 8.5) / 20) * health, testRect.y + 47);
 					if (targetList[0]->damageTime > 1) {
 						DrawUtils::drawRectangle(healthRect, MC_Color(255, 0, 0), 0.3f);
 						DrawUtils::fillRectangleA(healthRect, MC_Color(255, 0, 0, steveOpacity));
@@ -130,10 +130,10 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 						DrawUtils::drawRectangle(healthRect, MC_Color(0, 255, 0), 0.3);
 						DrawUtils::fillRectangleA(healthRect, MC_Color(0, 255, 0, 90));
 					}
-					vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + absorbtion * 4.f, testRect.y + 29);
-					if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + absorbtion * 4.f, testRect.y + 41);
-					vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + targetLen - 4.f, testRect.y + 30);
-					if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + targetLen - 4.f, testRect.y + 41);
+					vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + ((targetLen + 8.5) / 20), testRect.y + 29);
+					if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + ((targetLen + 8.5) / 20), testRect.y + 41);
+					vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + ((targetLen + 8.5) / 20), testRect.y + 30);
+					if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + ((targetLen + 8.5) / 20) * health, testRect.y + 41);
 					DrawUtils::fillRectangleA(absorbtionSubRect, MC_Color(25, 25, 25, 255));
 
 					if (absorbtion > 1.f) {
@@ -156,10 +156,10 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 16.5, positionY + defaultRectHeight);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
-					DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 2), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
-					vec4_t healthRect = vec4_t(testRect.x + 5, testRect.y + 38, testRect.x + ((targetLen - 4) / 20) * health, testRect.y + 40);
+					DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
+					vec4_t healthRect = vec4_t(testRect.x + 5, testRect.y + 38, testRect.x + ((targetLen + 10.5) / 20) * health, testRect.y + 40);
 					DrawUtils::fillRoundRectangle(healthRect, MC_Color(0, 255, 0, 100), true);
 				}
 
@@ -194,11 +194,11 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 16.5, positionY + defaultRectHeight);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
 					//DrawUtils::drawRoundRectangle(testRect, interfaceColor, 150);
 					DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 20 - size2, positionY + 17 - size2), vec2_t(size, size), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
-					vec4_t healthRect = vec4_t(testRect.x + 5, testRect.y + 38, testRect.x + ((targetLen - 4) / 20) * displayhealth, testRect.y + 40);
+					vec4_t healthRect = vec4_t(testRect.x + 5, testRect.y + 38, testRect.x + ((targetLen + 10.5) / 20) * displayhealth, testRect.y + 40);
 					DrawUtils::fillRoundRectangle(healthRect, interfaceColor, 255);
 					vec2_t healthTextPos = vec2_t(healthRect.x, healthRect.y + 1.f);
 					//DrawUtils::drawText(healthTextPos, &displaypercent, MC_Color(255, 255, 255), 1, 1, true);
@@ -238,7 +238,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, positionX + (targetLen * animationsize), positionY + ((defaultRectHeight - 11) * animationsize));
+					vec4_t testRect = vec4_t(positionX, positionY, positionX + (targetLen * animationsize), positionY + ((defaultRectHeight) * animationsize));
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
 					//DrawUtils::drawRoundRectangle(testRect, interfaceColor, 150);
 					DrawUtils::drawImage("textures/entity/alex.png", vec2_t(positionX + 20 - size2, positionY + 17 - size2), vec2_t(size, size), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
@@ -280,7 +280,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
 					DrawUtils::drawRoundRectangle(testRect, interfaceColor, 150);
 					/*if (targetList[0]->damageTime > 1) {
@@ -329,7 +329,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					rawName = rawName.substr(0, rawName.find('\n'));
 					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
 					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 19);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 7.f, positionY + defaultRectHeight);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
 					DrawUtils::drawRoundRectangle(testRect, interfaceColor, 150);
 					DrawUtils::drawOldSteve(vec4_t(positionX + 5.f, positionY + 2.f, positionX, positionY));
@@ -347,7 +347,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 				if (mode.getSelectedValue() == 3) { // novoline
 					float targetLen = 37.f + DrawUtils::getTextWidth(&targetName, 1);
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + novolineRectHeight);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 11.5f, positionY + novolineRectHeight + 10.f);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), false);
 					vec4_t healthRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + ((targetLen - 4) / 20) * health, testRect.y + 30);
 					vec2_t healthTextPos = vec2_t(healthRect.x, healthRect.y + 1.f);
@@ -374,7 +374,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					namestr = namestr.substr(0, namestr.find('\n'));
 					if (namestr.length() < position.length()) targetLen = DrawUtils::getTextWidth(&position, 1) + 6.5;
 					else targetLen = DrawUtils::getTextWidth(&namestr, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 10);
+					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX + 7.f, positionY + defaultRectHeight);
 					if (showItems) testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight * 2.5f);
 					DrawUtils::fillRectangleA(testRect, MC_Color(0, 0, 0, opacity));
 					vec4_t healthRect = vec4_t(testRect.x + 4, testRect.y + 30, testRect.x + targetLen - 4, testRect.y + 35);
