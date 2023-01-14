@@ -4,12 +4,11 @@
 #include "DrawUtils.h"
 
 MC_Color ColorUtil::rainbowColor(float seconds, float saturation, float brightness, long index) {
-	auto interface = moduleMgr->getModule<Interface>();
 	float hue6 = (((TimerUtil::getCurrentMs() + index) % (int)(6000)) / (float)(6000));
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
+	return MC_Color(r * 255, g * 255, b * 255, 255);
 }
 
 MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -26,11 +25,10 @@ MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, 
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
+	return MC_Color(redPart, greenPart, bluePart);
 }
 
 MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2, int blue2, long index) {
-	auto interface = moduleMgr->getModule<Interface>();
 	double offset = ((TimerUtil::getCurrentMs() - index) / 8) / (double)120;
 	double aids123 = ((TimerUtil::getCurrentMs() - index) % 1000 / 1000.000);
 	int aids1234 = ((TimerUtil::getCurrentMs() - index) % 2000 / 2000.000) * 2;
@@ -40,7 +38,7 @@ MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
+	return MC_Color(redPart, greenPart, bluePart);
 }
 
 MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
@@ -52,12 +50,12 @@ MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
+	return MC_Color(r * 255, g * 255, b * 255, 255);
 }
 
 MC_Color ColorUtil::interfaceColor(int index) {
 	auto i = moduleMgr->getModule<Interface>();
-	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, i->opacity);
+	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
 
 	switch (i->color.getSelectedValue()) {
 	case 0: color = ColorUtil::rainbowColor(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
