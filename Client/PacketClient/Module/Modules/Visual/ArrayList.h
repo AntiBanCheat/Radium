@@ -16,7 +16,7 @@ public:
 	bool invert = false;
 	bool modes = true;
 	bool keybinds = false;
-
+	bool backgroundsync = false;
 	// Positions
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 	float positionX = windowSize.x;
