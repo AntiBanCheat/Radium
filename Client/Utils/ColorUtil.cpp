@@ -26,10 +26,11 @@ MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, 
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart);
+	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
 }
 
 MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2, int blue2, long index) {
+	auto interface = moduleMgr->getModule<Interface>();
 	double offset = ((TimerUtil::getCurrentMs() - index) / 8) / (double)120;
 	double aids123 = ((TimerUtil::getCurrentMs() - index) % 1000 / 1000.000);
 	int aids1234 = ((TimerUtil::getCurrentMs() - index) % 2000 / 2000.000) * 2;
@@ -39,7 +40,7 @@ MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart);
+	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
 }
 
 MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
