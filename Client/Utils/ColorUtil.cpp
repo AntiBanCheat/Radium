@@ -4,11 +4,12 @@
 #include "DrawUtils.h"
 
 MC_Color ColorUtil::rainbowColor(float seconds, float saturation, float brightness, long index) {
+	auto interface = moduleMgr->getModule<Interface>();
 	float hue6 = (((TimerUtil::getCurrentMs() + index) % (int)(6000)) / (float)(6000));
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, 255);
+	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
 }
 
 MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -50,12 +51,12 @@ MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, 255);
+	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
 }
 
 MC_Color ColorUtil::interfaceColor(int index) {
 	auto i = moduleMgr->getModule<Interface>();
-	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
+	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, i->opacity);
 
 	switch (i->color.getSelectedValue()) {
 	case 0: color = ColorUtil::rainbowColor(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
