@@ -36,6 +36,9 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerEnumSetting("TYPE", &type, 0);
 	type.addEntry("Normal", 0);
 	type.addEntry("Fake", 1);
+	registerEnumSetting("Priority", &priority, 0);
+	priority.addEntry("Normal", 0);
+	priority.addEntry("Largest", 1);
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
@@ -665,21 +668,61 @@ bool Scaffold::predictBlock(vec3_t blockBelow) {
 bool Scaffold::selectBlock() {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
-	float have = 0;
-	int slot = supplies->selectedHotbarSlot;
-	for (int n = 0; n < 9; n++) {
-		C_ItemStack* stack = inv->getItemStack(n);
-		if (stack->item != nullptr &&  (*stack->item)->isBlock()) {
-			float currentHave = stack->count;
-			if (currentHave > have) {
-				have = currentHave;
-				supplies->selectedHotbarSlot = n;
+	auto prevSlot = supplies->selectedHotbarSlot;
+	if (spoof) {
+		for (int n = 0; n < 9; n++) {
+			C_ItemStack* stack = inv->getItemStack(n);
+			C_ItemStack* fakestack = inv->getItemStack(slot);
+			if (stack->item != nullptr) {
+				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
+					if (prevSlot != n) {
+						supplies->selectedHotbarSlot = n;
+						/*__int64 id = *g_Data.getLocalPlayer()->getUniqueId();
+						C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+						C_Inventory* inv = supplies->inventory;
+						if (type.getSelectedValue() == 1) {
+							C_MobEquipmentPacket a(id, *g_Data.getLocalPlayer()->getSelectedItem(), n, n);
+							g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&a);
+						}*/
+					}
+					return true;
+				}
+			}
+		}
+	}
+	else {
+		if (priority.getSelectedValue() == 0) {
+			for (int n = 0; n < 9; n++) {
+				C_ItemStack* stack = inv->getItemStack(n);
+				if (stack->item != nullptr) {
+					if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
+						if (prevSlot != n)
+							supplies->selectedHotbarSlot = n;
+						return true;
+					}
+				}
+			}
+		}
+		else
+		{
+			{
+				int currentSlot = 0;
+				int CurrentBlockCount = 0;
+				for (int n = 0; n < 9; n++) {
+					C_ItemStack* stack = inv->getItemStack(n);
+					if (stack->item != nullptr) {
+						int currentstack = stack->count;
+						if (currentstack > CurrentBlockCount && stack->getItem()->isBlock() && isUsefulBlock(stack)) {
+							CurrentBlockCount = currentstack;
+							currentSlot = n;
+						}
+					}
+				}
+				supplies->selectedHotbarSlot = currentSlot;
 				return true;
 			}
 		}
 	}
-	
-	
 	return false;
 }
 
