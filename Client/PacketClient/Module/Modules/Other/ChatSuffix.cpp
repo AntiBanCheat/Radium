@@ -16,7 +16,7 @@ void ChatSuffix::onSendPacket(C_Packet* packet) {
 		std::string Sentence;
 		std::string end;
 
-		end = " | Radium";
+		end = " | Radium Client";
 		Sentence = funy->message.getText() + end;
 		funy->message.resetWithoutDelete();
 		funy->message = Sentence;
