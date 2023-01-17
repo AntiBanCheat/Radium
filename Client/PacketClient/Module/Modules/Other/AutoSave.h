@@ -4,7 +4,7 @@
 
 class AutoSave : public IModule {
 public:
-    std::string name = "AutoSave";
+    SettingEnum when = this;
     virtual void onTick(C_GameMode* gm);
     virtual const char* getModuleName();
     virtual void onEnable();
