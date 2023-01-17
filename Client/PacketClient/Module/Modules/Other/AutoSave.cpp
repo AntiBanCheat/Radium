@@ -1,8 +1,8 @@
 #include "AutoSave.h"
 
-using namespace std;
 AutoSave::AutoSave() : IModule(0, Category::OTHER, "Automatically save config") {
-  
+    registerEnumSetting("When", &when, 0);
+    server.addEntry("CloseClickGUI", 0);
 }
 
 const char* AutoSave::getModuleName() {
