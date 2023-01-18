@@ -50,6 +50,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerFloatSetting("Extend", &extend, extend, 0, 20);
+	registerIntSetting("Delay", &delay, delay, 0, 20);
 	registerBoolSetting("ZipLine", &zipline, zipline);
 }
 
@@ -196,58 +197,70 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		if (!jumping && velocityxz >= 0.01) {
-			for (int i = 0; i <= currExtend; i++) {
-				int tempx = vel.x * i;
-				int tempz = vel.z * i;
+		if (!jumping && velocityxz >= 0.01) 
+		{
+			for (int i = 0; i <= currExtend; i++) 
+			{
+				Odelay++;
+				if (Odelay > delay) 
+				{
+					int tempx = vel.x * i;
+					int tempz = vel.z * i;
 
-				vec3_t temp = blockBelow;
-				temp.x += tempx;
-				temp.z += tempz;
-				if (!placed.empty()) {
-					bool skip = false;
-					for (auto& i : placed) {
-						if (i == temp) {
-							skip = true;
+					vec3_t temp = blockBelow;
+					temp.x += tempx;
+					temp.z += tempz;
+					if (!placed.empty()) 
+					{
+						bool skip = false;
+						for (auto& i : placed) 
+						{
+							if (i == temp) 
+							{
+								skip = true;
+							}
+						}
+
+						if (skip) 
+						{
+							clientMessageF("Skipped due same block");
+							continue;
 						}
 					}
-
-					if (skip) {
-						clientMessageF("Skipped due same block");
-						continue;
+					if (isBlockReplacable(temp)) predictBlock(temp);
+					else if (buildBlock(temp)) 
+					{
+						placed.push_back(temp);
+						clientMessageF("Breaked due placed");
+						break;
 					}
-				}
-
-				if (isBlockReplacable(temp)) predictBlock(temp);
-				else if (buildBlock(temp)) {
-					placed.push_back(temp);
-					clientMessageF("Breaked due placed");
-					break;
+					Odelay = 0;
 				}
 			}
 
-			placed.clear();
-		}
-		else {
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else buildBlock(blockBelow);
-		}
-
-		/*
+		placed.clear();
+	    }
+	    else 
+		{
 		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-		else if (!buildBlock(blockBelow)) {
-			if (velocityxz > 0.f) {  // Are we actually walking?
-				blockBelow.x -= vel.x;
-				blockBelow.z -= vel.z;
-				if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-					blockBelow.x += vel.x;
-					blockBelow.z += vel.z;
-					buildBlock(blockBelow);
-				}
+		else buildBlock(blockBelow);
+	    }
+
+	/*
+	if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+	else if (!buildBlock(blockBelow)) {
+		if (velocityxz > 0.f) {  // Are we actually walking?
+			blockBelow.x -= vel.x;
+			blockBelow.z -= vel.z;
+			if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+				blockBelow.x += vel.x;
+				blockBelow.z += vel.z;
+				buildBlock(blockBelow);
 			}
 		}
-		*/
 	}
+	*/
+}
 	oldpos = blockBelow.floor();
 
 	if (!sprint) { gm->player->setSprinting(false); sprintMod->useSprint = false; }
