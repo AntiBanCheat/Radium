@@ -686,7 +686,7 @@ bool Scaffold::selectBlock() {
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			C_ItemStack* fakestack = inv->getItemStack(slot);
-			if (stack->item != nullptr) {
+			if (stack->item != nullptr &&  (*stack->item)->isBlock()) {
 				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
 					if (prevSlot != n) {
 						supplies->selectedHotbarSlot = n;
