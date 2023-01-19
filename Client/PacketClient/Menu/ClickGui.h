@@ -7,6 +7,8 @@
 #include "../../Utils/DrawUtils.h"
 #include "../../Utils/GuiUtils.h"
 #include "../Module/ModuleManager.h"
+#include "../Config/ConfigManager.h"
+#include "../Config/SettingManager.h"
 
 struct ClickModule {
 	bool isExtended = false;
