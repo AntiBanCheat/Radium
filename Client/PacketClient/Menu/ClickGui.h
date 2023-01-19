@@ -93,4 +93,5 @@ public:
 	static void onWheelScroll(bool direction); // true = up, false = down
 	static void onLoadConfig(void* confVoid);
 	static void onSaveConfig(void* confVoid);
+	virtual void onDisable() override;
 };
