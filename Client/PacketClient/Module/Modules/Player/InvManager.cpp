@@ -225,6 +225,11 @@ void InvManager::onTick(C_GameMode* gm) {
 		if (Odelay > delay) {
 			if (!dropSlots.empty()) {
 				for (int i : dropSlots) {
+					if (mode.getSelectedValue() == 1)
+					{
+						player->velocity.x = 0;
+						player->velocity.z = 0;
+					}
 					player->getSupplies()->inventory->dropSlot(i);
 					dropSlots.push_back(i);
 					Odelay = 0;
