@@ -27,6 +27,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("HiveSlow", 3);
 	tower.addEntry("Fast", 4);
 	tower.addEntry("None", 4);
+	tower.addEntry("Flareon", 6);
 	registerEnumSetting("Down", &downwards, 0);
 	downwards.addEntry("Vanilla", 0);
 	downwards.addEntry("None", 1);
@@ -370,6 +371,15 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 
 			}
 			break;
+			case 5: //FlareonTower
+			if (player) {
+				vec3_t myPos = *player->getPos();
+				myPos.y += 0.61;
+				player->setPos(myPos);
+				moveVec.y = 0.01;
+				g_Data.getLocalPlayer()->lerpMotion(moveVec);
+				break;
+			}
 		case 4: // Fast
 			if (player->onGround) {
 				player->jumpFromGround();
