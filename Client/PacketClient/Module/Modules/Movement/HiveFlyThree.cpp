@@ -7,11 +7,12 @@ HiveFlyThree::HiveFlyThree() : IModule(0, Category::MOVEMENT, "Turkey go falling
 	//registerBoolSetting("TimerBoost", &this->timerMode, this->timerMode);
 	registerBoolSetting("TimerBoost", &this->timerMode, this->timerMode);
 	//registerBoolSetting("Strafe", &this->strafeMode, this->strafeMode);
+	registerBoolSetting("BlinkMode", &this->blinkMode, this->blinkMode);
 	registerBoolSetting("Boost", &this->boostMode, this->boostMode);
-	//registerBoolSetting("Old", &this->oldMode, this->oldMode);
+	registerBoolSetting("Old", &this->oldMode, this->oldMode);
 	registerFloatSetting("Value", &this->speed2, this->speed2, -0.02f, 0.f);
 	registerFloatSetting("Speed", &this->speedA, this->speedA, 0.10f, 1.f);
-	registerIntSetting("Boost", &this->timer, this->timer, 10.f, 500.f);
+	registerIntSetting("Boost", &this->timer, this->timer, 1.f, 500.f);
 }
 
 HiveFlyThree::~HiveFlyThree() {
@@ -25,7 +26,7 @@ void HiveFlyThree::onEnable() {
 	{
 		auto player = g_Data.getLocalPlayer();
 		player->animateHurt();
-		stepMod->height = 0.5625f;
+		//stepMod->height = 0.5625f;
 		if (boostMode) {
 			*g_Data.getClientInstance()->minecraft->timer = static_cast<float>(this->timer);
 		}
@@ -126,16 +127,12 @@ void HiveFlyThree::onTick(C_GameMode* gm) {
 	if (scaffoldMod->isEnabled()) {
 		scaffoldMod->setEnabled(false);
 	}
-	auto bhopMod = moduleMgr->getModule<Bhop>();
+	auto bhopMod = moduleMgr->getModule<Speed>();
 	if (bhopMod->isEnabled()) {
 		bhopMod->setEnabled(false);
 	}
 	if (timerMode) {
-		//*g_Data.getClientInstance()->minecraft->timer = 20.f;
-		auto dmgMod = moduleMgr->getModule<TestModule>();
-		if (dmgMod->isEnabled()) {
-			dmgMod->setEnabled(false);
-		}
+
 		C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
 	}
 	if (oldMode && GameData::isKeyDown(*input->sneakKey)) {
@@ -262,7 +259,7 @@ void HiveFlyThree::onDisable() {
 	}
 	auto stepMod = moduleMgr->getModule<Step>();
 	{
-		stepMod->height = 1.5f;
+		//stepMod->height = 1.5f;
 
 		if (timerMode) {
 			*g_Data.getClientInstance()->minecraft->timer = 20.f;
