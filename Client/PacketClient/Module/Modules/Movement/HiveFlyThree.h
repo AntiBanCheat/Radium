@@ -1,6 +1,6 @@
 #pragma once
 #include "Module.h"
-class HiveFly : public IModule {
+class HiveFlyThree : public IModule {
 private:
 public:
 	int testTimer = 0;
@@ -24,8 +24,8 @@ public:
 	float Up = .01;
 	float UpSpeed = 0.1;
 	float Test = 0.005f;
-	HiveFly();
-	~HiveFly();
+	HiveFlyThree();
+	~HiveFlyThree();
 
 	// Inherited via IModule
 	virtual const char* getModuleName() override;
