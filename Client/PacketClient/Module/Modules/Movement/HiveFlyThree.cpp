@@ -1,8 +1,8 @@
-#include "HiveFly.h"
+#include "HiveFlyThree.h"
 
 #include "../../Module/ModuleManager.h"
 
-HiveFly::HiveFly() : IModule(0, Category::MOVEMENT, "Turkey go falling off cliff wee!1!1!!") {
+HiveFlyThree::HiveFlyThree() : IModule(0, Category::MOVEMENT, "Turkey go falling off cliff wee!1!1!!") {
 	//registerFloatSetting("Little SHIT", &this->Test, this->Test, 1.f, 50.f);
 	//registerBoolSetting("TimerBoost", &this->timerMode, this->timerMode);
 	registerBoolSetting("TimerBoost", &this->timerMode, this->timerMode);
@@ -14,13 +14,13 @@ HiveFly::HiveFly() : IModule(0, Category::MOVEMENT, "Turkey go falling off cliff
 	registerIntSetting("Boost", &this->timer, this->timer, 10.f, 500.f);
 }
 
-HiveFly::~HiveFly() {
+HiveFlyThree::~HiveFlyThree() {
 }
 
-const char* HiveFly::getModuleName() {
-	return "HiveFly";
+const char* HiveFlyThree::getModuleName() {
+	return "HiveFlyThree";
 }
-void HiveFly::onEnable() {
+void HiveFlyThree::onEnable() {
 	auto stepMod = moduleMgr->getModule<Step>();
 	{
 		auto player = g_Data.getLocalPlayer();
@@ -30,7 +30,7 @@ void HiveFly::onEnable() {
 			*g_Data.getClientInstance()->minecraft->timer = static_cast<float>(this->timer);
 		}
 		if (damageMode) {
-			auto hfMod = moduleMgr->getModule<HiveFly>();
+			auto hfMod = moduleMgr->getModule<HiveFlyThree>();
 			if (hfMod->isEnabled()) {
 				hfMod->setEnabled(false);
 			}
@@ -68,11 +68,11 @@ void HiveFly::onEnable() {
 	}
 }
 
-bool HiveFly::isFlashMode() {
+bool HiveFlyThree::isFlashMode() {
 	return false;
 }
 
-void HiveFly::onTick(C_GameMode* gm) {
+void HiveFlyThree::onTick(C_GameMode* gm) {
 	if (counter == 5) {
 		counter = 0;
 	} else {
@@ -153,7 +153,7 @@ void HiveFly::onTick(C_GameMode* gm) {
 		}
 		gm->player->velocity.y = glideModEffective;
 		*g_Data.getClientInstance()->minecraft->timer = 20.f;
-		auto hfMod = moduleMgr->getModule<HiveFly>();
+		auto hfMod = moduleMgr->getModule<HiveFlyThree>();
 		{
 			//hfMod->timerMode = false;
 			hfMod->boostMode = false;
@@ -164,7 +164,7 @@ void HiveFly::onTick(C_GameMode* gm) {
 	}
 }
 
-void HiveFly::onMove(C_MoveInputHandler* input) {
+void HiveFlyThree::onMove(C_MoveInputHandler* input) {
 	if (boostMode) {
 		auto player = g_Data.getLocalPlayer();
 		vec2_t moveVec2d = {input->forwardMovement, -input->sideMovement};
@@ -249,7 +249,7 @@ void HiveFly::onMove(C_MoveInputHandler* input) {
 	*/
 }
 
-void HiveFly::onDisable() {
+void HiveFlyThree::onDisable() {
 	if (blinkMode) {
 		auto blinkMod = moduleMgr->getModule<Blink>();
 		blinkMod->setEnabled(false);
