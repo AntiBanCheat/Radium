@@ -2,20 +2,19 @@
 #include "pch.h"
 
 ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that displays every module") {
-	registerEnumSetting("Theme", &theme, 1);
+	registerEnumSetting("Theme", &theme, 5);
 	theme.addEntry("PacketV2", 0);
 	theme.addEntry("Vape", 1);
 	theme.addEntry("Astolfo", 2);
 	theme.addEntry("PacketOld", 3);
 	theme.addEntry("Tenacity", 4);
-	theme.addEntry("TANA", 5);
-	//theme.addEntry("TANA2", 6); //Broken Click GUI
-	registerEnumSetting("Color", &color, 2);
+	theme.addEntry("Rise", 5); //LOL I'm KaeruClient :cold: developed
+	registerEnumSetting("Color", &color, 0);
 	color.addEntry("Rainbow", 0);
 	color.addEntry("Astolfo", 1);
 	color.addEntry("Wave", 2);
 	color.addEntry("RGBWave", 3);
-	registerEnumSetting("Fonts", &Fonts, 3);
+	registerEnumSetting("Fonts", &Fonts, 0);
 	Fonts.addEntry("Mojangles", 0);
 	Fonts.addEntry("Notosans", 1);
 	Fonts.addEntry("TEN", 2);
