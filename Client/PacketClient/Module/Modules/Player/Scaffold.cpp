@@ -44,10 +44,10 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
 	registerBoolSetting("Visual", &this->showExposed, this->showExposed);
-	registerIntSetting("R", &this->expR, this->expR, 0, 255);
-	registerIntSetting("G", &this->expG, this->expG, 0, 255);
-	registerIntSetting("B", &this->expB, this->expB, 0, 255);
-	registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
+	//registerIntSetting("R", &this->expR, this->expR, 0, 255);
+	//registerIntSetting("G", &this->expG, this->expG, 0, 255);
+	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
+	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerFloatSetting("Extend", &extend, extend, 0, 20);
