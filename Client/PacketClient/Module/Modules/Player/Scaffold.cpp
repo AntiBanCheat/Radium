@@ -545,32 +545,68 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (player == nullptr) return;
 
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	vec4_t testRect = vec4_t(scX, scY, 25 + scX, scY + 16);
-	vec2_t textPos(testRect.x + 8, testRect.y + 8);
-	vec2_t blockPos(testRect.x + 5, testRect.y + 7);
+	if (clickGUI->Fonts.selected==1)
+	{
+		vec4_t testRect = vec4_t(scX, scY, 56 + scX, scY + 16);
+		vec2_t textPos(testRect.x + 20, testRect.y + 5);
+		vec2_t blockPos(testRect.x + 3, testRect.y + 7);
 
-	if (blockCount && !clickGUI->isEnabled()) {
-		C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
-		C_Inventory* inv = supplies->inventory;
-		int totalCount = 0;
+		if (blockCount && !clickGUI->isEnabled()) {
+			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+			C_Inventory* inv = supplies->inventory;
+			int totalCount = 0;
 
-		DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, 150), false);
-		for (int s = 0; s < 9; s++) {
-			C_ItemStack* stack = inv->getItemStack(s);
-			if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
-				if (stack->isValid()) DrawUtils::drawItem(stack, vec2_t(blockPos.x - 1, blockPos.y - 7), 1, 1, false);
-				totalCount += stack->count;
+			DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, 150), false);
+			for (int s = 0; s < 9; s++) {
+				C_ItemStack* stack = inv->getItemStack(s);
+				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
+					if (stack->isValid()) DrawUtils::drawItem(stack, vec2_t(blockPos.x - 1, blockPos.y - 7), 1, 1, false);
+					totalCount += stack->count;
+				}
 			}
-		}
 
-		string count = to_string(totalCount);
-		MC_Color color = MC_Color();
-		if (totalCount > 64) color = MC_Color(255, 255, 255);
-		if (totalCount < 64) color = MC_Color(255, 255, 20);
-		if (totalCount < 32) color = MC_Color(255, 196, 0);
-		if (totalCount < 16) color = MC_Color(252, 62, 62);
-		if (totalCount < 1) color = MC_Color(255, 0, 0);
-		DrawUtils::drawText(vec2_t(textPos), &count, color, 1.f, true);
+			string count = to_string(totalCount);
+			string text = count + " blocks";
+			MC_Color color = MC_Color();
+			if (totalCount > 64) color = MC_Color(255, 255, 255);
+			if (totalCount < 64) color = MC_Color(255, 255, 20);
+			if (totalCount < 32) color = MC_Color(255, 196, 0);
+			if (totalCount < 16) color = MC_Color(252, 62, 62);
+			if (totalCount < 1) color = MC_Color(255, 0, 0);
+			DrawUtils::drawText(vec2_t(textPos), &text, color, 1.f, true);
+		}
+	}
+	else
+	{
+		vec4_t testRect = vec4_t(scX, scY, 70 + scX, scY + 16);
+		vec2_t textPos(testRect.x + 20, testRect.y + 5);
+		vec2_t blockPos(testRect.x + 3, testRect.y + 7);
+
+		if (blockCount && !clickGUI->isEnabled()) {
+			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+			C_Inventory* inv = supplies->inventory;
+			int totalCount = 0;
+
+			DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, 150), false);
+			for (int s = 0; s < 9; s++) {
+				C_ItemStack* stack = inv->getItemStack(s);
+				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
+					if (stack->isValid()) DrawUtils::drawItem(stack, vec2_t(blockPos.x - 1, blockPos.y - 7), 1, 1, false);
+					totalCount += stack->count;
+				}
+			}
+
+			string count = to_string(totalCount);
+			string temp = "blocks";
+			MC_Color color = MC_Color();
+			if (totalCount > 64) color = MC_Color(255, 255, 255);
+			if (totalCount < 64) color = MC_Color(255, 255, 20);
+			if (totalCount < 32) color = MC_Color(255, 196, 0);
+			if (totalCount < 16) color = MC_Color(252, 62, 62);
+			if (totalCount < 1) color = MC_Color(255, 0, 0);
+			DrawUtils::drawText(vec2_t(textPos), &count, color, 1.f, true);
+			DrawUtils::drawText(vec2_t(textPos.x + 15, textPos.y), &temp, color, 1.f, true);
+	    }
 	}
 
 	if (showExposed) {
