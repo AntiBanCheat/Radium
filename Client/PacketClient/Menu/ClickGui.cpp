@@ -5725,7 +5725,7 @@ void ClickGui::renderNewCategory(Category category) {
 			}
 		}
 
-		vec4_t winRectPos = vec4_t(xOffset, yOffset, xEnd, surenobugY);
+		vec4_t winRectPos = vec4_t(xOffset, yOffset, xEnd * 1.7, surenobugY);
 
 		if (winRectPos.contains(&mousePos)) {
 			if (scrollingDirection > 0 && overflowing) ourWindow->yOffset += scrollingDirection;
