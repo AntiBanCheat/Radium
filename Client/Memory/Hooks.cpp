@@ -990,7 +990,7 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 					blinkMod->getMovePlayerPacketHolder()->push_back(new C_MovePlayerPacket(*movePacket));
 				}
 				if (packet->isInstanceOf<PlayerAuthInputPacket>()) blinkMod->getPlayerAuthInputPacketHolder()->push_back(new PlayerAuthInputPacket(*reinterpret_cast<PlayerAuthInputPacket*>(packet)));
-				else blinkMod->getPlayerActionPacketHolder()->push_back(new C_PlayerActionPacket(*reinterpret_cast<C_PlayerActionPacket*>(packet)))
+				else blinkMod->getPlayerActionPacketHolder()->push_back(new C_PlayerActionPacket(*reinterpret_cast<C_PlayerActionPacket*>(packet)));
 				return;
 			}
 		}
