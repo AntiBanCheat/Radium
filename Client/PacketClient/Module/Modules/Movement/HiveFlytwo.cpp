@@ -3,9 +3,10 @@
 HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does this bypass ?!?!?") {
 	registerFloatSetting("Speed", &speed, speed, .1f, 2.f);
 	registerFloatSetting("Height", &height, height, 0.f, 1.f);
-	registerIntSetting("Blinktime", &blinkTime, blinkTime, 0, 1000);
-	registerIntSetting("Dashtime", &dashTime, dashTime, 0, 1000);
-	registerBoolSetting("Blink", &blink, blink);
+	registerFloatSetting("ClipUp", &clipUp, clipUp, 0.f, 5.f);
+	registerIntSetting("DashTime", &dashTime, dashTime, 0, 1000);
+	registerIntSetting("BoostTime", &boostTime, boostTime, 0, 1000);
+	registerIntSetting("LockTime", &lockTime, lockTime, 0, 3000);
 }
 
 const char* HiveFlytwo::getModuleName() {
@@ -15,29 +16,31 @@ const char* HiveFlytwo::getModuleName() {
 
 void HiveFlytwo::onEnable() {
 	dashed = false;
+	auto player = g_Data.getLocalPlayer();
+	vec3_t myPos = *player->getPos();
+	myPos.y += clipUp;
+	player->setPos(myPos);
+	auto lock = moduleMgr->getModule<Freelook>();
+	lock->setEnabled(true);
+	auto aura = moduleMgr->getModule<Killaura>();
+	if (aura->isEnabled())
+	{
+		aurais = true;
+		aura->setEnabled(false);
+	}
+	Sleep(boostTime);
 }
 
 void HiveFlytwo::onTick(C_GameMode* gm) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
-	if (g_Data.canUseMoveKeys()) {
-		if (blink) {
-			auto blink = moduleMgr->getModule<Blink>();
-			if (TimerUtil::hasTimedElapsed(blinkTime, true)) {
-				blink->setEnabled(false);
-				blink->setEnabled(true);
-			}
-		}
-
-	}
 }
 
 void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 	vec3_t moveVec;
-
+	auto blink = moduleMgr->getModule<Blink>();
 	if (g_Data.canUseMoveKeys()) {
 		if (TimerUtil::hasTimedElapsed(dashTime, !blink) && !dashed) {
 			dashed = true;
@@ -67,9 +70,16 @@ void HiveFlytwo::onDisable() {
 	Utils::patchBytes((unsigned char*)ViewBobbing, (unsigned char*)"\x0F\xB6\x80\xDB\x01\x00\x00", 7);
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
 	auto speedMod = moduleMgr->getModule<Speed>();
-	auto blink = moduleMgr->getModule<Blink>();
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 	MoveUtil::fullStop(false);
-	blink->setEnabled(false);
+	auto lock = moduleMgr->getModule<Freelook>();
+	lock->setEnabled(false);
+	auto aura = moduleMgr->getModule<Killaura>();
+	if (aurais == true)
+	{
+		aura->setEnabled(true);
+		aurais = false;
+	}
+	Sleep(lockTime);
 }
