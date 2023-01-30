@@ -180,6 +180,12 @@ void Scaffold::onTick(C_GameMode* gm) {
 		blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
 		if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
 			if (velocityxz > 0.f) {
+				auto aura = moduleMgr->getModule<Killaura>();
+				if (aura->isEnabled())
+				{
+					aurais = true;
+					aura->setEnabled(false);
+				}
 				blockBelow15.z -= vel.z * 0.4f;
 				blockBelow15.z -= vel.z * 0.4f;
 				if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
@@ -195,11 +201,26 @@ void Scaffold::onTick(C_GameMode* gm) {
 					}
 				}
 			}
+			else
+			{
+				auto aura = moduleMgr->getModule<Killaura>();
+				if (aurais == true)
+				{
+					aura->setEnabled(true);
+					aurais = false;
+				}
+			}
 		}
 	}
 	else {
 		if (!jumping && velocityxz >= 0.01) 
 		{
+			auto aura = moduleMgr->getModule<Killaura>();
+			if (aura->isEnabled())
+			{
+				aurais = true;
+				aura->setEnabled(false);
+			}
 			for (int i = 0; i <= currExtend; i++) 
 			{
 				Odelay++;
@@ -243,6 +264,12 @@ void Scaffold::onTick(C_GameMode* gm) {
 	    }
 	    else 
 		{
+			auto aura = moduleMgr->getModule<Killaura>();
+			if (aurais == true)
+			{
+				aura->setEnabled(true);
+				aurais = false;
+			}
 		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 		else buildBlock(blockBelow);
 	    }
@@ -342,6 +369,12 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 	vec3_t moveVec;
 
 	if (jumping && foundBlock) {
+		auto aura = moduleMgr->getModule<Killaura>();
+		if (aura->isEnabled())
+		{
+			aurais = true;
+			aura->setEnabled(false);
+		}
 		//g_Data.getClientInstance()->minecraft->setTimerSpeed(towerTimer);
 		switch (tower.getSelectedValue()) {
 		case 0: // Vanilla
@@ -495,10 +528,6 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 	if (type.getSelectedValue() == 1 && spoof) {
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
-			if (stack->item != nullptr) {
-				EquipPacket->hotbarSlot = n;
-				if (EquipPacket->hotbarSlot = n) clientMessageF("Sended Packet");//test
-			}
 		}
 	}
 
@@ -550,29 +579,49 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 		vec4_t testRect = vec4_t(scX, scY, 56 + scX, scY + 16);
 		vec2_t textPos(testRect.x + 20, testRect.y + 5);
 		vec2_t blockPos(testRect.x + 3, testRect.y + 7);
-
 		if (blockCount && !clickGUI->isEnabled()) {
 			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 			C_Inventory* inv = supplies->inventory;
 			int totalCount = 0;
-
-			DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, 150), false);
+			for (int s = 0; s < 9; s++) {
+				C_ItemStack* stack = inv->getItemStack(s);
+				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
+					totalCount += stack->count;
+				}
+			}
+			if (totalCount > 99)
+			{
+				vec4_t testRect2 = vec4_t(scX, scY, 61 + scX, scY + 16);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+			}
+			else
+			{
+				vec4_t testRect2 = vec4_t(scX, scY, 56 + scX, scY + 16);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+			}
 			for (int s = 0; s < 9; s++) {
 				C_ItemStack* stack = inv->getItemStack(s);
 				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
 					if (stack->isValid()) DrawUtils::drawItem(stack, vec2_t(blockPos.x - 1, blockPos.y - 7), 1, 1, false);
-					totalCount += stack->count;
 				}
 			}
-
 			string count = to_string(totalCount);
 			string text = count + " blocks";
 			MC_Color color = MC_Color();
+			if (totalCount > 99) 
+			{
+				string text = count + "  blocks";
+			}
 			if (totalCount > 64) color = MC_Color(255, 255, 255);
 			if (totalCount < 64) color = MC_Color(255, 255, 20);
 			if (totalCount < 32) color = MC_Color(255, 196, 0);
 			if (totalCount < 16) color = MC_Color(252, 62, 62);
 			if (totalCount < 1) color = MC_Color(255, 0, 0);
+			if (totalCount == 0)
+			{
+				auto sca = moduleMgr->getModule<Scaffold>();
+				sca->setEnabled(false);
+			}
 			DrawUtils::drawText(vec2_t(textPos), &text, color, 1.f, true);
 		}
 	}
@@ -586,26 +635,46 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 			C_Inventory* inv = supplies->inventory;
 			int totalCount = 0;
-
-			DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, 150), false);
+			for (int s = 0; s < 9; s++) {
+				C_ItemStack* stack = inv->getItemStack(s);
+				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
+					totalCount += stack->count;
+				}
+			}
+			if (totalCount > 99)
+			{
+				vec4_t testRect2 = vec4_t(scX, scY, 76 + scX, scY + 16);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+			}
+			else
+			{
+				vec4_t testRect2 = vec4_t(scX, scY, 70 + scX, scY + 16);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+			}
 			for (int s = 0; s < 9; s++) {
 				C_ItemStack* stack = inv->getItemStack(s);
 				if (stack->item != nullptr && stack->getItem()->isBlock() && findBlocks(stack)) {
 					if (stack->isValid()) DrawUtils::drawItem(stack, vec2_t(blockPos.x - 1, blockPos.y - 7), 1, 1, false);
-					totalCount += stack->count;
 				}
 			}
-
 			string count = to_string(totalCount);
-			string temp = "blocks";
+			string text = count + " blocks";
 			MC_Color color = MC_Color();
+			if (totalCount > 99)
+			{
+				string text = count + "  blocks";
+			}
 			if (totalCount > 64) color = MC_Color(255, 255, 255);
 			if (totalCount < 64) color = MC_Color(255, 255, 20);
 			if (totalCount < 32) color = MC_Color(255, 196, 0);
 			if (totalCount < 16) color = MC_Color(252, 62, 62);
 			if (totalCount < 1) color = MC_Color(255, 0, 0);
-			DrawUtils::drawText(vec2_t(textPos), &count, color, 1.f, true);
-			DrawUtils::drawText(vec2_t(textPos.x + 15, textPos.y), &temp, color, 1.f, true);
+			if (totalCount == 0)
+			{
+				auto sca = moduleMgr->getModule<Scaffold>();
+				sca->setEnabled(false);
+			}
+			DrawUtils::drawText(vec2_t(textPos), &text, color, 1.f, true);
 	    }
 	}
 
@@ -731,19 +800,10 @@ bool Scaffold::selectBlock() {
 	if (spoof) {
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
-			C_ItemStack* fakestack = inv->getItemStack(slot);
-			if (stack->item != nullptr &&  (*stack->item)->isBlock()) {
+			if (stack->item != nullptr) {
 				if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-					if (prevSlot != n) {
+					if (prevSlot != n)
 						supplies->selectedHotbarSlot = n;
-						/*__int64 id = *g_Data.getLocalPlayer()->getUniqueId();
-						C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
-						C_Inventory* inv = supplies->inventory;
-						if (type.getSelectedValue() == 1) {
-							C_MobEquipmentPacket a(id, *g_Data.getLocalPlayer()->getSelectedItem(), n, n);
-							g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&a);
-						}*/
-					}
 					return true;
 				}
 			}
@@ -820,7 +880,12 @@ void Scaffold::onDisable() {
 	if (player == nullptr) return;
 
 	if (speedwasenabled) { speedMod->setEnabled(true); speedwasenabled = false; }
-
+	auto aura = moduleMgr->getModule<Killaura>();
+	if (aurais == true)
+	{
+		aura->setEnabled(true);
+		aurais = false;
+	}
 	if (tower.getSelectedValue() == 1 && foundBlock && jumping) player->velocity.y = 0.f;
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	supplies->selectedHotbarSlot = slot;
