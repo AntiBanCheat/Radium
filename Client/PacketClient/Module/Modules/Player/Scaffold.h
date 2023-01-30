@@ -41,6 +41,7 @@ private:
 	bool sneaking = false;
 	bool jumping = false;
 	bool oneDot12 = true;
+	bool aurais = false;
 
 	bool findBlocks(C_ItemStack* itemStack);
 	bool isUsefulBlock(C_ItemStack* itemStack);
