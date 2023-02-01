@@ -1079,6 +1079,20 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 				}
 			}
 		}
+		
+		//Sentinel
+		if (disabler->mode.getSelectedValue() == 7) {
+			if (packet->isInstanceOf<NetworkLatencyPacket>()) {
+				return;
+			}
+			if (packet->isInstanceOf<PlayerAuthInputPacket>()) {
+				for (int i = 0; i < 4; i++) {
+					moduleMgr->onSendPacket(packet);
+
+					oFunc(a, packet);
+				}
+			}
+		}
 
 		// Mineplex
 		if (disabler->mode.getSelectedValue() == 3) {
