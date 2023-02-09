@@ -87,8 +87,8 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new Bhop()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Step()));
 		//moduleList.push_back(std::shared_ptr<IModule>(new HiveFly()));
-		moduleList.push_back(std::shared_ptr<IModule>(new HiveFlytwo()));
 #ifdef _DEBUG
+		moduleList.push_back(std::shared_ptr<IModule>(new HiveFlytwo()));
 		moduleList.push_back(std::shared_ptr<IModule>(new HiveFly()));
 		moduleList.push_back(std::shared_ptr<IModule>(new KBFly()));
 #endif

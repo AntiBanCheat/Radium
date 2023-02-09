@@ -6945,12 +6945,18 @@ void ClickGui::onKeyUpdate(int key, bool isDown) {
 	}
 
 	if (isCapturingKey && !shouldStopCapturing) {
-		newKeybind = key;
+		if (VK_DELETE == key || VK_ESCAPE == key)
+			newKeybind = 0x0;
+		else
+			newKeybind = key;
 		shouldStopCapturing = true;
 	}
 
 	if (timesRendered < 1) return;
 	timesRendered = 0;
+
+	if (isCapturingKey)
+		return;
 
 	switch (key) {
 	case VK_ESCAPE:

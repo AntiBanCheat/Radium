@@ -604,25 +604,24 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			string remove = gray + "[-] " + string(RESET);
 			string fix = gray + "[*] " + string(RESET);
 
-			string changeLog = (gray + bold + string("Changelogs") + ": \n" + RESET +
+			string changeLog = (gray + bold + string("RadiumClient-Release") + ": \n" + RESET +
 				gray + bold + interfaceMod->versionStr + ": \n" + RESET +
-				gray + bold + "Scaffold: \n" + RESET +
-				fix + "Fixed Flareon rotation \n" +
-				add + "Added Visual \n" +
+				gray + bold + "Credits \n" + RESET +
+				fix + "Packet(dead) \n" +
+				fix + "Deq \n" +
+				fix + "Founder \n" +
+				fix + "Steve's Noob#2585 \n" +
+				fix + "NRG#4200 \n" +
+				fix + "z98#3636 \n" +
 				"\n" +
-				gray + bold + "Disabler: \n" + RESET +
-				fix + "Added HiveCombatTests \n" +
-				fix + "Swing is now server-sided \n" +
-				"\n" +
-				gray + bold + "Regen: \n" + RESET +
-				add + "Added Rotation mode \n" +
-				"\n" +
-				gray + bold + "Killaura: \n" + RESET +
-				add + "Added autosword \n" + 
-				fix + "Hive rotation and DesyncRot improvement \n" +
-				"\n" +
-				gray + bold + "Notification: \n" + RESET +
-				fix + "Fixed \n"
+				gray + bold + "Developers(Radium) \n" + RESET +
+				fix + "DarkNBTHax(cool) \n" +
+				fix + "KaeruKing(nice) \n" +
+				fix + "AntiBanCheat \n" +
+				fix + "As4r1 \n" +
+				fix + "giyo000 \n" +
+				fix + "SBreality \n" +
+				fix + "Ika286(lol) \n"
 				);
 
 			//float size = g_Data.getClientInstance()->getGuiData()->widthGame / g_Data.getClientInstance()->getGuiData()->heightGame - 1.7769f; // interesting

@@ -25,7 +25,7 @@ void AutoGG::onTick(C_GameMode* gm) {
 
     if (send) {
         C_TextPacket textPacket;
-        textPacket.message.setText("GG");
+        textPacket.message.setText("gg");
         textPacket.sourceName.setText(player->getNameTag()->getText());
         textPacket.xboxUserId = to_string(player->getUserId());
         g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&textPacket);
