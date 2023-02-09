@@ -8,7 +8,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	mode.addEntry("Hive", 5);
 	mode.addEntry("FlareonTest", 6);
 #if _DEBUG
-	maxRange = 7
+	maxRange = 7;
 #endif
 
 	registerFloatSetting("Range", &range, range, 1, maxRange);
