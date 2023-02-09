@@ -7,7 +7,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("Hive", 5);
 	mode.addEntry("FlareonTest", 6);
-	registerFloatSetting("Range", &range, range, 1, 7);
+	registerFloatSetting("Range", &range, range, 1, 3);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 }
 
@@ -54,7 +54,11 @@ void Regen::onEnable() {
 
 	animYawB = player->yawUnused1;
 	animPitchB = player->pitch;
-
+	if (range > 5)
+	{
+		clientMessageF("sry You don't have permission to use more than 5 ranges");
+		setEnabled(false);
+	}
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	slot = supplies->selectedHotbarSlot;
 }
