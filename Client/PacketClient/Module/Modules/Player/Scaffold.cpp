@@ -265,33 +265,37 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 			placed.clear();
 		}
-		else if (!(jumping || sneaking))
+		else
 		{
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else buildBlock(blockBelow);
+		}
+
+		if ((!(jumping || sneaking) && velocityxz <= 0.01) || !MoveUtil::isMoving) {
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aurais == true)
 			{
 				aura->setEnabled(true);
 				aurais = false;
 			}
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else buildBlock(blockBelow);
 		}
 
-	/*
-	if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-	else if (!buildBlock(blockBelow)) {
-		if (velocityxz > 0.f) {  // Are we actually walking?
-			blockBelow.x -= vel.x;
-			blockBelow.z -= vel.z;
-			if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-				blockBelow.x += vel.x;
-				blockBelow.z += vel.z;
-				buildBlock(blockBelow);
+		/*
+		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+		else if (!buildBlock(blockBelow)) {
+			if (velocityxz > 0.f) {  // Are we actually walking?
+				blockBelow.x -= vel.x;
+				blockBelow.z -= vel.z;
+				if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+					blockBelow.x += vel.x;
+					blockBelow.z += vel.z;
+					buildBlock(blockBelow);
+				}
 			}
 		}
+		*/
 	}
-	*/
-}
+
 	oldpos = blockBelow.floor();
 
 	if (!sprint) { gm->player->setSprinting(false); sprintMod->useSprint = false; }
