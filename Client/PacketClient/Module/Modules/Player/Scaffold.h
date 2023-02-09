@@ -25,6 +25,7 @@ private:
 	float animFlareonPitch = 0.f;
 	float animYaw = 0.f;
 	int towerTimer = 20;
+	float towerMultiply = 1.2f;
 	float random = 1.5f;
 	bool sprint = true;
 	bool lockY = false;

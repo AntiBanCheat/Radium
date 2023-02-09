@@ -26,8 +26,8 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("Clip", 2);
 	tower.addEntry("HiveSlow", 3);
 	tower.addEntry("Fast", 4);
-	tower.addEntry("None", 4);
-	tower.addEntry("Flareon", 6);
+	tower.addEntry("Flareon", 5);
+	tower.addEntry("None", 6);
 	registerEnumSetting("Down", &downwards, 0);
 	downwards.addEntry("Vanilla", 0);
 	downwards.addEntry("None", 1);
@@ -49,6 +49,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
 	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
+	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerFloatSetting("Extend", &extend, extend, 0, 20);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
@@ -124,9 +125,11 @@ void Scaffold::onTick(C_GameMode* gm) {
 	auto speed = moduleMgr->getModule<Speed>();
 
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
-	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
+
+	if (!jumping || !foundBlock)
+		g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 
 	if (preventkicks && speed->isEnabled()) {
 		speed->setEnabled(false);
@@ -213,7 +216,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		if (!jumping && velocityxz >= 0.01) 
+		if (!jumping && velocityxz >= 0.01)
 		{
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aura->isEnabled())
@@ -221,10 +224,10 @@ void Scaffold::onTick(C_GameMode* gm) {
 				aurais = true;
 				aura->setEnabled(false);
 			}
-			for (int i = 0; i <= currExtend; i++) 
+			for (int i = 0; i <= currExtend; i++)
 			{
 				Odelay++;
-				if (Odelay > delay) 
+				if (Odelay > delay)
 				{
 					int tempx = vel.x * i;
 					int tempz = vel.z * i;
@@ -232,25 +235,25 @@ void Scaffold::onTick(C_GameMode* gm) {
 					vec3_t temp = blockBelow;
 					temp.x += tempx;
 					temp.z += tempz;
-					if (!placed.empty()) 
+					if (!placed.empty())
 					{
 						bool skip = false;
-						for (auto& i : placed) 
+						for (auto& i : placed)
 						{
-							if (i == temp) 
+							if (i == temp)
 							{
 								skip = true;
 							}
 						}
 
-						if (skip) 
+						if (skip)
 						{
 							clientMessageF("Skipped due same block");
 							continue;
 						}
 					}
 					if (isBlockReplacable(temp)) predictBlock(temp);
-					else if (buildBlock(temp)) 
+					else if (buildBlock(temp))
 					{
 						placed.push_back(temp);
 						clientMessageF("Breaked due placed");
@@ -260,9 +263,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 				}
 			}
 
-		placed.clear();
-	    }
-	    else 
+			placed.clear();
+		}
+		else if (!(jumping || sneaking))
 		{
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aurais == true)
@@ -270,9 +273,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 				aura->setEnabled(true);
 				aurais = false;
 			}
-		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-		else buildBlock(blockBelow);
-	    }
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else buildBlock(blockBelow);
+		}
 
 	/*
 	if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
@@ -375,7 +378,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			aurais = true;
 			aura->setEnabled(false);
 		}
-		//g_Data.getClientInstance()->minecraft->setTimerSpeed(towerTimer);
+		g_Data.getClientInstance()->minecraft->setTimerSpeed(towerTimer);
 		switch (tower.getSelectedValue()) {
 		case 0: // Vanilla
 			moveVec.x = g_Data.getLocalPlayer()->velocity.x;
@@ -401,24 +404,23 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 		case 3: // HiveClip
 			if (velocityxz <= 0.05) {
 				g_Data.getClientInstance()->minecraft->setTimerSpeed(30.f); // LOL
-
 			}
 			break;
-			case 5: //FlareonTower
-			if (player) {
-				vec3_t myPos = *player->getPos();
-				myPos.y += 0.61;
-				player->setPos(myPos);
-				moveVec.y = 0.01;
-				g_Data.getLocalPlayer()->lerpMotion(moveVec);
-				break;
-			}
 		case 4: // Fast
 			if (player->onGround) {
 				player->jumpFromGround();
 				moveVec.x = g_Data.getLocalPlayer()->velocity.x;
 				moveVec.y = 0.7f;
 				moveVec.z = g_Data.getLocalPlayer()->velocity.z;
+				g_Data.getLocalPlayer()->lerpMotion(moveVec);
+			}
+			break;
+		case 5: //FlareonTower
+			if (player) {
+				vec3_t myPos = *player->getPos();
+				myPos.y += 0.61;
+				player->setPos(myPos);
+				moveVec.y = 0.01;
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			}
 			break;
