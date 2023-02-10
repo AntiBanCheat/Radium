@@ -1,6 +1,6 @@
 #include "HiveFlyThree.h"
 
-#include "../../Module/ModuleManager.h"
+#include "../../ModuleManager.h"
 
 HiveFlyThree::HiveFlyThree() : IModule(0, Category::MOVEMENT, "Turkey go falling off cliff wee!1!1!!") {
 	//registerFloatSetting("Little SHIT", &this->Test, this->Test, 1.f, 50.f);
@@ -250,12 +250,6 @@ void HiveFlyThree::onDisable() {
 	if (blinkMode) {
 		auto blinkMod = moduleMgr->getModule<Blink>();
 		blinkMod->setEnabled(false);
-	}
-	if (strafeMode) {
-		auto killauraMod = moduleMgr->getModule<Killaura>();
-		killauraMod->cock = false;
-		killauraMod->isMulti = true;
-		killauraMod->rot = true;
 	}
 	auto stepMod = moduleMgr->getModule<Step>();
 	{

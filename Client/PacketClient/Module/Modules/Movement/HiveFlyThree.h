@@ -1,5 +1,5 @@
 #pragma once
-#include "Module.h"
+#include "../Module.h"
 class HiveFlyThree : public IModule {
 private:
 public:
@@ -30,7 +30,7 @@ public:
 	// Inherited via IModule
 	virtual const char* getModuleName() override;
 	virtual void onDisable() override;
-	virtual bool isFlashMode() override;
+	virtual bool isFlashMode();
 	virtual void onTick(C_GameMode* gm) override;
 	virtual void onEnable() override;
 	virtual void onMove(C_MoveInputHandler* input) override;

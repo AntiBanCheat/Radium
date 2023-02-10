@@ -173,7 +173,7 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 			// Drawing
 			auto interfaceColor = ColorUtil::interfaceColor(curIndex);
-			if (backgrounds)
+			if (backgroundsync)
 				if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(interfaceColor));
 			else if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(0,0,0, opacity));
 			switch (mode.getSelectedValue()) {

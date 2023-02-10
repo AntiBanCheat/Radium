@@ -10,8 +10,9 @@ private:
 	SettingEnum animation = this;
 
 	float spacing = 0.f;
-	int opacity = 150;
 public:
+	int opacity = 150;
+	int coloropacity = 150;
 	bool focused = false;
 	bool invert = false;
 	bool modes = true;
