@@ -388,11 +388,11 @@ void Speed::onMove(C_MoveInputHandler* input) {
 			dmgticks++;
 			if (player->onGround) {
 				player->jumpFromGround();
-				dmgticks = 0;
 			}
 			if (MoveUtil::isMoving()) {
 				if (player->damageTime > 0) {
 					MoveUtil::setSpeed(speed);
+					dmgticks = 0;
 				}
 				else if (dmgticks < 14) {
 					MoveUtil::setSpeed(player->velocity.magnitudexz());
