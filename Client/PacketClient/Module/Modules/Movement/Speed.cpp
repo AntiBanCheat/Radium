@@ -7,6 +7,7 @@ float speedMin = 0.59f; // inf value
 int packetsSent = 0;
 int enabledTicks = 0;
 int flareonticks = 0;
+int dmgticks = 0;
 int hivegroundticks = 0;
 
 using namespace std;
@@ -54,6 +55,7 @@ void Speed::onEnable() {
 	if (player == nullptr) return;
 	enabledTicks = 0;
 	flareonticks = 0;
+	dmgticks = 0;
 	clientmessage = false;
 	hivegroundticks = 0;
 	needblink = false;
@@ -382,15 +384,19 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	}
 
 	if (mode.getSelectedValue() == 12) {
-		if (MoveUtil::isMoving()) {
+		if (pressed) {
+			dmgticks++;
 			if (player->onGround) {
 				player->jumpFromGround();
+				dmgticks = 0;
 			}
-			else {
-				MoveUtil::setSpeed(player->velocity.magnitudexz());
-			}
-			if (player->damageTime > 0) {
-				MoveUtil::setSpeed(speed);
+			if (MoveUtil::isMoving()) {
+				if (player->damageTime > 0) {
+					MoveUtil::setSpeed(speed);
+				}
+				else if (dmgticks < 14) {
+					MoveUtil::setSpeed(player->velocity.magnitudexz());
+				}
 			}
 		}
 	}
