@@ -27,11 +27,9 @@ public:
 	~SettingManager();
 
 	std::string currentSettings = "Settings";
-	std::string autosaveSettings = "autosave";
 
 	void loadSettings(std::string name, bool create);
 	void saveSettings();
-	void autosaveSettings();
 	void init();
 };
 
