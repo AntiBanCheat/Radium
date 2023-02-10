@@ -17,7 +17,6 @@ public:
 	bool modes = true;
 	bool keybinds = false;
 	bool backgroundsync = false;
-	int coloropacity = 150;
 	// Positions
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 	float positionX = windowSize.x;

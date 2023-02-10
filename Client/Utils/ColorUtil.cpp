@@ -69,17 +69,14 @@ MC_Color ColorUtil::interfaceColor(int index) {
 }
 
 MC_Color ColorUtil::rainbowColortwo(float seconds, float saturation, float brightness, long index) {
-	auto arraylist = moduleMgr->getModule<ArrayList>();
-	auto interface = moduleMgr->getModule<Interface>();
 	float hue6 = (((TimerUtil::getCurrentMs() + index) % (int)(6000)) / (float)(6000));
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, arraylist->coloropacity);
+	return MC_Color(r * 255, g * 255, b * 255, 255);
 }
 
 MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
-	auto arraylist = moduleMgr->getModule<ArrayList>();
 	auto interface = moduleMgr->getModule<Interface>();
 	float hue = ((TimerUtil::getCurrentMs()) % (int)(((int)10) * 1000)) / (float)(((int)10) * 1000);
 	float r, g, b = 0;
@@ -93,12 +90,10 @@ MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, arraylist->coloropacity);
+	return MC_Color(redPart, greenPart, bluePart);
 }
 
 MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
-	auto arraylist = moduleMgr->getModule<ArrayList>();
-	auto interface = moduleMgr->getModule<Interface>();
 	double offset = ((TimerUtil::getCurrentMs() - index) / 8) / (double)120;
 	double aids123 = ((TimerUtil::getCurrentMs() - index) % 1000 / 1000.000);
 	int aids1234 = ((TimerUtil::getCurrentMs() - index) % 2000 / 2000.000) * 2;
@@ -108,11 +103,10 @@ MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int gre
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, arraylist->coloropacity);
+	return MC_Color(redPart, greenPart, bluePart);
 }
 
 MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
-	auto arraylist = moduleMgr->getModule<ArrayList>();
 	auto interface = moduleMgr->getModule<Interface>();
 	float speed = 3000;
 	float hue = (float)(TimerUtil::getCurrentMs() % (int)speed) + ((yTotal - yOffset) * 9);
@@ -121,7 +115,7 @@ MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, arraylist->coloropacity);
+	return MC_Color(r * 255, g * 255, b * 255, 255);
 }
 
 MC_Color ColorUtil::interfaceColortwo(int index) {
@@ -132,7 +126,6 @@ MC_Color ColorUtil::interfaceColortwo(int index) {
 	case 0: color = ColorUtil::rainbowColortwo(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
 	case 1: color = ColorUtil::astolfoRainbowtwo(index / 5, 1000); break; /* Astolfo */
 	case 2: color = ColorUtil::waveColortwo(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* Wave */
-	case 3: color = ColorUtil::RGBWavetwo(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* RGB Wave */
-	}
+	case 3: color = ColorUtil::RGBWavetwo(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* RGB Wave */ }
 	return MC_Color(color);
 }
