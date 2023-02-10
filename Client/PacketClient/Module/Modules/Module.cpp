@@ -134,13 +134,13 @@ IModule::IModule(int key, Category c, const char* tooltip) {
 	this->keybind = key;
 	this->category = c;
 	this->tooltip = tooltip;
-	this->registerKeybindSetting(string("keybind"), &this->keybind, this->keybind, 0, 0xFF);
+	this->registerKeybindSetting(std::string("Keybind"), &this->keybind, this->keybind);
 	this->registerBoolSetting(string("enabled"), &this->enabled, false);
 	this->registerBoolSetting(string("Hide in list"), &this->shouldHide, false);
 	this->ModulePos = vec2_t(0.f, 0.f);
 }
 
-void IModule::registerFloatSetting(string name, float* floatPtr, float defaultValue, float minValue, float maxValue) {
+void IModule::registerFloatSetting(std::string name, float* floatPtr, float defaultValue, float minValue, float maxValue) {
 #ifdef DEBUG
 	if (minValue > maxValue)
 		__debugbreak();  // Minimum value is bigger than maximum value
@@ -171,7 +171,7 @@ void IModule::registerFloatSetting(string name, float* floatPtr, float defaultVa
 	settings.push_back(setting);  // Add to list
 }
 
-void IModule::registerIntSetting(string name, int* intPtr, int defaultValue, int minValue, int maxValue) {
+SettingEntry* IModule::registerIntSetting(std::string name, int* intPtr, int defaultValue, int minValue, int maxValue) {
 #ifdef DEBUG
 	if (minValue > maxValue)
 		__debugbreak();  // Minimum value is bigger than maximum value
@@ -200,71 +200,10 @@ void IModule::registerIntSetting(string name, int* intPtr, int defaultValue, int
 	strcpy_s(setting->name, 19, name.c_str());
 
 	settings.push_back(setting);  // Add to list
+	return setting;
 }
 
-void IModule::registerMinMaxSetting(string name, int* intPtr, int defaultValue, int minValue, int maxValue) {
-#ifdef DEBUG
-	if (minValue > maxValue)
-		__debugbreak();  // Minimum value is bigger than maximum value
-#endif
-
-	SettingEntry* setting = new SettingEntry();
-	setting->valueType = ValueType::INT_T;
-	setting->value = reinterpret_cast<SettingValue*>(intPtr);  // Actual Value
-
-	// Default Value
-	SettingValue* defaultVal = new SettingValue();
-	defaultVal->_int = defaultValue;
-	setting->defaultValue = defaultVal;
-
-	// Min Value
-	SettingValue* minVal = new SettingValue();
-	minVal->_int = minValue;
-	setting->minValue = minVal;
-
-	// Max Value
-	SettingValue* maxVal = new SettingValue();
-	maxVal->_int = maxValue;
-	setting->maxValue = maxVal;
-
-	// Name
-	strcpy_s(setting->name, 19, name.c_str());
-
-	settings.push_back(setting);  // Add to list
-}
-
-void IModule::registerKeybindSetting(string name, int* intPtr, int defaultValue, int minValue, int maxValue) {
-#ifdef DEBUG
-	if (minValue > maxValue)
-		__debugbreak();  // Minimum value is bigger than maximum value
-#endif
-
-	SettingEntry* setting = new SettingEntry();
-	setting->valueType = ValueType::KEYBIND_T;
-	setting->value = reinterpret_cast<SettingValue*>(intPtr);  // Actual Value
-
-	// Default Value
-	SettingValue* defaultVal = new SettingValue();
-	defaultVal->_keybind = defaultValue;
-	setting->defaultValue = defaultVal;
-
-	// Min Value
-	SettingValue* minVal = new SettingValue();
-	minVal->_keybind = minValue;
-	setting->minValue = minVal;
-
-	// Max Value
-	SettingValue* maxVal = new SettingValue();
-	maxVal->_keybind = maxValue;
-	setting->maxValue = maxVal;
-
-	// Name
-	strcpy_s(setting->name, 19, name.c_str());
-
-	settings.push_back(setting);  // Add to list
-}
-
-void IModule::registerEnumSetting(string name, SettingEnum* ptr, int defaultValue) {
+void IModule::registerEnumSetting(std::string name, SettingEnum* ptr, int defaultValue) {
 	SettingEntry* setting = new SettingEntry();
 	setting->valueType = ValueType::ENUM_T;
 	if (defaultValue < 0 || defaultValue >= ptr->GetCount())
@@ -290,9 +229,10 @@ void IModule::registerEnumSetting(string name, SettingEnum* ptr, int defaultValu
 	strcpy_s(setting->name, 19, name.c_str());
 	settings.push_back(setting);
 }
-void IModule::registerEnumSetting(const char* name, SettingEnum* ptr, int defaultValue) {
+
+SettingEntry* IModule::registerEnumSettingGroup(std::string name, SettingEnum* ptr, int defaultValue) {
 	SettingEntry* setting = new SettingEntry();
-	setting->valueType = ValueType::ENUM_T;
+	setting->valueType = ValueType::ENUM_SETTING_GROUP_T;
 	if (defaultValue < 0 || defaultValue >= ptr->GetCount())
 		defaultValue = 0;
 
@@ -313,11 +253,21 @@ void IModule::registerEnumSetting(const char* name, SettingEnum* ptr, int defaul
 	// Enum data
 	setting->extraData = ptr;
 
-	strcpy_s(setting->name, 19, name);
+	strcpy_s(setting->name, 19, name.c_str());
+
+	int numToAdd = ptr->Entrys.size();
+
+	while (numToAdd > 0) {
+		setting->groups.push_back(nullptr);
+		numToAdd--;
+	}
+
 	settings.push_back(setting);
+
+	return setting;
 }
 
-void IModule::registerBoolSetting(string name, bool* boolPtr, bool defaultValue) {
+void IModule::registerBoolSetting(std::string name, bool* boolPtr, bool defaultValue) {
 	SettingEntry* setting = new SettingEntry();
 	setting->valueType = ValueType::BOOL_T;
 
@@ -332,6 +282,177 @@ void IModule::registerBoolSetting(string name, bool* boolPtr, bool defaultValue)
 	settings.push_back(setting);  // Add to list
 }
 
+SettingEntry* IModule::registerKeybindSetting(std::string name, int* intPtr, int defaultValue) {
+	SettingEntry* newSetting = registerIntSetting(name, intPtr, defaultValue, 0, 0xFF);
+	newSetting->valueType = ValueType::KEYBIND_T;
+
+	return newSetting;
+}
+
+SettingEntry* SettingGroup::registerFloatSetting(std::string name, float* floatPtr, float defaultValue, float minValue, float maxValue) {
+#ifdef DEBUG
+	if (minValue > maxValue)
+		__debugbreak();  // Minimum value is bigger than maximum value
+#endif
+
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::FLOAT_T;
+
+	setting->value = reinterpret_cast<SettingValue*>(floatPtr);
+
+	// Default Value
+	SettingValue* defaultVal = new SettingValue();
+	defaultVal->_float = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	// Min Value
+	SettingValue* minVal = new SettingValue();
+	minVal->_float = minValue;
+	setting->minValue = minVal;
+
+	// Max Value
+	SettingValue* maxVal = new SettingValue();
+	maxVal->_float = maxValue;
+	setting->maxValue = maxVal;
+
+	strcpy_s(setting->name, 19, name.c_str());  // Name
+
+	setting->nestValue = parent->nestValue + 1;
+
+	entries.push_back(setting);  // Add to list
+
+	return setting;
+}
+
+SettingEntry* SettingGroup::registerIntSetting(std::string name, int* intPtr, int defaultValue, int minValue, int maxValue) {
+#ifdef DEBUG
+	if (minValue > maxValue)
+		__debugbreak();  // Minimum value is bigger than maximum value
+#endif
+
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::INT_T;
+	setting->value = reinterpret_cast<SettingValue*>(intPtr);  // Actual Value
+
+	// Default Value
+	SettingValue* defaultVal = new SettingValue();
+	defaultVal->_int = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	// Min Value
+	SettingValue* minVal = new SettingValue();
+	minVal->_int = minValue;
+	setting->minValue = minVal;
+
+	// Max Value
+	SettingValue* maxVal = new SettingValue();
+	maxVal->_int = maxValue;
+	setting->maxValue = maxVal;
+
+	// Name
+	strcpy_s(setting->name, 19, name.c_str());
+
+	setting->nestValue = parent->nestValue + 1;
+
+	entries.push_back(setting);  // Add to list
+	return setting;
+}
+
+SettingEntry* SettingGroup::registerEnumSetting(std::string name, SettingEnum* ptr, int defaultValue) {
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::ENUM_T;
+	if (defaultValue < 0 || defaultValue >= ptr->GetCount())
+		defaultValue = 0;
+
+	// Actual Value
+	setting->value = reinterpret_cast<SettingValue*>(&ptr->selected);
+	setting->value->_int = defaultValue;
+
+	// Default Value
+	SettingValue* defaultVal = new SettingValue();
+	defaultVal->_int = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	// Min Value (is Extended)
+	SettingValue* minVal = new SettingValue();
+	minVal->_bool = false;
+	setting->minValue = minVal;
+
+	// Enum data
+	setting->extraData = ptr;
+
+	setting->nestValue = parent->nestValue + 1;
+
+	strcpy_s(setting->name, 19, name.c_str());
+	entries.push_back(setting);
+
+	return setting;
+}
+
+SettingEntry* SettingGroup::registerEnumSettingGroup(std::string name, SettingEnum* ptr, int defaultValue) {
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::ENUM_SETTING_GROUP_T;
+	if (defaultValue < 0 || defaultValue >= ptr->GetCount())
+		defaultValue = 0;
+
+	// Actual Value
+	setting->value = reinterpret_cast<SettingValue*>(&ptr->selected);
+	setting->value->_int = defaultValue;
+
+	// Default Value
+	SettingValue* defaultVal = new SettingValue();
+	defaultVal->_int = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	// Min Value (is Extended)
+	SettingValue* minVal = new SettingValue();
+	minVal->_bool = false;
+	setting->minValue = minVal;
+
+	// Enum data
+	setting->extraData = ptr;
+
+	strcpy_s(setting->name, 19, name.c_str());
+
+	int numToAdd = ptr->Entrys.size();
+
+	while (numToAdd > 0) {
+		setting->groups.push_back(nullptr);
+		numToAdd--;
+	}
+
+	setting->nestValue = parent->nestValue + 1;
+
+	entries.push_back(setting);
+
+	return setting;
+}
+
+SettingEntry* SettingGroup::registerBoolSetting(std::string name, bool* boolPtr, bool defaultValue) {
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::BOOL_T;
+
+	setting->value = reinterpret_cast<SettingValue*>(boolPtr);  // Actual value
+
+	SettingValue* defaultVal = new SettingValue();  // Default Value
+	defaultVal->_bool = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	strcpy_s(setting->name, 19, name.c_str());  // Name
+
+	setting->nestValue = parent->nestValue + 1;
+
+	entries.push_back(setting);  // Add to list
+
+	return setting;
+}
+
+SettingEntry* SettingGroup::registerKeybindSetting(std::string name, int* intPtr, int defaultValue) {
+	SettingEntry* newSetting = registerIntSetting(name, intPtr, defaultValue, 0, 0xFF);
+	newSetting->valueType = ValueType::KEYBIND_T;
+
+	return newSetting;
+}
 IModule::~IModule() {
 	for (auto it = this->settings.begin(); it != this->settings.end(); it++) {
 		delete* it;
@@ -369,11 +490,13 @@ void IModule::onTick(C_GameMode*) {
 }
 
 void IModule::onKeyUpdate(int key, bool isDown) {
-	if (key == getKeybind()) {
-		if (isHoldMode())
-			setEnabled(isDown);
-		else if (isDown)
-			toggle();
+	if (!moduleMgr->getModule<ClickGUIMod>()->hasOpenedGUI) {
+		if (key == getKeybind()) {
+			if (isHoldMode())
+				setEnabled(isDown);
+			else if (isDown)
+				toggle();
+		}
 	}
 }
 
@@ -391,6 +514,89 @@ void IModule::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 void IModule::onSendPacket(C_Packet*) {
 }
+
+#pragma warning(pop)
+
+void IModule::onLoadSettings(void* confVoid) {
+	json* conf = reinterpret_cast<json*>(confVoid);
+	if (conf->contains(this->getRawModuleName())) {
+		auto obj = conf->at(this->getRawModuleName());
+		if (obj.is_null())
+			return;
+		for (auto it = this->settings.begin(); it != this->settings.end(); ++it) {
+			SettingEntry* sett = *it;
+			if (obj.contains(sett->name)) {
+				auto value = obj.at(sett->name);
+				if (value.is_null())
+					continue;
+				try {
+					switch (sett->valueType) {
+					case ValueType::KEYBIND_T:
+						sett->value->_int = value.get<int>();
+						break;
+					}
+					//sett->makeSureTheKeyValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+					sett->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+					continue;
+				}
+				catch (exception e) {
+					logF("Keybind Load Error (%s): %s", this->getRawModuleName(), e.what());
+				}
+			}
+			if (obj.contains("Hidden")) {
+				auto value = obj.at("Hidden");
+				if (value.is_null())
+					continue;
+				shouldHide = value.get<bool>();
+			}
+		}
+
+		for (vector<string>::iterator it = g_friend.List.begin(); it != g_friend.List.end(); ++it) {
+			if (conf->contains("Friends")) {
+				auto friends = conf->at("Friends");//e
+				if (!friends.is_null()) {
+					auto value = friends.at(it->data());
+					string name = value.get < string >();
+					name = Utils::sanitize(name);
+					name = name.substr(0, name.find('\n'));
+					if (!FriendList::findPlayer(name))
+						FriendList::addPlayerToList(name);
+				}
+			}
+		}
+		if (this->enabled)
+			this->onEnable();
+	}
+}
+
+#pragma warning(push)
+#pragma warning(disable : 26444)
+void IModule::onSaveSettings(void* confVoid) {
+	json* conf = reinterpret_cast<json*>(confVoid);
+	string modName = getRawModuleName();
+	if (conf->contains(modName.c_str()))
+		conf->erase(modName.c_str());
+
+	json obj = {};
+	//auto obj = conf->at(modName);
+	for (auto sett : this->settings) {
+		obj.emplace("Hidden", this->shouldHide);
+		switch (sett->valueType) {
+		case ValueType::KEYBIND_T:
+			obj.emplace(sett->name, sett->value->_int);
+			break;
+		}
+	}
+	json Friends = {};
+	for (vector<string>::iterator it = g_friend.List.begin(); it != g_friend.List.end(); ++it)
+		Friends.emplace(it->data(), (int)it->length());
+
+	conf->emplace(modName.c_str(), obj);
+	conf->emplace("Friends", Friends);
+}
+
+
+#pragma warning(pop)
 
 void IModule::onLoadConfig(void* confVoid) {
 	json* conf = reinterpret_cast<json*>(confVoid);
@@ -415,6 +621,8 @@ void IModule::onLoadConfig(void* confVoid) {
 					case ValueType::INT64_T:
 						sett->value->int64 = value.get<__int64>();
 						break;
+					case ValueType::ENUM_T:
+					case ValueType::KEYBIND_T:
 					case ValueType::INT_T:
 						sett->value->_int = value.get<int>();
 						break;
@@ -422,21 +630,47 @@ void IModule::onLoadConfig(void* confVoid) {
 						sett->value->_bool = value.get<bool>();
 						break;
 					case ValueType::TEXT_T:
-						sett->value->text = new string(value.get<string>());
+						sett->value->text = new std::string(value.get<std::string>());
 						break;
-					case ValueType::ENUM_T:
-						try {
-							sett->value->_int = value.get<int>();
+					case ValueType::SETTING_GROUP_T: {
+						json group = value.get<json>();
+						sett->groups[0]->onLoadConfig(&group);
+					} break;
+					case ValueType::BOOL_SETTING_GROUP_T: {
+						json obj2 = value.get<json>();
+						if (obj2.contains("value") && !obj2.at("value").is_null()) {
+							sett->value->_bool = obj2["value"].get<bool>();
 						}
-						catch (const exception& e) {
-							logF("Config Load Error(Enum) (%s): %s ", this->getRawModuleName(), e.what());
+						if (obj2.contains("group") && obj2.at("group").is_object() && !obj.at("group").is_null()) {
+							json group = obj2["group"].get<json>();
+
+							sett->groups[0]->onLoadConfig(&group);
 						}
-						break;
+					} break;
+					case ValueType::ENUM_SETTING_GROUP_T: {
+						json obj2 = value;
+						if (obj2.contains("value") && !obj2.at("value").is_null()) {
+							sett->value->_int = obj["value"].get<int>();
+						}
+						if (obj2.contains("groups") && obj2.at("groups").is_array() && !obj.at("group").is_null()) {
+							std::vector<json> groups = obj2["groups"].get<std::vector<json>>();
+
+							int i = 0;
+							for (auto it2 = groups.begin(); it2 != groups.end(); ++it2, ++i) {
+								if (i >= sett->groups.size())
+									break;
+
+								if (sett->groups[i] != nullptr) {
+									sett->groups[i]->onLoadConfig(it2._Ptr);
+								}
+							}
+						}
+					} break;
 					}
 					sett->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
 					continue;
 				}
-				catch (exception e) {
+				catch (std::exception e) {
 					logF("Config Load Error (%s): %s", this->getRawModuleName(), e.what());
 				}
 			}
@@ -446,11 +680,79 @@ void IModule::onLoadConfig(void* confVoid) {
 	}
 }
 
+void SettingGroup::onLoadConfig(void* confVoid) {
+	json& obj = *reinterpret_cast<json*>(confVoid);
+	for (auto it = entries.begin(); it != entries.end(); ++it) {
+		SettingEntry* sett = *it;
+		if (obj.contains(sett->name)) {
+			auto value = obj.at(sett->name);
+			if (value.is_null())
+				continue;
+			try {
+				switch (sett->valueType) {
+				case ValueType::FLOAT_T:
+					sett->value->_float = value.get<float>();
+					break;
+				case ValueType::DOUBLE_T:
+					sett->value->_double = value.get<double>();
+					break;
+				case ValueType::INT64_T:
+					sett->value->int64 = value.get<__int64>();
+					break;
+				case ValueType::ENUM_T:
+				case ValueType::KEYBIND_T:
+				case ValueType::INT_T:
+					sett->value->_int = value.get<int>();
+					break;
+				case ValueType::BOOL_T:
+					sett->value->_bool = value.get<bool>();
+					break;
+				case ValueType::TEXT_T:
+					sett->value->text = new std::string(value.get<std::string>());
+					break;
+				case ValueType::SETTING_GROUP_T: {
+					json group = value.get<json>();
+					sett->groups[0]->onLoadConfig(&group);
+				} break;
+				case ValueType::BOOL_SETTING_GROUP_T: {
+					json obj2 = value.get<json>();
+					if (obj2.contains("value") && !obj2.at("value").is_null()) {
+						sett->value->_bool = obj2["value"].get<bool>();
+					}
+					if (obj2.contains("group") && obj2.at("group").is_object() && !obj.at("group").is_null()) {
+						json group = obj2["group"].get<json>();
+						sett->groups[0]->onLoadConfig(&group);
+					}
+				} break;
+				case ValueType::ENUM_SETTING_GROUP_T: {
+					json obj2 = value;
+					if (obj2.contains("value") && !obj2.at("value").is_null()) {
+						sett->value->_int = obj["value"].get<int>();
+					}
+					if (obj2.contains("groups") && obj2.at("groups").is_object() && !obj.at("group").is_null()) {
+						for (auto n = 0; n < sett->groups.size(); n++) {
+							if (sett->groups[n] != nullptr && obj2.contains(std::to_string(n)) && !obj2.at(std::to_string(n)).is_null() && obj2.at(std::to_string(n)).is_object()) {
+								sett->groups[n]->onLoadConfig(&obj2[std::to_string(n)]);
+							}
+						}
+					}
+				} break;
+				}
+				sett->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+				continue;
+			}
+			catch (std::exception e) {
+				logF("Config Load Error in setting group #sad (%s): %s", parent->name, e.what());
+			}
+		}
+	}
+}
+
 #pragma warning(push)
 #pragma warning(disable : 26444)
 void IModule::onSaveConfig(void* confVoid) {
 	json* conf = reinterpret_cast<json*>(confVoid);
-	string modName = getRawModuleName();
+	std::string modName = getRawModuleName();
 	if (conf->contains(modName.c_str()))
 		conf->erase(modName.c_str());
 
@@ -467,6 +769,8 @@ void IModule::onSaveConfig(void* confVoid) {
 		case ValueType::INT64_T:
 			obj.emplace(sett->name, sett->value->int64);
 			break;
+		case ValueType::ENUM_T:
+		case ValueType::KEYBIND_T:
 		case ValueType::INT_T:
 			obj.emplace(sett->name, sett->value->_int);
 			break;
@@ -476,94 +780,119 @@ void IModule::onSaveConfig(void* confVoid) {
 		case ValueType::TEXT_T:
 			obj.emplace(sett->name, *sett->value->text);
 			break;
-		case ValueType::ENUM_T:
-			obj.emplace(sett->name, sett->value->_int);
-			break;
+		case ValueType::SETTING_GROUP_T: {
+			json obj2 = {};
+			sett->groups[0]->onSaveConfig(&obj2);
+			obj.emplace(sett->name, obj2);
+		} break;
+		case ValueType::BOOL_SETTING_GROUP_T: {
+			json obj2 = {};
+			obj2.emplace("value", sett->value->_bool);
+			json groupObj = {};
+			sett->groups[0]->onSaveConfig(&groupObj);
+			obj2.emplace("group", groupObj);
+			obj.emplace(sett->name, obj2);
+		} break;
+		case ValueType::ENUM_SETTING_GROUP_T: {
+			json obj2 = {};
+			obj2.emplace("value", sett->value->_int);
+			json groups;
+
+			int num = 0;
+			for (auto it : sett->groups) {
+				json obj3 = {};
+				if (it == nullptr) {
+					groups.emplace(std::to_string(num), obj3);
+					num++;
+					continue;
+				}
+				else {
+					it->onSaveConfig(&obj3);
+					groups.emplace(std::to_string(num), obj3);
+				}
+				num++;
+			}
+
+			obj2.emplace("groups", groups);
+			obj.emplace(sett->name, obj2);
+		} break;
 		}
 	}
+
 	conf->emplace(modName.c_str(), obj);
 }
 
-#pragma warning(pop)
-
-void IModule::onLoadSettings(void* confVoid) {
-	json* conf = reinterpret_cast<json*>(confVoid);
-	if (conf->contains(this->getRawModuleName())) {
-		auto obj = conf->at(this->getRawModuleName());
-		if (obj.is_null())
-			return;
-		for (auto it = this->settings.begin(); it != this->settings.end(); ++it) {
-			SettingEntry* sett = *it;
-			if (obj.contains(sett->name)) {
-				auto value = obj.at(sett->name);
-				if (value.is_null())
-					continue;
-				try {
-					switch (sett->valueType) {
-					case ValueType::KEYBIND_T:
-						sett->value->_keybind = value.get<int>();
-						break;
-					}
-					sett->makeSureTheKeyValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
-					continue;
-				}
-				catch (exception e) {
-					logF("Keybind Load Error (%s): %s", this->getRawModuleName(), e.what());
-				}
-			}
-			if (obj.contains("Hidden")) {
-				auto value = obj.at("Hidden");
-				if (value.is_null())
-					continue;
-				shouldHide = value.get<bool>();
-			}
-		}
-
-		for (vector<string>::iterator it = g_friend.List.begin(); it != g_friend.List.end(); ++it) {
-			if (conf->contains("Friends")) {
-				auto friends = conf->at("Friends");//e
-				if (!friends.is_null()) {
-					auto value = friends.at(it->data());
-					string name = value.get < string >();
-					name = Utils::sanitize(name);
-					name = name.substr(0, name.find('\n'));
-					if(!FriendList::findPlayer(name))
-					FriendList::addPlayerToList(name);
-				}
-			}
-		}
-		if (this->enabled)
-			this->onEnable();
-	}
-}
-
-#pragma warning(push)
-#pragma warning(disable : 26444)
-void IModule::onSaveSettings(void* confVoid) {
-	json* conf = reinterpret_cast<json*>(confVoid);
-	string modName = getRawModuleName();
-	if (conf->contains(modName.c_str()))
-		conf->erase(modName.c_str());
-
-	json obj = {};
+void SettingGroup::onSaveConfig(void* confVoid) {
+	json* obj = reinterpret_cast<json*>(confVoid);
+	const char* name = parent->name;
 	//auto obj = conf->at(modName);
-	for (auto sett : this->settings) {
-		obj.emplace("Hidden", this->shouldHide);
+
+	for (auto sett : entries) {
 		switch (sett->valueType) {
-		case ValueType::KEYBIND_T:
-			obj.emplace(sett->name, sett->value->_keybind);
+		case ValueType::FLOAT_T:
+			obj->emplace(sett->name, sett->value->_float);
 			break;
+		case ValueType::DOUBLE_T:
+			obj->emplace(sett->name, sett->value->_double);
+			break;
+		case ValueType::INT64_T:
+			obj->emplace(sett->name, sett->value->int64);
+			break;
+		case ValueType::ENUM_T:
+		case ValueType::KEYBIND_T:
+		case ValueType::INT_T:
+			obj->emplace(sett->name, sett->value->_int);
+			break;
+		case ValueType::BOOL_T:
+			obj->emplace(sett->name, sett->value->_bool);
+			break;
+		case ValueType::TEXT_T:
+			obj->emplace(sett->name, *sett->value->text);
+			break;
+		case ValueType::SETTING_GROUP_T: {
+			json obj2 = {};
+			sett->groups[0]->onSaveConfig(&obj2);
+			obj->emplace(sett->name, obj2);
+		} break;
+		case ValueType::BOOL_SETTING_GROUP_T: {
+			json obj2 = {};
+			obj2.emplace("value", sett->value->_bool);
+			json groupObj = {};
+			sett->groups[0]->onSaveConfig(&groupObj);
+			obj2.emplace("group", groupObj);
+			obj->emplace(sett->name, obj2);
+		} break;
+		case ValueType::ENUM_SETTING_GROUP_T: {
+			json obj2 = {};
+			obj2.emplace("value", sett->value->_int);
+			json groups;
+
+			int num = 0;
+
+			for (auto it : sett->groups) {
+				json obj3 = {};
+				if (it == nullptr) {
+					groups.emplace(std::to_string(num), obj3);
+					num++;
+					continue;
+				}
+				else {
+					it->onSaveConfig(&obj3);
+					groups.emplace(std::to_string(num), obj3);
+				}
+				num++;
+			}
+
+			obj2.emplace("groups", groups);
+			obj->emplace(sett->name, obj2);
+		} break;
 		}
 	}
-	json Friends = {};
-	for (vector<string>::iterator it = g_friend.List.begin(); it != g_friend.List.end(); ++it)
-		Friends.emplace(it->data(), (int)it->length());
-
-	conf->emplace(modName.c_str(), obj);
-	conf->emplace("Friends", Friends);
 }
 
 #pragma warning(pop)
+
+
 
 bool IModule::isHoldMode() {
 	return false;
@@ -683,38 +1012,69 @@ void IModule::clientMessageF(const char* fmt, ...) {
 
 void SettingEntry::makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt() {
 	switch (valueType) {
+	case ValueType::ENUM_SETTING_GROUP_T:
 	case ValueType::ENUM_T:
-		value->_int = max(0, min(reinterpret_cast<SettingEnum*>(extraData)->GetCount() - 1, value->_int));
+		value->_int = std::max(0, std::min(reinterpret_cast<SettingEnum*>(extraData)->GetCount() - 1, value->_int));
 		break;
+	case ValueType::BOOL_SETTING_GROUP_T:
 	case ValueType::BOOL_T:
 		break;
 	case ValueType::INT64_T:
-		value->int64 = max(minValue->int64, min(maxValue->int64, value->int64));
-		break; 
-	case ValueType::INT_T:
-		value->_int = max(minValue->_int, min(maxValue->_int, value->_int));
+		value->int64 = std::max(minValue->int64, std::min(maxValue->int64, value->int64));
 		break;
 	case ValueType::DOUBLE_T:
-		value->_double = max(minValue->_double, min(maxValue->_double, value->_double));
+		value->_double = std::max(minValue->_double, std::min(maxValue->_double, value->_double));
 		break;
 	case ValueType::FLOAT_T:
-		value->_float = max(minValue->_float, min(maxValue->_float, value->_float));
+		value->_float = std::max(minValue->_float, std::min(maxValue->_float, value->_float));
+		break;
+	case ValueType::KEYBIND_T:
+	case ValueType::INT_T:
+		value->_int = std::max(minValue->_int, std::min(maxValue->_int, value->_int));
 		break;
 	case ValueType::TEXT_T:
-		//break;
+	case ValueType::SETTING_GROUP_T:
+		break;
 	default:
 		logF("unrecognized value %i", valueType);
 		break;
+	}
+
+	if (!groups.empty()) {
+		for (auto it : groups) {
+			if (it != nullptr) {
+				for (auto i : it->entries)
+					i->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+			}
+		}
 	}
 }
 
-void SettingEntry::makeSureTheKeyValueIsAGoodBoiAndTheUserHasntScrewedWithIt() {
-	switch (valueType) {
-	case ValueType::KEYBIND_T:
-		value->_keybind = max(minValue->_keybind, min(maxValue->_keybind, value->_keybind));
-		break;
-	default:
-		logF("unrecognized value %i", valueType);
-		break;
+SettingEntry* SettingEntry::addSettingGroup(int _enum, SettingGroup* group) {
+	int enumReal = -1;
+
+	SettingEnum* dat = (SettingEnum*)extraData;
+
+	int i = 0;
+	for (auto it = dat->Entrys.begin(); it < dat->Entrys.end(); it++, i++) {
+		if (it->GetValue() == _enum)
+			enumReal = i;
 	}
+
+	if (enumReal < 0 || enumReal >= groups.size())
+		return this;
+
+	groups[enumReal] = group;
+
+	group->parent = this;
+
+	return this;
+}
+
+SettingEntry* SettingEntry::addSettingGroup(SettingGroup* group) {
+	groups[0] = group;
+
+	group->parent = this;
+
+	return this;
 }

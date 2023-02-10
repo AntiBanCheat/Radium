@@ -18,7 +18,9 @@ ArrayList::ArrayList() : IModule(0, Category::VISUAL, "Displays enabled modules"
 	registerBoolSetting("BackGroundSync", &backgroundsync, backgroundsync);
 	registerBoolSetting("Keybinds", &keybinds, keybinds);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
+	registerIntSetting("ColorOpacity", &coloropacity, coloropacity, 0, 255);
 	registerFloatSetting("Spacing", &spacing, spacing, 0.f, 1.f);
+	registerBoolSetting("BackGroundSync", &backgroundsync, backgroundsync);
 	shouldHide = true;
 }
 
@@ -127,6 +129,7 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			float xOffsetOri = windowSize.x - textWidth - (textPadding * 2);
 			float xOffset = windowSize.x - mod->pos->x;
 
+
 			switch (animation.getSelectedValue()) {
 			case 0: case 1: mod->pos->x += ((textPadding * 2) + textWidth - mod->pos->x) * 0.05f; break;
 			case 2: mod->pos->x += INFINITY; break;
@@ -170,11 +173,9 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 			// Drawing
 			auto interfaceColor = ColorUtil::interfaceColor(curIndex);
-			if (backgrounds) {
+			if (backgrounds)
 				if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(interfaceColor));
-			}
-				if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(0,0,0, opacity));
-			
+			else if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(0,0,0, opacity));
 			switch (mode.getSelectedValue()) {
 			case 0:
 				DrawUtils::fillRectangleA(leftRect, MC_Color(interfaceColor));
@@ -204,9 +205,10 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 				break;
 			case 5: DrawUtils::drawText(textPos, &textStr, MC_Color(interfaceColor), textSize, 1.f, true); break;
 			}
-
-			if (invert) yOffset -= textHeight + (textPadding * 2);
+			//bottom
+			if (invert) yOffset-= textHeight + (textPadding * 2);
 			else yOffset += textHeight + (textPadding * 2);
+			//test
 
 			lastModuleLength = textWidth;
 			underline = vec4_t(leftRect.x, leftRect.w, windowSize.x, leftRect.w + 1.f);

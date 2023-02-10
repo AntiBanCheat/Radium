@@ -14,6 +14,7 @@ private:
 
     int tick = 0;
     int slot = 0;
+    int maxRange = 5;
 public:
     bool hasDestroyed = false;
     bool destroy = false;

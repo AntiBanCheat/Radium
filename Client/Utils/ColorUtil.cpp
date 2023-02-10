@@ -63,7 +63,8 @@ MC_Color ColorUtil::interfaceColor(int index) {
 	case 0: color = ColorUtil::rainbowColor(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
 	case 1: color = ColorUtil::astolfoRainbow(index / 5, 1000); break; /* Astolfo */
 	case 2: color = ColorUtil::waveColor(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* Wave */
-	case 3: color = ColorUtil::RGBWave(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* RGB Wave */ }
+	case 3: color = ColorUtil::RGBWave(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* RGB Wave */
+	}
 	return MC_Color(color);
 }
 

@@ -1,4 +1,4 @@
-﻿#include "Watermark.h"
+#include "Watermark.h"
 #include "../pch.h"
 #include <chrono>
 
@@ -10,7 +10,7 @@ Watermark::Watermark() : IModule(0, Category::VISUAL, "Displays the watermark") 
 	mode.addEntry("Weird", 2);
 	mode.addEntry("Skeet", 3);
 	mode.addEntry("FirstLetter", 4);
-	mode.addEntry("Celsius", 5);
+	mode.addEntry("Radium", 5);
 	registerBoolSetting("Gradient", &gradient, &gradient);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
 	registerFloatSetting("Scale", &scale, scale, 0.5f, 2);
@@ -53,7 +53,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		vec4_t newRect = vec4_t(positionX, positionY, positionX + aidsLen, positionY + textHeight + (textPadding * 2));
 		vec4_t idkRect = vec4_t(positionX, positionY, positionX + aidsLen, positionY + textHeight + (textPadding * 2));
 		vec4_t newRectTop = vec4_t(newRect.x, newRect.y - 2, newRect.z, newRect.y);
-		vec4_t celsiusRect = vec4_t(positionX, positionY, positionX + aidsLen, positionY + (textHeight * 2) + (textPadding * 4));
+		vec4_t RadiumRect = vec4_t(positionX, positionY, positionX + aidsLen, positionY + (textHeight * 2) + (textPadding * 4));
 
 		//DrawUtils::drawRounderRectangle(vec4_t(positionX, positionY, positionX + 15, positionY + 2.F), interfaceColor);
 		//DrawUtils::drawCircle(vec4_t(positionX + 10, positionY, positionX + 14, positionY + 2.F), MC_Color(10, 10, 10, 255));
@@ -82,7 +82,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		case 4: // FirstLetter
 			break;
 		case 5: // Image
-			DrawUtils::drawGradientText(vec2_t(celsiusRect.x, celsiusRect.y), &clientName, scale, 1, true);
+			DrawUtils::drawGradientText(vec2_t(RadiumRect.x, RadiumRect.y), &clientName, scale, 1, true);
 			break; 
 		}
 	}

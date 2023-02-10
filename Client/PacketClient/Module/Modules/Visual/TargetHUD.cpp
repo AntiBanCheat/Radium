@@ -1,8 +1,8 @@
-#include "CelsiusHUD.h"
+#include "TargetHUD.h"
 #include "../pch.h"
 
 using namespace std;
-CelsiusHUD::CelsiusHUD() : IModule(0, Category::VISUAL, "Displays information about your target") {
+TargetHUD::TargetHUD() : IModule(0, Category::VISUAL, "Displays information about your target") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("New", 0);
 	mode.addEntry("Old", 1);
@@ -19,12 +19,12 @@ CelsiusHUD::CelsiusHUD() : IModule(0, Category::VISUAL, "Displays information ab
 	registerIntSetting("RiseQuality", &RiseQuality, RiseQuality, 1, 100);
 }
 
-const char* CelsiusHUD::getModuleName() { return ("CelsiusHUD"); }
+const char* TargetHUD::getModuleName() { return ("TargetHUD"); }
 
 #pragma region TargetList
 static bool entityChanged = false;
 static vector<C_Entity*> targetList;
-void findPlayers_CelsiusHUD(C_Entity* currentEntity, bool isRegularEntity) {
+void findPlayers_TargetHUD(C_Entity* currentEntity, bool isRegularEntity) {
 	if (currentEntity == nullptr) return;
 //	if (currentEntity == g_Data.getLocalPlayer()) return;
 	if (!g_Data.getLocalPlayer()->canAttack(currentEntity, false)) return;
@@ -47,9 +47,9 @@ struct CompareTargetEnArray {
 };
 #pragma endregion
 
-void CelsiusHUD::onTick(C_GameMode* gm) {
+void TargetHUD::onTick(C_GameMode* gm) {
 	targetList.clear();
-	g_Data.forEachEntity(findPlayers_CelsiusHUD);
+	g_Data.forEachEntity(findPlayers_TargetHUD);
 	targetListEmpty = targetList.empty();
 	sort(targetList.begin(), targetList.end(), CompareTargetEnArray());
 
@@ -64,7 +64,7 @@ void CelsiusHUD::onTick(C_GameMode* gm) {
 	}
 }
 
-void CelsiusHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
+void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 

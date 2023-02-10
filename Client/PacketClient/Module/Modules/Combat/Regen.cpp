@@ -5,9 +5,13 @@
 using namespace std;
 Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerEnumSetting("Mode", &mode, 0);
-	mode.addEntry("Hive", 5);
-	mode.addEntry("FlareonTest", 6);
-	registerFloatSetting("Range", &range, range, 1, 7);
+	mode.addEntry("Hive", 0);
+	mode.addEntry("FlareonTest", 1);
+#if _DEBUG
+	maxRange = 7;
+#endif
+
+	registerFloatSetting("Range", &range, range, 1, maxRange);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 }
 
@@ -16,8 +20,8 @@ const char* Regen::getRawModuleName() {
 }
 
 const char* Regen::getModuleName() {
-	if (mode.getSelectedValue() == 5) name = string("Regen ") + string(GRAY) + string("HiveSingle+");
-	if (mode.getSelectedValue() == 6) name = string("Regen ") + string(GRAY) + string("FlareonTest");
+	if (mode.getSelectedValue() == 0) name = string("Regen ") + string(GRAY) + string("HiveSingle+");
+	if (mode.getSelectedValue() == 1) name = string("Regen ") + string(GRAY) + string("FlareonTest");
 	return name.c_str();
 }
 
@@ -57,6 +61,9 @@ void Regen::onEnable() {
 
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	slot = supplies->selectedHotbarSlot;
+
+	if (range > maxRange)
+		range = maxRange;
 }
 
 void Regen::onTick(C_GameMode* gm) {
@@ -81,10 +88,7 @@ void Regen::onTick(C_GameMode* gm) {
 	if (tick == delay) tick = 0;
 	if (g_Data.canUseMoveKeys()) {
 		switch (mode.getSelectedValue()) {
-		case 0: // Vanilla
-			// nothing lol
-			break;
-		case 5: // FlareonSingle+
+		case 0: // FlareonSingle+
 		{
 
 			//Check Absorpription Health Check
@@ -221,7 +225,7 @@ void Regen::onTick(C_GameMode* gm) {
 			}
 		}
 		break;
-		case 6: // FlareonTest
+		case 1: // FlareonTest
 		{
 			smooth = false;
 			//Check Absorpription Health Check

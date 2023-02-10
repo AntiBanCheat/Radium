@@ -440,15 +440,6 @@ void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, boo
 	text = Utils::sanitize(text);
 	text = text.substr(0, text.find('\n'));
 
-	if (nameTagsMod->health) {
-		int dmg;
-		int maxHealth = 20;
-		float green = (maxHealth - (float)ent->getHealth()) / maxHealth;
-		float red = 1.0f - green;
-		dmg = (int)(red * 100.0f);
-		text = text + " | " + std::to_string(dmg) + "%";
-	}
-
 	float textWidth = getTextWidth(&text, textSize);
 	float textHeight = DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight() * textSize;
 

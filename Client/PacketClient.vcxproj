@@ -333,6 +333,7 @@
     <ClCompile Include="PacketClient\Module\Modules\Exploit\FreeTP.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Other\Breaker.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\Flight.cpp" />
+    <ClCompile Include="PacketClient\Module\Modules\Movement\HiveFlyThree.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Combat\HitBoxes.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\HiveFly.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Visual\ArrayList.cpp" />
@@ -526,6 +527,7 @@
     <ClInclude Include="PacketClient\Module\Modules\Other\Spammer.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\Sprint.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\Speed.h" />
+    <ClInclude Include="PacketClient\Module\Modules\Movement\HiveFlyThree.h" />
     <ClInclude Include="PacketClient\Module\Modules\Player\Blink.h" />
     <ClInclude Include="PacketClient\Module\Modules\Visual\Camera.h" />
     <ClInclude Include="PacketClient\Module\Modules\Exploit\ChatBypass.h" />

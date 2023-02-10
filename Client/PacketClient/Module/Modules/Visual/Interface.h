@@ -5,7 +5,7 @@
 
 class Interface : public IModule {
 public:
-	std::string clientName = "Celsius";
+	std::string clientName = "Radium";
 	std::string releaseStr = "Release";
 	std::string versionStr = "V2.4";
 

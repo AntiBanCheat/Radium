@@ -4,7 +4,9 @@
 
 class Scaffold : public IModule {
 private:
+	int intPosY = 0;
 	bool shouldSwing = false;
+	bool towerOnlyNoMove = false;
 	bool foundBlock = false;
 	bool blockCount = true;
 	bool showExposed = true;
@@ -15,6 +17,8 @@ private:
 	int expR = 255;
 	int expG = 50;
 	int expB = 0;
+	int delay = 0;
+	int Odelay = 0;
 	float expT = 0.4f;
 	bool inclSelf = true;
 	float animPitch = 0.f;
@@ -23,6 +27,8 @@ private:
 	float animFlareonPitch = 0.f;
 	float animYaw = 0.f;
 	int towerTimer = 20;
+	int towerTick = 0;
+	float towerMultiply = 1.2f;
 	float random = 1.5f;
 	bool sprint = true;
 	bool lockY = false;
@@ -39,6 +45,7 @@ private:
 	bool sneaking = false;
 	bool jumping = false;
 	bool oneDot12 = true;
+	bool aurais = false;
 
 	bool findBlocks(C_ItemStack* itemStack);
 	bool isUsefulBlock(C_ItemStack* itemStack);
@@ -71,6 +78,7 @@ public:
 	SettingEnum downwards = this;
 	SettingEnum tower = this;
 	SettingEnum type = this;
+	SettingEnum priority = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
 	virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;

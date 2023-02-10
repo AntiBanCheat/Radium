@@ -34,9 +34,12 @@ void Step::onTick(C_GameMode* gm) {
 	if (reverse && player->onGround && !player->isInWater() && !player->isInLava() && !moduleMgr->getModule<Jesus>()->foundWater)
 		player->velocity.y = -1.f;
 }
-
 void Step::onMove(C_MoveInputHandler* input) {
-	if (mode.getSelectedValue() == 2) {
+	if (mode.getSelectedValue() == 2) 
+	{
+	auto speedMod = moduleMgr->getModule<Speed>();
+	if (!speedMod->isEnabled())
+	{
 		C_LocalPlayer* player = g_Data.getLocalPlayer();
 		if (player == nullptr)
 			return;
@@ -193,6 +196,8 @@ void Step::onMove(C_MoveInputHandler* input) {
 				player->velocity.y = 0;
 			}
 		}
+	}
+	
 	}
 }
 

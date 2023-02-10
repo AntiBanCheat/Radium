@@ -75,6 +75,23 @@ void SettingManager::saveSettings() {
 	delete[] fullPath;
 }
 
+void SettingManager::autosaveSettings() {
+	logF("Saving Settings %s", autosaveSettings.c_str());
+	size_t allocSize = autosaveSettings.size() + roamingFolder.size() + 20;  // std::wstring::size() can be wierd so lets make sure this actually fits
+	char* fullPath = new char[allocSize];
+	sprintf_s(fullPath, allocSize, "%S\\%s.txt", roamingFolder.c_str(), autosaveSettings.c_str());
+
+	moduleMgr->onSaveSettings(&currentSettingsObj);
+
+	std::ofstream o(fullPath, std::ifstream::binary);
+
+	o << std::setw(4) << currentSettingsObj << std::endl;
+	o.flush();
+	o.close();
+
+	delete[] fullPath;
+}
+
 void SettingManager::init() {
 	logF("Initializing Settings");
 	loadSettings(currentSettings, true);

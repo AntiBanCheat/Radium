@@ -68,7 +68,7 @@ void HudEditor::render() {
 	string position = "Position: " + to_string((int)floorf(currPos->x)) + " " + to_string((int)floorf(currPos->y)) + " " + to_string((int)floorf(currPos->z));
 	string speedText = "Speed: " + to_string((int)player->getBlocksPerSecond()) + string(".") + to_string((int)(player->getBlocksPerSecond() * 10) - ((int)player->getBlocksPerSecond() * 10));
 	string fpsText = "FPS: " + to_string(g_Data.getFPS());
-	string totalCountAids = "64";
+	string totalCountAids = "64 blocks";
 	string example = "Example Notification";
 	string strLength = "V2.11 - Developer Build   ";
 	float lFPS = DrawUtils::getTextWidth(&fpsText, 1) + 6.5;
@@ -86,8 +86,9 @@ void HudEditor::render() {
 	vec4_t rectPos = vec4_t(interfaceMod->posX, interfaceMod->posY + 6, lPos + interfaceMod->posX, interfaceMod->posY + 20);
 	vec4_t testRect = vec4_t(targetHUD->positionX, targetHUD->positionY, targetHUD->targetLen + targetHUD->positionX, targetHUD->positionY + rectHeight2);
 	vec4_t watermarkRect = vec4_t(watermark->positionX - 1.f, watermark->positionY - 3.f, watermark->aidsLen + watermark->positionX + 1.f, watermark->positionY + watermark->height);
-	vec4_t scaffoldRect = vec4_t(scaffold->scX, scaffold->scY, 20 + scaffold->scX, scaffold->scY + 15);
+	vec4_t scaffoldRect = vec4_t(scaffold->scX, scaffold->scY, 70 + scaffold->scX, scaffold->scY + 15);
 	vec2_t blockPos(scaffoldRect.x + 5, scaffoldRect.y + 7);
+	vec2_t textPos(scaffoldRect.x + 20, scaffoldRect.y + 5);
 	vec4_t infoRect = vec4_t(interfaceMod->releaseX, interfaceMod->releaseY + 4, infoTextLength + interfaceMod->releaseX, interfaceMod->releaseY + 20);
 	vec4_t rectPos2 = vec4_t(arrayList->positionX - 50, arrayList->positionY, arrayList->positionX, arrayList->positionY + 10);
 	if (arrayList->invert) rectPos2 = vec4_t(arrayList->positionX - 50, arrayList->positionY - 10, arrayList->positionX, arrayList->positionY);
@@ -129,7 +130,7 @@ void HudEditor::render() {
 		}
 	}*/ 
 
-	DrawUtils::drawText(blockPos, &totalCountAids, MC_Color(255, 255, 255), 1.F, 1.F, true);
+	DrawUtils::drawText(textPos, &totalCountAids, MC_Color(255, 255, 255), 1.F, 1.F, true);
 	if (interfaceMod->info) DrawUtils::drawRectangle(fpsRectPos, MC_Color(0, 0, 0), 0.5F);
 	if (interfaceMod->armorHUD) DrawUtils::drawRectangle(armorHudRect, MC_Color(0, 0, 0), 0.5F);
 	if (interfaceMod->info) DrawUtils::fillRectangleA(fpsRectPos, MC_Color(255, 255, 255, 100));
@@ -144,7 +145,15 @@ void HudEditor::render() {
 	if (targetHUD->isEnabled()) DrawUtils::drawRectangle(testRect, MC_Color(255, 255, 255), 1.f);
 	if (targetHUD->isEnabled() && targetHUDIsFocused) DrawUtils::fillRoundRectangle(testRect, MC_Color(255, 255, 255, 255), false);
 	if (sessionInfo->isEnabled() && sessionInfoIsFocused) DrawUtils::fillRoundRectangle(sessionInfoRect, MC_Color(255, 255, 255, 100), true);
-	DrawUtils::drawRectangle(scaffoldRect, MC_Color(255, 255, 255), 1.F);
+	if (clickGUI->Fonts.selected == 1)
+	{
+		vec4_t scaffoldRect1 = vec4_t(scaffold->scX, scaffold->scY, 56 + scaffold->scX, scaffold->scY + 15);
+		DrawUtils::drawRectangle(scaffoldRect1, MC_Color(255, 255, 255), 1.F);
+	}
+	else
+	{
+		DrawUtils::drawRectangle(scaffoldRect, MC_Color(255, 255, 255), 1.F);
+	}
 
 	//keybd_event(0x41, 0, KEYEVENTF_EXTENDEDKEY, 0);
 	vec4_t t = vec4_t(20, 20, 200, 30);
