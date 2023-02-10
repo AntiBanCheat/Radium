@@ -28,9 +28,8 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("Fast", 4);
 	tower.addEntry("Flareon", 5);
 	tower.addEntry("MiniMotion", 6);
-	tower.addEntry("MiniYPort", 7);
-	tower.addEntry("Slow", 8);
-	tower.addEntry("None", 9);
+	tower.addEntry("Slow", 7);
+	tower.addEntry("None", 8);
 	registerEnumSetting("Down", &downwards, 0);
 	downwards.addEntry("Vanilla", 0);
 	downwards.addEntry("None", 1);
@@ -429,40 +428,21 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 6: //MiniMotion
-		case 7: //MiniYPort
+			towerTick++;
 			if (player->onGround) {
 				towerTick = 0;
 				player->jumpFromGround();
 			}
-
-			intPosY = player->getPos()->y;
-			if (player->getPos()->y - intPosY < 0.05) {
-				vec3_t* uwu = player->getPos();
-				uwu->y = intPosY;
-				player->setPos(uwu->add(0, 0, 0));
-				moveVec.y = 0.42;
-				towerTick = 1;
-			}
 			else if (towerTick == 1) {
 				moveVec.y = 0.34;
-				towerTick++;
 			}
 			else if (towerTick == 2) {
 				moveVec.y = 0.25;
-				towerTick++;
-			}
-			else if (towerTick == 3) {
-				if (tower.getSelectedValue() == 7) {
-					moveVec.y = -0.3;
-				}
-				else {
-					// Nothing -_-
-				}
 			}
 
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
-		case 8: //Slow
+		case 7: //Slow
 			moveVec.y = 0.34;
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
