@@ -25,6 +25,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("TPBoost", 9);
 	mode.addEntry("Halcyon", 10);
 	mode.addEntry("Flareon", 11);
+	mode.addEntry("DamageSafe", 12);
 	// Vanilla
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	// All Settings
@@ -377,6 +378,20 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				speedFriction = randomFloat(.33f, .45f);
 			}
 			MoveUtil::setSpeed(speedFriction);
+		}
+	}
+
+	if (mode.getSelectedValue() == 12) {
+		if (MoveUtil::isMoving()) {
+			if (player->onGround) {
+				player->jumpFromGround();
+			}
+			else {
+				MoveUtil::setSpeed(player->velocity.magnitudexz());
+			}
+			if (player->damageTime > 0) {
+				MoveUtil::setSpeed(speed);
+			}
 		}
 	}
 }

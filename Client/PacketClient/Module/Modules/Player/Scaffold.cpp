@@ -428,22 +428,41 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 6: //MiniMotion
-			towerTick++;
 			if (player->onGround) {
 				towerTick = 0;
 				player->jumpFromGround();
 			}
+
+			intPosY = player->getPos()->y;
+			if (player->getPos()->y - intPosY < 0.05) {
+				vec3_t* uwu = player->getPos();
+				uwu->y = intPosY;
+				player->setPos(uwu->add(0, 0, 0));
+				moveVec.y = 0.42;
+				towerTick = 1;
+			}
 			else if (towerTick == 1) {
 				moveVec.y = 0.34;
+				towerTick++;
 			}
 			else if (towerTick == 2) {
 				moveVec.y = 0.25;
+				towerTick++;
 			}
-
-			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
 		case 7: //Slow
-			moveVec.y = 0.34;
+			towerTick++;
+			if (player->onGround) {
+				towerTick = 0;
+			}
+
+			if (towerTick < 2) {
+				moveVec.y = 0.34;
+			}
+			else {
+				moveVec.y = 0.25;
+			}
+
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
 		}
