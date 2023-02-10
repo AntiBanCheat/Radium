@@ -31,9 +31,10 @@ public:
 #else
 	std::string currentConfig = "PCPublic";
 #endif
-
+        std::string AutosaveConfig = "Autosave";
 	void loadConfig(std::string name, bool create);
 	void saveConfig();
+	void autosaveConfig();
 	void init();
 };
 

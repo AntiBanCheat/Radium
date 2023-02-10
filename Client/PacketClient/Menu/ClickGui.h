@@ -7,6 +7,8 @@
 #include "../../Utils/DrawUtils.h"
 #include "../../Utils/GuiUtils.h"
 #include "../Module/ModuleManager.h"
+#include "../Config/ConfigManager.h"
+#include "../Config/SettingManager.h"
 
 struct ClickModule {
 	bool isExtended = false;
@@ -119,4 +121,5 @@ public:
 	static void onWheelScroll(bool direction); // true = up, false = down
 	static void onLoadConfig(void* confVoid);
 	static void onSaveConfig(void* confVoid);
+	virtual void onDisable() override;
 };
