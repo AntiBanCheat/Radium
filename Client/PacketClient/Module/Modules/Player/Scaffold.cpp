@@ -27,11 +27,15 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("HiveSlow", 3);
 	tower.addEntry("Fast", 4);
 	tower.addEntry("Flareon", 5);
-	tower.addEntry("None", 6);
+	tower.addEntry("MiniMotion", 6);
+	tower.addEntry("MiniYPort", 7);
+	tower.addEntry("Slow", 8);
+	tower.addEntry("None", 9);
 	registerEnumSetting("Down", &downwards, 0);
 	downwards.addEntry("Vanilla", 0);
 	downwards.addEntry("None", 1);
 	registerBoolSetting("BlockCount", &blockCount, blockCount);
+	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
 	registerBoolSetting("Spoof", &spoof, spoof);
 	registerEnumSetting("TYPE", &type, 0);
@@ -114,6 +118,7 @@ void Scaffold::onEnable() {
 
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	slot = supplies->selectedHotbarSlot;
+	towerTick = 0;
 }
 
 void Scaffold::onTick(C_GameMode* gm) {
@@ -364,6 +369,7 @@ bool Scaffold::isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos) {
 void Scaffold::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
+	if (towerOnlyNoMove && g_Data.getLocalPlayer()->velocity.magnitudexz() <= 0.05) return;
 
 	// Math
 	vec3_t pos = *player->getPos();
@@ -374,6 +380,8 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 	float c = cos(calcYaw);
 	float s = sin(calcYaw);
 	vec3_t moveVec;
+	moveVec.x = g_Data.getLocalPlayer()->velocity.x;
+	moveVec.z = g_Data.getLocalPlayer()->velocity.z;
 
 	if (jumping && foundBlock) {
 		auto aura = moduleMgr->getModule<Killaura>();
@@ -385,20 +393,16 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(towerTimer);
 		switch (tower.getSelectedValue()) {
 		case 0: // Vanilla
-			moveVec.x = g_Data.getLocalPlayer()->velocity.x;
 			moveVec.y = 0.4f;
-			moveVec.z = g_Data.getLocalPlayer()->velocity.z;
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
 		case 1: // Hive
-			if (velocityxz <= 0.05) {
-				g_Data.getClientInstance()->minecraft->setTimerSpeed(145.f); // LOL
-				/*old*/
-				/*movement = {movement.x * c - movement.y * s, movement.x * s + movement.y * c};
-				player->setPos(vec3_t(pos.x, mathGround, pos.z));
-				moveVec.y = player->velocity.y;
-				player->jumpFromGround();*/
-			}
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(145.f); // LOL
+			/*old*/
+			/*movement = {movement.x * c - movement.y * s, movement.x * s + movement.y * c};
+			player->setPos(vec3_t(pos.x, mathGround, pos.z));
+			moveVec.y = player->velocity.y;
+			player->jumpFromGround();*/
 			break;
 		case 2: // Clip
 			if (player->onGround) {
@@ -406,16 +410,12 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 3: // HiveClip
-			if (velocityxz <= 0.05) {
-				g_Data.getClientInstance()->minecraft->setTimerSpeed(30.f); // LOL
-			}
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(30.f); // LOL
 			break;
 		case 4: // Fast
 			if (player->onGround) {
 				player->jumpFromGround();
-				moveVec.x = g_Data.getLocalPlayer()->velocity.x;
 				moveVec.y = 0.7f;
-				moveVec.z = g_Data.getLocalPlayer()->velocity.z;
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			}
 			break;
@@ -427,6 +427,44 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 				moveVec.y = 0.01;
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			}
+			break;
+		case 6: //MiniMotion
+		case 7: //MiniYPort
+			if (player->onGround) {
+				towerTick = 0;
+				player->jumpFromGround();
+			}
+
+			intPosY = player->getPos()->y;
+			if (player->getPos()->y - intPosY < 0.05) {
+				vec3_t* uwu = player->getPos();
+				uwu->y = intPosY;
+				player->setPos(uwu->add(0, 0, 0));
+				moveVec.y = 0.42;
+				towerTick = 1;
+			}
+			else if (towerTick == 1) {
+				moveVec.y = 0.34;
+				towerTick++;
+			}
+			else if (towerTick == 2) {
+				moveVec.y = 0.25;
+				towerTick++;
+			}
+			else if (towerTick == 3) {
+				if (tower.getSelectedValue() == 7) {
+					moveVec.y = -0.3;
+				}
+				else {
+					// Nothing -_-
+				}
+			}
+
+			g_Data.getLocalPlayer()->lerpMotion(moveVec);
+			break;
+		case 8: //Slow
+			moveVec.y = 0.34;
+			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
 		}
 		if (tower.getSelectedValue() != 5) {

@@ -4,7 +4,9 @@
 
 class Scaffold : public IModule {
 private:
+	int intPosY = 0;
 	bool shouldSwing = false;
+	bool towerOnlyNoMove = false;
 	bool foundBlock = false;
 	bool blockCount = true;
 	bool showExposed = true;
@@ -25,6 +27,7 @@ private:
 	float animFlareonPitch = 0.f;
 	float animYaw = 0.f;
 	int towerTimer = 20;
+	int towerTick = 0;
 	float towerMultiply = 1.2f;
 	float random = 1.5f;
 	bool sprint = true;
