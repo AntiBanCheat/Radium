@@ -143,6 +143,7 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new Nuker()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Derp()));
 		moduleList.push_back(std::shared_ptr<IModule>(new MCF()));
+		moduleList.push_back(std::shared_ptr<IModule>(new AutoSave()));
 		//moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
 
 #ifdef _DEBUG

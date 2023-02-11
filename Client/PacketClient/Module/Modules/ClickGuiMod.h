@@ -1,6 +1,8 @@
 #pragma once
 #include "../../Menu/HudEditor.h"
 #include "../../Menu/ClickGui.h"
+#include "../../Config/ConfigManager.h"
+#include "../../Config/SettingManager.h"
 #include "Module.h"
 
 class ClickGUIMod : public IModule {

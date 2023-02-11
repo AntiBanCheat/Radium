@@ -134,6 +134,7 @@
 #include "Modules/Other/Nuker.h"
 #include "Modules/Other/Derp.h"
 #include "Modules/Other/MCF.h"
+#include "Modules/Other/AutoSave.h"
 
 #include "Modules/Module.h"
 
