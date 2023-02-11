@@ -860,7 +860,8 @@ void Hooks::Actor_lerpMotion(C_Entity* _this, vec3_t motVec) {
 			networkSender = reinterpret_cast<void*>(9 + FindSignature("48 8B CB FF ?? ?? ?? ?? 00 C6 47 ?? 01 48 8B 5C 24"));
 
 		if (networkSender == _ReturnAddress()) {
-			
+			auto speed = moduleMgr->getModule<Speed>();
+			speed->damageMotion = motVec.magnitudexz();
 			motVec = _this->velocity.lerp(motVec, velocity->x, velocity->y, velocity->x);
 		}
 	}

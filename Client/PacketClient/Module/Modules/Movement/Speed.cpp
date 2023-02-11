@@ -7,11 +7,7 @@ float speedMin = 0.59f; // inf value
 int packetsSent = 0;
 int enabledTicks = 0;
 int flareonticks = 0;
-<<<<<<< HEAD
 int strafeTime = 0;
-=======
-int dmgticks = 0;
->>>>>>> parent of 7bd3f58 (DamageSafe renamed to DamageBoost and improving bypass)
 int hivegroundticks = 0;
 
 using namespace std;
@@ -59,11 +55,7 @@ void Speed::onEnable() {
 	if (player == nullptr) return;
 	enabledTicks = 0;
 	flareonticks = 0;
-<<<<<<< HEAD
 	strafeTime = 0;
-=======
-	dmgticks = 0;
->>>>>>> parent of 7bd3f58 (DamageSafe renamed to DamageBoost and improving bypass)
 	clientmessage = false;
 	hivegroundticks = 0;
 	needblink = false;
@@ -391,30 +383,22 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		}
 	}
 
+	//DamageBoost
 	if (mode.getSelectedValue() == 12) {
 		if (pressed) {
-			dmgticks++;
 			if (player->onGround) {
 				player->jumpFromGround();
 			}
 
-			if (damageMotion != nullptr) {
+			if (damageMotion != 0) {
 				strafeTime = 0;
-				MoveUtil::setSpeed(damageMotion.magnitudexz() + .06);
-				damageMotion = nullptr;
+				MoveUtil::setSpeed(damageMotion + .06);
+				damageMotion = 0;
 			}
 
 			if (MoveUtil::isMoving()) {
-<<<<<<< HEAD
 				if (strafeTime < 13) {
 					strafeTime++;
-=======
-				if (player->damageTime > 0) {
-					MoveUtil::setSpeed(speed);
-					dmgticks = 0;
-				}
-				else if (dmgticks < 14) {
->>>>>>> parent of 7bd3f58 (DamageSafe renamed to DamageBoost and improving bypass)
 					MoveUtil::setSpeed(player->velocity.magnitudexz());
 				}
 			}

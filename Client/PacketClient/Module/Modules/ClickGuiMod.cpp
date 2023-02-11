@@ -72,12 +72,6 @@ void ClickGUIMod::onDisable() {
 	openAnimation = false;
 	hasOpenedGUI = false;
 	animation = 1;
-
-	auto autoSaveMod = moduleMgr->getModule<AutoSave>();
-	if (autoSaveMod->isEnabled() && autoSaveMod->when.getSelectedValue() == 0) {
-		configMgr->saveConfig();
-		SettingMgr->saveSettings();
-	}
 }
 
 void ClickGUIMod::onLoadConfig(void* conf) {
