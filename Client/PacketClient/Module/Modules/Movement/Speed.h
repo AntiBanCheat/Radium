@@ -29,6 +29,8 @@ public:
 	float maxSpeed2 = 0.88991f;
 	bool preventKick = false;
 
+	vec3_t damageMotion = nullptr;
+
 	std::string name = "Speed";
 	SettingEnum mode = this;
 

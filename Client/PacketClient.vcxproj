@@ -267,6 +267,7 @@
     <ClCompile Include="PacketClient\Module\Modules\Movement\HiveFlytwo.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\HiveTestModule.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\bhop.cpp" />
+    <ClCompile Include="PacketClient\Module\Modules\Other\AutoSave.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Other\DeathEffects.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Other\AutoSpellBook.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Player\AutoTool.cpp" />
@@ -471,6 +472,7 @@
     <ClInclude Include="PacketClient\Module\Modules\Movement\HiveFlytwo.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\HiveTestModule.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\bhop.h" />
+    <ClInclude Include="PacketClient\Module\Modules\Other\AutoSave.h" />
     <ClInclude Include="PacketClient\Module\Modules\Other\DeathEffects.h" />
     <ClInclude Include="PacketClient\Module\Modules\Other\AutoSpellBook.h" />
     <ClInclude Include="PacketClient\Module\Modules\Player\AutoTool.h" />
