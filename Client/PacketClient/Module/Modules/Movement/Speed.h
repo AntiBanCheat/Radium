@@ -11,6 +11,8 @@ private:
 	bool groundcheck;
 	float oldx;
 	float oldz;
+
+	virtual void setSpeed(float speed);
 public:
 	float effectiveSpeed = 0.5f;
 	float duration = 1.f;

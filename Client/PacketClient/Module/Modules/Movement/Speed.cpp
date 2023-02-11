@@ -59,6 +59,7 @@ void Speed::onEnable() {
 	clientmessage = false;
 	hivegroundticks = 0;
 	needblink = false;
+	damageMotion = 0;
 
 	oldx = player->currentPos.x;
 	oldz = player->currentPos.z;
@@ -388,22 +389,42 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				player->jumpFromGround();
+				if (strafeTime >= 13) {
+					setSpeed(randomFloat(speedMin, speedMax));
+				}
 			}
 
 			if (damageMotion != 0) {
 				strafeTime = 0;
-				MoveUtil::setSpeed(damageMotion + speed * 0.1);
+				setSpeed(damageMotion + speed * 0.1);
 				damageMotion = 0;
 			}
 
 			if (MoveUtil::isMoving()) {
-				if (strafeTime < 13) {
+				if (strafeTime <= 13) {
 					strafeTime++;
-					MoveUtil::setSpeed(player->velocity.magnitudexz());
+					setSpeed(player->velocity.magnitudexz());
 				}
 			}
 		}
 	}
+}
+
+void Speed::setSpeed(float speed) {
+	C_MoveInputHandler* input = g_Data.getClientInstance()->getMoveTurnInput();
+	auto player = g_Data.getLocalPlayer();
+	float calcYaw = (player->yaw + 90) * (PI / 180);
+	float c = cos(calcYaw);
+	float s = sin(calcYaw);
+
+	vec2_t moveVec2D = { input->forwardMovement, -input->sideMovement };
+	moveVec2D = { moveVec2D.x * c - moveVec2D.y * s, moveVec2D.x * s + moveVec2D.y * c };
+	vec3_t moveVec;
+
+	moveVec.x = moveVec2D.x * speed;
+	moveVec.y = player->velocity.y;
+	moveVec.z = moveVec2D.y * speed;
+	player->lerpMotion(moveVec);
 }
 
 void Speed::onSendPacket(C_Packet* packet) {

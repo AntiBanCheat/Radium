@@ -9,6 +9,7 @@ Killsults::Killsults() : IModule(0, Category::OTHER, "Insults people you kill lo
 	mode.addEntry("Japanese", 3);
 	mode.addEntry("Japanese810", 4);
 	mode.addEntry("UwUSpeak", 5);
+	mode.addEntry("Health", 6);
 	registerBoolSetting("Sound", &sound, sound);
 	registerBoolSetting("Notification", &notification, notification);
 }
@@ -201,6 +202,9 @@ void Killsults::onPlayerTick(C_Player* plr) {
 		case 5: // UwU
 			random = rand() % 13;
 			textPacket.message.setText(uwuspeakMessage[random]);
+			break;
+		case 6:
+			textPacket.message.setText(to_string(player->getHealth() + player->getAbsorption()) + " Health remaining, Want power? radiumclient.com");
 			break;
 	}
 		textPacket.sourceName.setText(player->getNameTag()->getText());
