@@ -7,7 +7,7 @@ float speedMin = 0.59f; // inf value
 int packetsSent = 0;
 int enabledTicks = 0;
 int flareonticks = 0;
-int dmgticks = 0;
+bool dmgBoosted = false;
 int hivegroundticks = 0;
 
 using namespace std;
@@ -26,7 +26,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("TPBoost", 9);
 	mode.addEntry("Halcyon", 10);
 	mode.addEntry("Flareon", 11);
-	mode.addEntry("DamageSafe", 12);
+	mode.addEntry("DamageBoost", 12);
 	// Vanilla
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	// All Settings
@@ -55,7 +55,7 @@ void Speed::onEnable() {
 	if (player == nullptr) return;
 	enabledTicks = 0;
 	flareonticks = 0;
-	dmgticks = 0;
+	dmgBoosted = false;
 	clientmessage = false;
 	hivegroundticks = 0;
 	needblink = false;
@@ -383,19 +383,24 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		}
 	}
 
+	// DamageBoost
 	if (mode.getSelectedValue() == 12) {
 		if (pressed) {
-			dmgticks++;
 			if (player->onGround) {
 				player->jumpFromGround();
 			}
 			if (MoveUtil::isMoving()) {
 				if (player->damageTime > 0) {
-					MoveUtil::setSpeed(speed);
-					dmgticks = 0;
+					if (!dmgBoosted) {
+						MoveUtil::setSpeed(speed);
+						dmgBoosted = true;
+					}
+					else {
+						MoveUtil::setSpeed(player->velocity.magnitudexz());
+					}
 				}
-				else if (dmgticks < 14) {
-					MoveUtil::setSpeed(player->velocity.magnitudexz());
+				else {
+					dmgBoosted = false;
 				}
 			}
 		}
