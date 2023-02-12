@@ -65,19 +65,33 @@ void Breaker::onTick(C_GameMode* gm) {
 
 	if (treasures) {
 		static auto breaker = moduleMgr->getModule<Breaker>();
+		static auto gamemode = gm;
+		static vec3_t topPos = nullptr;
+
 		g_Data.forEachEntity([](C_Entity* ent, bool b) {
 			string name = ent->getNameTag()->getText();
 			int id = ent->getEntityTypeId();
+			vec3_t pos = ent->getPos()->add(0, 1, 0);
+			bool isTopAir = gamemode->player->region->getBlock(pos)->toLegacy()->blockId;
 
-			if (name.find("Treasure") != string::npos && g_Data.getLocalPlayer()->getPos()->dist(*ent->getPos()) <= 5) {
-				breaker->delay++;
-				if (breaker->delay >= 20) {
-					if (breaker->swing) g_Data.getLocalPlayer()->swing();
-					g_Data.getCGameMode()->attack(ent);
-					breaker->delay = 0;
+			if (!isTopAir) {
+				topPos = pos;
+			}
+			else {
+				if (name.find("Treasure") != string::npos && g_Data.getLocalPlayer()->getPos()->dist(*ent->getPos()) <= 5) {
+					breaker->delay++;
+					if (breaker->delay >= 20) {
+						if (breaker->swing) g_Data.getLocalPlayer()->swing();
+						g_Data.getCGameMode()->attack(ent);
+						breaker->delay = 0;
+					}
 				}
 			}
 		});
+
+		if (topPos != nullptr) {
+			blockPos = vec3_ti(topPos.x, topPos.y, topPos.z);
+		}
 	}
 }
 

@@ -24,6 +24,7 @@ Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitti
 	//registerBoolSetting("TapSwing", &tapswing, tapswing);
 	registerBoolSetting("NoSwing", &noswing, noswing);
 	registerBoolSetting("NoSwingV2", &slowSwing, slowSwing);
+	registerBoolSetting("1.8.9", &_189, _189);
 	registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("Reset", &reset, reset);
 	registerFloatSetting("X", &xPos, xPos, -3.f, 3.f);
@@ -81,6 +82,7 @@ void Animations::onTick(C_GameMode* gm) {
 	if (shouldBlock) {
 		//if (mode.getSelectedValue() == 1) Utils::nopBytes((unsigned char*)SmoothSwing, 6);
 		if (!swing) *player->getSwingState() = 0.f;
+		if (isAttacking && _189) *player->getSwingState() = 0.f;
 	}
 
 	if (slowSwing) *player->getSwingState() = 0.f;

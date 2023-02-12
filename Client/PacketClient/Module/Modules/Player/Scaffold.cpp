@@ -427,18 +427,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 6: //Slow
-			towerTick++;
-			if (player->onGround) {
-				towerTick = 0;
-			}
-
-			if (towerTick < 2) {
-				moveVec.y = 0.34;
-			}
-			else {
-				moveVec.y = 0.25;
-			}
-
+			moveVec.y = 0.32;
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
 		}

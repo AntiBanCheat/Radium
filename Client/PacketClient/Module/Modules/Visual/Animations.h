@@ -8,6 +8,7 @@ private:
     bool reset = false;
     bool swing = true;
     bool requireswing = false;
+    bool _189 = false;
 public:
     float xPos = 0.f, yPos = 0.f, zPos = 0.f;
     bool shouldBlock = false;
