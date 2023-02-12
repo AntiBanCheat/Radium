@@ -97,6 +97,12 @@ void Killaura::onEnable() {
 void Killaura::onTick(C_GameMode* gm) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
+
+	if (player->canFly) {
+		setEnabled(false);
+		return;
+	}
+
 	if (moduleMgr->getModule<Regen>()->isregen == true) {
 		animYaw = player->yawUnused1;
 		animPitch = player->pitch;
