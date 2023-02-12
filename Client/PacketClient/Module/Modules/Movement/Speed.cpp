@@ -28,7 +28,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("Flareon", 11);
 	mode.addEntry("DamageSafe", 12);
 	// Vanilla
-	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
+	registerFloatSetting("Height", &height, height, 0.000001f, 0.42f);
 	// All Settings
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 35);
@@ -69,7 +69,7 @@ void Speed::onTick(C_GameMode* gm) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 
-	if (mode.getSelectedValue() == 11) player->setSprinting(true); 
+	if (mode.getSelectedValue() == 11) player->setSprinting(true);
 
 	if (enabledTicks > 10) enabledTicks++;
 	else enabledTicks = 0;
@@ -88,13 +88,11 @@ void Speed::onTick(C_GameMode* gm) {
 		ticks++;
 		break;
 	}
-if (dboost) {
+	if (dboost) {
 		if (player->onGround) {
 			moduleMgr->getModule<Blink>()->setEnabled(false);
 			//auto notification = g_Data.addNotification("Speed:", "IKA HA BAKA"); notification->duration = 3;
 		}
-	}
-	if (dboost) {
 
 		if (GameData::isKeyDown(*input->spaceBarKey))g_Data.getClientInstance()->minecraft->setTimerSpeed(boosttimer);
 		if (GameData::isKeyDown(*input->spaceBarKey)) {
@@ -107,8 +105,7 @@ if (dboost) {
 				moduleMgr->getModule<Blink>()->setEnabled(true);
 			}
 		}
-	}
-	if (dboost) {
+
 		if (!GameData::isKeyDown(*input->spaceBarKey)) {
 			moduleMgr->getModule<Blink>()->setEnabled(false);
 		}

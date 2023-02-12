@@ -53,7 +53,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
-	registerFloatSetting("Extend", &extend, extend, 0, 20);
+	registerIntSetting("Extend", &extend, extend, 0, 20);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 	registerBoolSetting("ZipLine", &zipline, zipline);
 }
@@ -172,7 +172,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	blockBelowPredict.y -= player->height;
 	blockBelowPredict.y -= 0.5f;
 
-	currExtend = extend;
+	currExtend = extend + 1.2;
 
 	if (sneaking && downwards.getSelectedValue() == 0) {
 		vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
