@@ -264,6 +264,7 @@
     <ClCompile Include="PacketClient\Module\Modules\Exploit\NoLagBack.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Exploit\HiveOnGround.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Exploit\Detector.cpp" />
+    <ClCompile Include="PacketClient\Module\Modules\Exploit\PacketMine.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\HiveFlytwo.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\HiveTestModule.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Movement\bhop.cpp" />
@@ -469,6 +470,7 @@
     <ClInclude Include="PacketClient\Module\Modules\Exploit\NoLagBack.h" />
     <ClInclude Include="PacketClient\Module\Modules\Exploit\HiveOnGround.h" />
     <ClInclude Include="PacketClient\Module\Modules\Exploit\Detector.h" />
+    <ClInclude Include="PacketClient\Module\Modules\Exploit\PacketMine.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\HiveFlytwo.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\HiveTestModule.h" />
     <ClInclude Include="PacketClient\Module\Modules\Movement\bhop.h" />
