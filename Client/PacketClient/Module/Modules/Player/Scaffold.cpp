@@ -882,7 +882,10 @@ bool Scaffold::findBlocks(C_ItemStack* itemStack) {
 
 void Scaffold::onDisable() {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
-	g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(20.f);
+
+	if (type.getSelectedValue() == 1) {
+		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(20.f);
+	}
 	auto sprint = moduleMgr->getModule<Sprint>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	sprint->useSprint = true;

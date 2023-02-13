@@ -386,18 +386,10 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				player->jumpFromGround();
-				if (strafeTime >= 13) {
-					setSpeed(randomFloat(speedMin, speedMax));
-				}
 			}
 
 			if (damageMotion != 0 && damageMotion >= 0.15f) {
-				if (damageMotion > speed) {
-					setSpeed(damageMotion + speed * 0.1);
-				}
-				else {
-					setSpeed(speed);
-				}
+				setSpeed(damageMotion + speed * 0.1);
 				damageMotion = 0;
 				strafeTime = 0;
 			}
