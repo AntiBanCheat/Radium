@@ -23,6 +23,8 @@ public:
 
 	void setTimerSpeed(float tps) {
 		*this->timer = tps;
+	}
+		void setRenderTimerSpeed(float tps) {
 		*this->renderTimer = tps;
 	};
 };

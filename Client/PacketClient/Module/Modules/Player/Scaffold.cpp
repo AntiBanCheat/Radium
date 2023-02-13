@@ -36,6 +36,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
 	registerBoolSetting("Spoof", &spoof, spoof);
+	registerBoolSetting("FakeSpoof", &fakespoof, fakespoof);
 	registerEnumSetting("TYPE", &type, 0);
 	type.addEntry("Normal", 0);
 	type.addEntry("Fake", 1);
@@ -95,7 +96,9 @@ bool Scaffold::isBlockReplacable(vec3_t blockPos) {
 void Scaffold::onEnable() {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
+	if(fakespoof){
+		g_Data.getClientInstance()->minecraft->setRendertimer(0.f);
+	}
 	blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
 	blockBelowY.y -= g_Data.getLocalPlayer()->height;
 	blockBelowY.y -= 0.5f;
@@ -123,7 +126,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 	C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
+	if(fakespoof){
+		g_Data.getClientInstance()->minecraft->setRendertimer(0.f);
+	}
 	auto sprintMod = moduleMgr->getModule<Sprint>();
 	auto speed = moduleMgr->getModule<Speed>();
 
@@ -880,6 +885,7 @@ bool Scaffold::findBlocks(C_ItemStack* itemStack) {
 
 void Scaffold::onDisable() {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
+	g_Data.getClientInstance()->minecraft->setRendertimer(20.f);
 	auto sprint = moduleMgr->getModule<Sprint>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	sprint->useSprint = true;
