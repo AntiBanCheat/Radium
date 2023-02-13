@@ -24,6 +24,9 @@ public:
 	void setTimerSpeed(float tps) {
 		*this->timer = tps;
 		*this->renderTimer = tps;
+	}
+		void setRenderTimerSpeed(float tps) {
+		*this->renderTimer = tps;
 	};
 };
 
