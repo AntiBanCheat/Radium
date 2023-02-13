@@ -391,8 +391,13 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				}
 			}
 
-			if (damageMotion != 0) {
-				setSpeed(damageMotion + speed * 0.1);
+			if (damageMotion != 0 && damageMotion >= 0.15f) {
+				if (damageMotion > speed) {
+					setSpeed(damageMotion + speed * 0.1);
+				}
+				else {
+					setSpeed(speed);
+				}
 				damageMotion = 0;
 				strafeTime = 0;
 			}

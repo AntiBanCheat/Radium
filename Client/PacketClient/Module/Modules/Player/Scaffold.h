@@ -12,7 +12,6 @@ private:
 	bool showExposed = true;
 	bool movedx = false;
 	bool movedz = false;
-	bool fakespoof = false;
 	bool speedwasenabled = false;
 	vec3_t oldpos;
 	int expR = 255;
