@@ -110,6 +110,7 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new XP()));
 
 		// Exploit
+		moduleList.push_back(std::shared_ptr<IModule>(new PacketMine()));
 		moduleList.push_back(std::shared_ptr<IModule>(new PacketMultiplier()));
 		moduleList.push_back(std::shared_ptr<IModule>(new HiveOnGround()));
 		moduleList.push_back(std::shared_ptr<IModule>(new HackerDetector()));

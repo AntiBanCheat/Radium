@@ -98,6 +98,7 @@
 #include "Modules/Player/XP.h"
 
 // Exploit
+#include "Modules/Exploit/PacketMine.h"
 #include "Modules/Exploit/PacketMultiplier.h"
 #include "Modules/Exploit/HiveOnGround.h"
 #include "Modules/Exploit/HackerDetector.h"
