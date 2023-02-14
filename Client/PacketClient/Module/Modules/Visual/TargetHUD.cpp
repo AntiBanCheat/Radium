@@ -408,7 +408,13 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					}
 
 					infoStr += string(to_string((int) absorbtion / 2));
-					infoStr += string(RESET) + " Dist: " + to_string((int)dist);
+					infoStr += string(RESET) + " Dist: ";
+					auto killauraMod = moduleMgr->getModule<Killaura>();
+					if (dist <= killauraMod->range) {
+						infoStr += string(BLUE);
+						// DrawUtils::drawText(vec2_t(windowSize.x / 2 - DrawUtils::getTextWidth(&string("IN LAR")), windowSize.y / 2 + 10), &string("IN LAR"), MC_Color(255, 165, 0, opacity), 1, 1, true);
+					}
+					infoStr += to_string((int)dist);
 
 					int selfScore = entScore(g_Data.getLocalPlayer());
 					int oppenantScore = entScore(targetList[0]);
@@ -423,7 +429,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 						winr = YELLOW + string("Neutral");
 					}
 
-					infoStr += " " + winr + RESET;
+					infoStr += string(RESET) + " " + winr + string(RESET);
 
 					static const float rectHeight = (3, 3) * DrawUtils::getFont(Fonts::DEFAULT)->getLineHeight();
 					float targetLen = 37.f + DrawUtils::getTextWidth(&name, 1);
@@ -432,11 +438,29 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					else targetLen = DrawUtils::getTextWidth(&name, 1) + 6.5;
 
 					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + rectHeight);
+					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), false);
+					vec4_t hpRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + ((targetLen - 4) / 14) * absorption, testRect.y + 30);
+					vec4_t blackHpRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + (targetLen - 4), testRect.y + 30);
+					MC_Color color;
+					if (absorbtion > 5) {
+						color = MC_Color(25, 255, 25);
+					}
+					else if (absorbtion > 1) {
+						color = MC_Color(255, 255, 25);
+					}
+					else {
+						color = MC_Color(255, 25, 25);
+					}
+
+					color.a = opacity;
+					// DrawUtils::fillRoundRectangle(blackHpRect, color, false);
+					color.a = 255;
+					// DrawUtils::fillRoundRectangle(hpRect, color, false);
+
 					vec2_t namePos = vec2_t(testRect.x + 4, testRect.y + 5);
-					vec2_t distPos = vec2_t(testRect.x + 4, testRect.y + 15);
+					vec2_t distPos = vec2_t(testRect.x + 4, testRect.y + 20);
 					DrawUtils::drawText(distPos, &infoStr, MC_Color(255, 255, 255), 1, 1, true);
 					DrawUtils::drawText(namePos, &name, MC_Color(255, 255, 255), 1, 1, true);
-					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), true);
 				}
 
 				if (mode.getSelectedValue() == 1) {
