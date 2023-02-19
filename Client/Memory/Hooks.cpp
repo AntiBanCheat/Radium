@@ -983,7 +983,7 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 		return;
 
 	if (blinkMod->isEnabled() || freeTP->isEnabled() || (freecam->isEnabled() && freecam->cancelPackets) || speed->needblink) {
-		if (!blinkMod->allpackets && packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() || packet->isInstanceOf<C_PlayerActionPacket>()) {
+		if (!blinkMod->allpackets && (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() || packet->isInstanceOf<C_PlayerActionPacket>())) {
 			if (blinkMod->isEnabled()) {
 				if (packet->isInstanceOf<C_MovePlayerPacket>()) {
 					C_MovePlayerPacket* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet); movePacket->onGround = true;
