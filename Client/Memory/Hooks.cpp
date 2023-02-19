@@ -1028,7 +1028,7 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 			return;
 		}
 		if (blinkMod->getPacketHolder()->size() > 0) {
-			for (auto it : *blinkMod->getPlayerActionPacketHolder()) {
+			for (auto it : *blinkMod->getPacketHolder()) {
 				oFunc(a, (it));
 				delete it;
 				it = nullptr;
