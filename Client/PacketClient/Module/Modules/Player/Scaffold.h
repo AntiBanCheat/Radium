@@ -4,6 +4,9 @@
 
 class Scaffold : public IModule {
 private:
+	int offGroundTicks = 0;
+	bool uwu = false;
+
 	int intPosY = 0;
 	bool shouldSwing = false;
 	bool towerOnlyNoMove = false;
@@ -32,7 +35,6 @@ private:
 	float random = 1.5f;
 	bool sprint = true;
 	bool lockY = false;
-	bool spoof = false;
 	bool zipline = false;
 	bool preventkicks = false;
 	int yLock = -1;
@@ -40,7 +42,6 @@ private:
 	int range = 4;
 	int slot = 0;
 	vec3_t blockBelowY;
-	bool fake = false;
 
 	bool sneaking = false;
 	bool jumping = false;
@@ -77,8 +78,8 @@ public:
 	SettingEnum rotations = this;
 	SettingEnum downwards = this;
 	SettingEnum tower = this;
-	SettingEnum type = this;
 	SettingEnum priority = this;
+	SettingEnum holdType = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
 	virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;

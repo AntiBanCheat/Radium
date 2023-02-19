@@ -106,7 +106,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		}
 
 		if (!targetListEmpty) {
-			auto absorbtion = 0.f;
+			auto absorbtion = targetList[0]->getAbsorption();
 			string percent = "100%";
 			auto interfaceColor = ColorUtil::interfaceColor(1);
 			vec3_t* pos = targetList[0]->getPos();
@@ -389,7 +389,6 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 				// jd
 				if (mode.getSelectedValue() == 9) {
-					int absorption = targetList[0]->getAbsorption();
 					string name;
 					string rawName = targetList[0]->getNameTag()->getText();
 					rawName = Utils::sanitize(rawName);
@@ -439,7 +438,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + rectHeight);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(0, 0, 0, opacity), false);
-					vec4_t hpRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + ((targetLen - 4) / 14) * absorption, testRect.y + 30);
+					vec4_t hpRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + ((targetLen - 4) / 14) * absorbtion, testRect.y + 30);
 					vec4_t blackHpRect = vec4_t(testRect.x + 35, testRect.y + 20, testRect.x + (targetLen - 4), testRect.y + 30);
 					MC_Color color;
 					if (absorbtion > 5) {

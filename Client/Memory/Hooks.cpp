@@ -862,7 +862,13 @@ void Hooks::Actor_lerpMotion(C_Entity* _this, vec3_t motVec) {
 		if (networkSender == _ReturnAddress()) {
 			auto speed = moduleMgr->getModule<Speed>();
 			speed->damageMotion = motVec.magnitudexz();
-			motVec = _this->velocity.lerp(motVec, velocity->x, velocity->y, velocity->x);
+
+			if (velocity->jumpReset) {
+				g_Data.getLocalPlayer()->jumpFromGround();
+			}
+			else {
+				motVec = _this->velocity.lerp(motVec, velocity->x, velocity->y, velocity->x);
+			}
 		}
 	}
 
