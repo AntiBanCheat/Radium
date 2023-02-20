@@ -35,10 +35,10 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerBoolSetting("BlockCount", &blockCount, blockCount);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
-	registerBoolSetting("Spoof", &spoof, spoof);
-	registerEnumSetting("TYPE", &type, 0);
-	type.addEntry("Normal", 0);
-	type.addEntry("Fake", 1);
+	registerEnumSetting("HoldType", &holdType, 0);
+	holdType.addEntry("Switch", 0);
+	holdType.addEntry("Spoof", 1);
+	holdType.addEntry("Fake", 2);
 	registerEnumSetting("Priority", &priority, 0);
 	priority.addEntry("Normal", 0);
 	priority.addEntry("Largest", 1);
@@ -117,7 +117,7 @@ void Scaffold::onEnable() {
 	slot = supplies->selectedHotbarSlot;
 	towerTick = 0;
 
-	if (type.getSelectedValue() == 1) {
+	if (holdType.getSelectedValue() == 3) {
 		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(0.f);
 	}
 }
@@ -136,6 +136,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (!jumping || !foundBlock)
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 
+	if (player->onGround) offGroundTicks = 0;
+	else offGroundTicks++;
+
 	if (preventkicks && speed->isEnabled()) {
 		speed->setEnabled(false);
 		auto notification = g_Data.addNotification("Scaffold:", "Disabled Speed"); notification->duration = 5;
@@ -146,7 +149,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (!selectBlock()) {
 		if (!restored) restored = true;
 		else {
-			//auto warning = g_Data.addNotification("Scaffold", "No Blocks Found"); warning->duration = 3;
+			auto warning = g_Data.addNotification("Scaffold", "No Blocks Found"); warning->duration = 3;
 			setEnabled(false);
 		}
 		return;
@@ -304,25 +307,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 	oldpos = blockBelow.floor();
 
 	if (!sprint) { gm->player->setSprinting(false); sprintMod->useSprint = false; }
-	if (spoof) {
-		/*__int64 id = *g_Data.getLocalPlayer()->getUniqueId();
-		C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
-		C_Inventory* inv = supplies->inventory;
-		if (type.getSelectedValue() == 1 && MoveUtil::isMoving) {
-			for (int n = 0; n < 9; n++) {
-				C_ItemStack* stack = inv->getItemStack(n);
-				if (stack->item != nullptr) {
-					if ((*stack->item)->isBlock() && (*stack->item)->itemId != 0) {
-						C_MobEquipmentPacket a(id, *stack, n, n);
-						g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&a);
-					}
-				}
-			}
-			C_MobEquipmentPacket a(id, *g_Data.getLocalPlayer()->getSelectedItem(), supplies->selectedHotbarSlot, supplies->selectedHotbarSlot);
-			g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&a);
-		}*/
-		supplies->selectedHotbarSlot = slot;
-	}
 
 	//Insane Hive Rotation
 	if (rotations.getSelectedValue() == 9) {
@@ -342,6 +326,10 @@ void Scaffold::onTick(C_GameMode* gm) {
 	backPos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos2 = vec3_t(blockBelow.x, blockBelow.y, blockBelow.z);
+
+	if (holdType.getSelectedValue() == 1) {
+		supplies->selectedHotbarSlot = slot;
+	}
 }
 
 bool Scaffold::isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos) {
@@ -369,7 +357,7 @@ bool Scaffold::isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos) {
 void Scaffold::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	if (towerOnlyNoMove && g_Data.getLocalPlayer()->velocity.magnitudexz() <= 0.05) return;
+	if (towerOnlyNoMove && g_Data.getLocalPlayer()->velocity.magnitudexz() >= 0.05) return;
 
 	// Math
 	vec3_t pos = *player->getPos();
@@ -384,6 +372,8 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 	moveVec.z = g_Data.getLocalPlayer()->velocity.z;
 
 	if (jumping && foundBlock) {
+		uwu = true;
+
 		auto aura = moduleMgr->getModule<Killaura>();
 		if (aura->isEnabled())
 		{
@@ -429,8 +419,15 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 6: //Slow
-			moveVec.y = 0.32;
-			g_Data.getLocalPlayer()->lerpMotion(moveVec);
+			if (offGroundTicks < 3) {
+				moveVec.y = 0.4;
+				g_Data.getLocalPlayer()->lerpMotion(moveVec);
+			}
+			else if (offGroundTicks == 3) {
+				player->velocity.y = -0.4;
+			}
+
+
 			break;
 		}
 		if (tower.getSelectedValue() != 5) {
@@ -439,6 +436,10 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			blockBelow.y -= 0.5f;
 			blockBelowY = blockBelow;
 		}
+	}
+	else if (uwu) {
+		uwu = false;
+		player->velocity.y = -0.1;
 	}
 }
 
@@ -534,12 +535,6 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 	__int64 id = *g_Data.getLocalPlayer()->getUniqueId();
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
-
-	if (type.getSelectedValue() == 1 && spoof) {
-		for (int n = 0; n < 9; n++) {
-			C_ItemStack* stack = inv->getItemStack(n);
-		}
-	}
 
 	if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>()) {
 		if (g_Data.canUseMoveKeys()) {
@@ -807,7 +802,7 @@ bool Scaffold::selectBlock() {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
 	auto prevSlot = supplies->selectedHotbarSlot;
-	if (spoof) {
+	if (holdType.getSelectedValue() == 1) {
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
@@ -832,24 +827,21 @@ bool Scaffold::selectBlock() {
 				}
 			}
 		}
-		else
-		{
-			{
-				int currentSlot = 0;
-				int CurrentBlockCount = 0;
-				for (int n = 0; n < 9; n++) {
-					C_ItemStack* stack = inv->getItemStack(n);
-					if (stack->item != nullptr) {
-						int currentstack = stack->count;
-						if (currentstack > CurrentBlockCount && stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-							CurrentBlockCount = currentstack;
-							currentSlot = n;
-						}
+		else {
+			int currentSlot = 0;
+			int CurrentBlockCount = 0;
+			for (int n = 0; n < 9; n++) {
+				C_ItemStack* stack = inv->getItemStack(n);
+				if (stack->item != nullptr) {
+					int currentstack = stack->count;
+					if (currentstack > CurrentBlockCount && stack->getItem()->isBlock() && isUsefulBlock(stack)) {
+						CurrentBlockCount = currentstack;
+						currentSlot = n;
 					}
 				}
-				supplies->selectedHotbarSlot = currentSlot;
-				return true;
 			}
+			supplies->selectedHotbarSlot = currentSlot;
+			return true;
 		}
 	}
 	return false;
@@ -882,7 +874,10 @@ bool Scaffold::findBlocks(C_ItemStack* itemStack) {
 
 void Scaffold::onDisable() {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
-	g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(20.f);
+
+	if (holdType.getSelectedValue() == 3) {
+		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(20.f);
+	}
 	auto sprint = moduleMgr->getModule<Sprint>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	sprint->useSprint = true;

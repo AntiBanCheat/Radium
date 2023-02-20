@@ -33,19 +33,27 @@ void KBFly::onTick(C_GameMode* gm) {
 		moveVel = 0;
 		speedMod = 1;
 	}
-	if (stop) gm->player->velocity = vec3_t(0.f, -standVel, 0.f);
-	//gm->player->velocity.y = -standVel;
-	if (!vanf) {
-		if (gm->player->damageTime) {
-			moveVec.x = cos(calcYaw) * speedMod;
-			moveVec.y = -moveVel;
-			moveVec.z = sin(calcYaw) * speedMod;
-
-			gm->player->lerpMotion(moveVec);
-		}
+	if (stop) {
+		g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
+		gm->player->velocity = vec3_t(0.f, -standVel, 0.f); 
+		return;
+	}
+	if (gm->player->damageTime) {
+		toggle = true;
+		g_Data.getClientInstance()->minecraft->setTimerSpeed(5.f);
 	}
 
-	if (vanf && gm->player->damageTime) {
+	if (!toggle) return;
+
+	//gm->player->velocity.y = -standVel;
+	if (!vanf) {
+		moveVec.x = cos(calcYaw) * speedMod;
+		moveVec.y = -moveVel;
+		moveVec.z = sin(calcYaw) * speedMod;
+
+		gm->player->lerpMotion(moveVec);
+	}
+	else {
 		float yaw = gm->player->yaw;
 
 		if (GameData::isKeyDown(*input->forwardKey) && GameData::isKeyDown(*input->backKey))
@@ -120,10 +128,12 @@ void KBFly::onTick(C_GameMode* gm) {
 
 void KBFly::onEnable() {
 	helper = false;
+	toggle = false;
 }
 
 void KBFly::onDisable() {
 	float trueStop = __STDCPP_DEFAULT_NEW_ALIGNMENT__ + _ENABLE_ATOMIC_REF_ALIGNMENT_CHECK + INFINITY - 1 + NULL;
+	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
 	auto player = g_Data.getLocalPlayer();
 	auto fuckMod = moduleMgr->getModule<Breaker>();
 	helper = false;

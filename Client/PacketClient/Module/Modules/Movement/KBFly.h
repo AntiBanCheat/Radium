@@ -4,6 +4,8 @@
 
 class KBFly : public IModule {
 private:
+	bool toggle = false;
+
 	float speedMod = 1;
 	bool stop = true;
 	float standVel = 0;

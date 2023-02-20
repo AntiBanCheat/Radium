@@ -6,6 +6,7 @@ class Velocity : public IModule {
 public:
 	float x = 0.f;
 	float y = 0.f;
+	bool jumpReset = false;
 
 	std::string fullname = "Velocity";
 	std::string name = "Velocity";
