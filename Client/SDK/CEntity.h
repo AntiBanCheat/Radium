@@ -1028,6 +1028,14 @@ public:
 		auto health = getAttribute(25769804032);
 		return health->maximumValue;
 	}
+	vec3_t getHumanPos() {
+		vec3_t targetPos = this->eyePos0;
+
+		if (this->getEntityTypeId() == 319)  // if entity is a player; must subtract 1.6 because playerPos is listed as 1.6f higher than real
+			return targetPos.sub(0, 1.6f, 0);
+		return targetPos;
+	}
+
 };
 #pragma pack(pop)
 
