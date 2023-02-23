@@ -1226,7 +1226,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 		int prevSlot2 = supplies->selectedHotbarSlot;
 		int checkslot = 0;
 		if (g_Data.getLocalPlayer()->region->getBlock(*a2)->toLegacy()->blockId != 7) {
-			//	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 			C_Inventory* inv = supplies->inventory;
 			for (int n = 0; n < 9; n++) {
 				auto prevSlot = supplies->selectedHotbarSlot;
