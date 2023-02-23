@@ -98,6 +98,8 @@
 #include "Modules/Player/XP.h"
 
 // Exploit
+#include "Modules/Exploit/FastXPTwo.h"
+
 #include "Modules/Exploit/PacketMine.h"
 #include "Modules/Exploit/PacketMultiplier.h"
 #include "Modules/Exploit/HiveOnGround.h"

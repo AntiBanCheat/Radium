@@ -382,8 +382,13 @@ void* Hooks::Player_tickWorld(C_Player* _this, __int64 unk) {
 float Hooks::getDestroySpeed(C_Player* _this, C_Block& block) {
 	static auto oFunc = g_Hooks.getDestroySpeedHook->GetFastcall<float, C_Player*, C_Block&>();
 	static auto speedMine = moduleMgr->getModule<SpeedMine>();
+	static auto peedMine = moduleMgr->getModule<PacketMine>();
+
 	if (speedMine->isEnabled() && !speedMine->instant)
 		return speedMine->speed;
+	return oFunc(_this, block);
+	if (peedMine->isEnabled() && !peedMine->instant)
+		return peedMine->speed;
 	return oFunc(_this, block);
 }
 
@@ -1035,7 +1040,10 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 			return;
 		}
 	}
-
+	
+	else {
+		oFunc(a, packet);
+	}
 	if (disabler->isEnabled()) {
 		auto p2 = g_Data.getLocalPlayer();
 		if (disabler->mode.getSelectedValue() == 1 || disabler->mode.getSelectedValue() == 2) {
@@ -1172,7 +1180,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 							uint8_t data = blok->data;
 							auto id = blok->blockLegacy->blockId;
 							if (blok->blockLegacy->material->isSolid == true && (!isVeinMiner || (id == selectedBlockId && data == selectedBlockData)))
-								_this->destroyBlock(&tempPos, face);
+								_this->destroyBlock(&tempPos,  face);
 						}
 					}
 				}
@@ -1184,6 +1192,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 		_this->destroyBlock(a2, face);
 		return;
 	}
+	
 
 	oFunc(_this, a2, face, a4, a5);
 	if (PacketMineModule->isEnabled()) {
@@ -1198,7 +1207,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 
 			C_ItemStack* stack = inv->getItemStack(pSlot);
 			if (stack->item != nullptr) {
-				if (stack->getItem()->itemId == 318, 257) {  //invailedCheck
+				if (stack->getItem()->isPickaxe()) {  //invailedCheck
 					//if (prevSlot != n) {
 					checked = true;
 					//}
@@ -1224,7 +1233,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 
 				C_ItemStack* stack = inv->getItemStack(n);
 				if (stack->item != nullptr) {
-					if (stack->getItem()->itemId == 318, 257) {
+					if (stack->getItem()->isPickaxe()) {
 						if (prevSlot != n) {
 							checkslot = n;
 						}
