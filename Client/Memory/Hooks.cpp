@@ -1191,7 +1191,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 							uint8_t data = blok->data;
 							auto id = blok->blockLegacy->blockId;
 							if (blok->blockLegacy->material->isSolid == true && (!isVeinMiner || (id == selectedBlockId && data == selectedBlockData)))
-								_this->destroyBlock(&tempPos,  face);
+								_this->destroyBlock(&tempPos, face);
 						}
 					}
 				}
@@ -1205,7 +1205,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 	}
 
 	oFunc(_this, a2, face, a4, a5);
-<<<<<<< HEAD
+
 	if (PacketMineModule->isEnabled()) {
 		auto supplies = g_Data.getLocalPlayer()->getSupplies();
 		int pSlot = supplies->selectedHotbarSlot;
@@ -1263,8 +1263,6 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 
 		oFunc(_this, a2, face, a4, a5);
 	}
-=======
->>>>>>> e29ee662ecd4874fa9b08d2128a088edf7eacc4b
 }
 
 void Hooks::HIDController_keyMouse(C_HIDController* _this, void* a2, void* a3) {
