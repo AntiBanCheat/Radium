@@ -471,6 +471,7 @@ void Speed::onSendPacket(C_Packet* packet) {
 		//packet
 		if (moduleMgr->getModule<Regen>()->isregen) return;
 		if (!moduleMgr->getModule<Killaura>()->targetListEmpty) return;
+		if (!rotate) return;
 		movePacket->yaw = animYaw;
 		movePacket->headYaw = animYaw;
 	}
