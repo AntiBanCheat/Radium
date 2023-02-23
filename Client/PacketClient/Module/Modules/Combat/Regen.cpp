@@ -7,11 +7,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("Hive", 0);
 	mode.addEntry("FlareonTest", 1);
-#if _DEBUG
-	maxRange = 7;
-#endif
-
-	registerFloatSetting("Range", &range, range, 1, maxRange);
+	registerFloatSetting("Range", &range, range, 1, 7);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 }
 
@@ -61,9 +57,6 @@ void Regen::onEnable() {
 
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	slot = supplies->selectedHotbarSlot;
-
-	if (range > maxRange)
-		range = maxRange;
 }
 
 void Regen::onTick(C_GameMode* gm) {
