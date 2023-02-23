@@ -34,6 +34,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerIntSetting("Timer", &timer, timer, 20, 35);
 	registerBoolSetting("NoSlabs", &noslabs, noslabs);
 	registerBoolSetting("DesnycBoost", &dboost, dboost);
+	registerBoolSetting("Rotate", &rotate, rotate);
 
 	// Friction
 	registerFloatSetting("SpeedMax", &speedMax, speedMax, 0.f, 2.f);
@@ -63,6 +64,8 @@ void Speed::onEnable() {
 
 	oldx = player->currentPos.x;
 	oldz = player->currentPos.z;
+
+	animYaw = player->yaw;
 }
 
 void Speed::onTick(C_GameMode* gm) {
@@ -119,6 +122,39 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	bool pressed = MoveUtil::keyPressed();
 	if (!pressed) MoveUtil::stop(false);
 	if(mode.getSelectedValue() != 11) player->setSprinting(true);
+
+	if (rotate) {
+		float yaw = player->yaw;
+
+		if (input->forward && input->backward) {
+		}
+		else if (input->forward && input->right && !input->left) {
+			yaw += 45.f;
+		}
+		else if (input->forward && input->left && !input->right) {
+			yaw -= 45.f;
+		}
+		else if (input->backward && input->right && !input->left) {
+			yaw += 135.f;
+		}
+		else if (input->backward && input->left && !input->right) {
+			yaw -= 135.f;
+		}
+		else if (input->forward) {
+		}
+		else if (input->backward) {
+			yaw += 180.f;
+		}
+		else if (input->right && !input->left) {
+			yaw += 90.f;
+		}
+		else if (input->left && !input->right) {
+			yaw -= 90.f;
+		}
+
+		if (animYaw > yaw) animYaw -= ((animYaw - yaw) / 6);
+		else if (animYaw < yaw) animYaw += ((yaw - animYaw) / 6);
+	}
 
 	// Vanilla
 	if (mode.getSelectedValue() == 0) {
@@ -433,6 +469,11 @@ void Speed::onSendPacket(C_Packet* packet) {
 
 	if (packet->isInstanceOf<C_MovePlayerPacket>()) {
 		//packet
+		if (moduleMgr->getModule<Regen>()->isregen) return;
+		if (!moduleMgr->getModule<Killaura>()->targetListEmpty) return;
+		if (!rotate) return;
+		movePacket->yaw = animYaw;
+		movePacket->headYaw = animYaw;
 	}
 }
 

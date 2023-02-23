@@ -35,13 +35,10 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerBoolSetting("BlockCount", &blockCount, blockCount);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
-	registerEnumSetting("HoldType", &holdType, 0);
+	registerEnumSetting("Select", &holdType, 0);
 	holdType.addEntry("Switch", 0);
 	holdType.addEntry("Spoof", 1);
 	holdType.addEntry("Fake", 2);
-	registerEnumSetting("Priority", &priority, 0);
-	priority.addEntry("Normal", 0);
-	priority.addEntry("Largest", 1);
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
@@ -801,6 +798,7 @@ bool Scaffold::predictBlock(vec3_t blockBelow) {
 bool Scaffold::selectBlock() {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
+
 	auto prevSlot = supplies->selectedHotbarSlot;
 	if (holdType.getSelectedValue() == 1) {
 		for (int n = 0; n < 9; n++) {
@@ -815,34 +813,20 @@ bool Scaffold::selectBlock() {
 		}
 	}
 	else {
-		if (priority.getSelectedValue() == 0) {
-			for (int n = 0; n < 9; n++) {
-				C_ItemStack* stack = inv->getItemStack(n);
-				if (stack->item != nullptr) {
-					if (stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-						if (prevSlot != n)
-							supplies->selectedHotbarSlot = n;
-						return true;
-					}
+		int currentSlot = 0;
+		int CurrentBlockCount = 0;
+		for (int n = 0; n < 9; n++) {
+			C_ItemStack* stack = inv->getItemStack(n);
+			if (stack->item != nullptr) {
+				int currentstack = stack->count;
+				if (currentstack > CurrentBlockCount && stack->getItem()->isBlock() && isUsefulBlock(stack)) {
+					CurrentBlockCount = currentstack;
+					currentSlot = n;
 				}
 			}
 		}
-		else {
-			int currentSlot = 0;
-			int CurrentBlockCount = 0;
-			for (int n = 0; n < 9; n++) {
-				C_ItemStack* stack = inv->getItemStack(n);
-				if (stack->item != nullptr) {
-					int currentstack = stack->count;
-					if (currentstack > CurrentBlockCount && stack->getItem()->isBlock() && isUsefulBlock(stack)) {
-						CurrentBlockCount = currentstack;
-						currentSlot = n;
-					}
-				}
-			}
-			supplies->selectedHotbarSlot = currentSlot;
-			return true;
-		}
+		supplies->selectedHotbarSlot = currentSlot;
+		return true;
 	}
 	return false;
 }

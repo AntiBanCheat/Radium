@@ -78,7 +78,6 @@ public:
 	SettingEnum rotations = this;
 	SettingEnum downwards = this;
 	SettingEnum tower = this;
-	SettingEnum priority = this;
 	SettingEnum holdType = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
