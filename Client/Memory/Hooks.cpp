@@ -1191,7 +1191,7 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 							uint8_t data = blok->data;
 							auto id = blok->blockLegacy->blockId;
 							if (blok->blockLegacy->material->isSolid == true && (!isVeinMiner || (id == selectedBlockId && data == selectedBlockData)))
-								_this->destroyBlock(&tempPos,  face);
+								_this->destroyBlock(&tempPos, face);
 						}
 					}
 				}
@@ -1205,6 +1205,64 @@ void Hooks::GameMode_startDestroyBlock(C_GameMode* _this, vec3_ti* a2, uint8_t f
 	}
 
 	oFunc(_this, a2, face, a4, a5);
+
+	if (PacketMineModule->isEnabled()) {
+		auto supplies = g_Data.getLocalPlayer()->getSupplies();
+		int pSlot = supplies->selectedHotbarSlot;
+		bool checked = false;
+		{
+			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+			C_Inventory* inv = supplies->inventory;
+			//for (int n = 0; n < 9; n++) {
+			auto prevSlot = supplies->selectedHotbarSlot;
+
+			C_ItemStack* stack = inv->getItemStack(pSlot);
+			if (stack->item != nullptr) {
+				if (stack->getItem()->isPickaxe()) {  //invailedCheck
+					//if (prevSlot != n) {
+					checked = true;
+					//}
+					//if (prevSlot != n) {
+					//supplies->selectedHotbarSlot = n;
+
+					//}
+				}
+				else {
+					checked = false;
+				}
+				//}
+			}
+		}
+
+		int prevSlot2 = supplies->selectedHotbarSlot;
+		int checkslot = 0;
+		if (g_Data.getLocalPlayer()->region->getBlock(*a2)->toLegacy()->blockId != 7) {
+			C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+			C_Inventory* inv = supplies->inventory;
+			for (int n = 0; n < 9; n++) {
+				auto prevSlot = supplies->selectedHotbarSlot;
+
+				C_ItemStack* stack = inv->getItemStack(n);
+				if (stack->item != nullptr) {
+					if (stack->getItem()->isPickaxe()) {
+						if (prevSlot != n) {
+							checkslot = n;
+						}
+						//if (prevSlot != n) {
+							//supplies->selectedHotbarSlot = n;
+						//}
+					}
+				}
+			}
+			if (!checked) supplies->selectedHotbarSlot = checkslot;
+			_this->destroyBlock(a2, face);
+			supplies->selectedHotbarSlot = prevSlot2;
+			return;
+			//	}
+		}
+
+		oFunc(_this, a2, face, a4, a5);
+	}
 }
 
 void Hooks::HIDController_keyMouse(C_HIDController* _this, void* a2, void* a3) {
