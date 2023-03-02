@@ -9,6 +9,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	mode.addEntry("FlareonTest", 1);
 	registerFloatSetting("Range", &range, range, 1, 7);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
+	registerBoolSetting("Visual", &visual, visual);
 }
 
 const char* Regen::getRawModuleName() {
@@ -381,7 +382,17 @@ void Regen::onPlayerTick(C_Player* plr) {
 		}
 	}
 }
-
+void Regen::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
+	auto player = g_Data.getLocalPlayer();
+	if (player == nullptr) return;
+	if(visual){
+	if (blockPos != vec3_ti(0, 0, 0)) {
+	DrawUtils::setColor(.75f, .25f, .5f, 1.f);
+	DrawUtils::drawBox(blockPos.toVector3().add(0.f, 0.f, 0.f),
+	blockPos.add(1).toVector3().add(0.f, 0.f, 0.f), .3f);
+       }
+    }
+}
 void Regen::onSendPacket(C_Packet* packet) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
