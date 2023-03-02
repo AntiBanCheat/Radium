@@ -13,7 +13,7 @@ public:
 
 	virtual const char* getModuleName() { return "Freelook"; }
 	void onEnable() { oldPos = g_Data.getLocalPlayer()->viewAngles; }
-	void onDisable() { g_Data.getLocalPlayer()->applyTurnDelta(&oldPos); }
+	void onDisable() {}
 	bool callWhenDisabled() {
 		return true;
 	}
