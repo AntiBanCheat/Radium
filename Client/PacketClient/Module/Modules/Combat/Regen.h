@@ -34,11 +34,12 @@ public:
     bool isregen = false;
     bool canattack = true;
     int enabledticks;
-
+    bool visual =false;
     std::string name = "Regen";
     std::string name2 = "";
     SettingEnum mode = this;
 
+    virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;
     virtual void onSendPacket(C_Packet* packet);
     virtual void onPlayerTick(C_Player* plr);
     virtual const char* getRawModuleName();
