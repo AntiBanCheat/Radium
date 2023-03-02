@@ -10,6 +10,7 @@ ArrayList::ArrayList() : IModule(0, Category::VISUAL, "Displays enabled modules"
 	mode.addEntry("Bar", 3);
 	mode.addEntry("Right", 4);
 	mode.addEntry("None", 5);
+	mode.addEntry("Glass", 6);
 	registerEnumSetting("Animation", &animation, 1);
 	animation.addEntry("Normal", 0);
 	animation.addEntry("Smooth", 1);
@@ -204,6 +205,13 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 				DrawUtils::drawText(textPos, &textStr, MC_Color(interfaceColor), textSize, 1.f, true);
 				break;
 			case 5: DrawUtils::drawText(textPos, &textStr, MC_Color(interfaceColor), textSize, 1.f, true); break;
+			case 6:
+				DrawUtils::fillRectangleA(leftRect, MC_Color(0, 0, 0, 75));
+				if (mod->enabled) DrawUtils::fillRectangleA(underline, MC_Color(0, 0, 0, 75));
+				if (index == 1) DrawUtils::fillRectangleA(topLine, MC_Color(0, 0, 0, 75));
+				DrawUtils::fillRectangleA(bar, MC_Color(0, 0, 0, 75));
+				DrawUtils::drawText(textPos, &textStr, MC_Color(interfaceColor), textSize, 1.f, true);
+				break;
 			}
 			//bottom
 			if (invert) yOffset-= textHeight + (textPadding * 2);
