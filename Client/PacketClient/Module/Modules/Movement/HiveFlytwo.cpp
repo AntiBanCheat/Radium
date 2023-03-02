@@ -40,7 +40,7 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 	vec3_t moveVec;
-	auto blink = moduleMgr->getModule<Blink>();
+	bool blink = false;
 	if (g_Data.canUseMoveKeys()) {
 		if (TimerUtil::hasTimedElapsed(dashTime, !blink) && !dashed) {
 			dashed = true;
