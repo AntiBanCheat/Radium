@@ -5,7 +5,7 @@
 
 class Interface : public IModule {
 public:
-	std::string clientName = "Radium";
+	std::string clientName = "Celsius";
 	std::string releaseStr = "Release";
 	std::string versionStr = "V2.4";
 
@@ -31,6 +31,8 @@ public:
 	float armorY = 60;
 	float fpsX = 2.5;
 	float fpsY = windowSize.y - 40;
+	float RegenX = 200;
+	float RegenY = windowSize.y - 40;
 	float bpsX = 2.5f;
 	float bpsY = windowSize.y - 30;
 	float posX = 2.5f;
