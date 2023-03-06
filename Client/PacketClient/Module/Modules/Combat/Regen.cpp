@@ -385,7 +385,7 @@ void Regen::onPlayerTick(C_Player* plr) {
 void Regen::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	if(visual){
+	if(visual && destroy){
 	if (blockPos != vec3_ti(0, 0, 0)) {
 	DrawUtils::setColor(.75f, .25f, .5f, 1.f);
 	DrawUtils::drawBox(blockPos.toVector3().add(0.f, 0.f, 0.f),
