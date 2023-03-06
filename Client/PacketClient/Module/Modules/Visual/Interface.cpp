@@ -86,6 +86,15 @@ void Interface::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			DrawUtils::drawGradientText(fpsTextPos, &fpsText, 1, 1, true);
 			DrawUtils::fillRoundRectangle(fpsRectPos, MC_Color(0, 0, 0, opacity), false);
 
+			//regen
+			if (moduleMgr->getModule<Regen>()->destroy) {
+				std::string regenCount = "Mining (" + std::to_string((int)player->getAbsorption()) + " / 10)";
+				float lColor = DrawUtils::getTextWidth(&regenCount, 1) + 6.5;
+				vec4_t RegenRectPos = vec4_t(RegenX, RegenY + 7, lColor + RegenX, RegenY + 20);
+				vec2_t regenCountPos = vec2_t(RegenRectPos.x + 3, RegenRectPos.y + 3.5);
+				DrawUtils::drawGradientText(regenCountPos, &regenCount, 1, 1, true);
+			}
+
 			// Speed (BPS)
 			auto player = g_Data.getLocalPlayer();
 			std::string speedText = "Speed: " + std::to_string((int)player->getBlocksPerSecond()) + std::string(".") + std::to_string((int)(player->getBlocksPerSecond() * 10) - ((int)player->getBlocksPerSecond() * 10));
