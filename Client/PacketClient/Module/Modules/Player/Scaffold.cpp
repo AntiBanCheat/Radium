@@ -51,7 +51,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
-	registerIntSetting("Delay", &delay, delay, 0, 20);
+	registerFloatSetting("Delay", &delay, delay, 0.f, 20.f);
 	registerBoolSetting("ZipLine", &zipline, zipline);
 }
 
@@ -231,8 +231,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 			}
 			for (int i = 0; i <= currExtend; i++)
 			{
-				Odelay++;
-				if (Odelay > delay)
+				if (TimerUtil::hasTimedElapsed(delay, true))
 				{
 					int tempx = vel.x * i;
 					int tempz = vel.z * i;
