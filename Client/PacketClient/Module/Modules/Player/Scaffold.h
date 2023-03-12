@@ -20,8 +20,8 @@ private:
 	int expR = 255;
 	int expG = 50;
 	int expB = 0;
-	int delay = 0;
-	int Odelay = 0;
+	float delay = 0;
+	//int Odelay = 0;
 	float expT = 0.4f;
 	bool inclSelf = true;
 	float animPitch = 0.f;
