@@ -231,7 +231,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 			}
 			for (int i = 0; i <= currExtend; i++)
 			{
-				if (TimerUtil::hasTimedElapsed(delay, true))
+				if (TimerUtil::hasTimedElapsed((1000 / delay), true))
 				{
 					int tempx = vel.x * i;
 					int tempz = vel.z * i;
