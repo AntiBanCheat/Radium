@@ -27,7 +27,7 @@ bool ClientNameCommand::execute(std::vector<std::string>* args) {
 		interfaceMod->getClientName() = text;
 		return true;
 	} else if (args->at(1) == "reset") {
-		interfaceMod->getClientName() = "Celsius";
+		interfaceMod->getClientName() = "Radium";
 		//auto notification = g_Data.addNotification("Success:", "Reset the client's name!"); notification->duration = 10;
 		return true;
 	}
