@@ -5759,8 +5759,8 @@ void ClickGui::renderNewCategory(Category category) {
 		mousePos = mousePos.mul(windowSize);
 	}
 	std::string ltx;
-	float zrs = 25;//ずらす；
-	float zrsx = 4; //ずらすx；	
+	float zrs = 25;
+	float zrsx = 4;	
 	static auto clickmod = moduleMgr->getModule<ClickGUIMod>();
 	if (clickmod->Fonts.getSelectedValue()==1)ltx = ("          Movement");
 	else ltx = ("      Movement");
