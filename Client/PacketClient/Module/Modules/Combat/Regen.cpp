@@ -5,8 +5,8 @@
 using namespace std;
 Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerEnumSetting("Mode", &mode, 0);
-	mode.addEntry("Hive", 0);
-	mode.addEntry("FlareonTest", 1);
+	mode.addEntry("HiveFast", 0);
+	mode.addEntry("HiveSafe", 1);
 	registerFloatSetting("Range", &range, range, 1, 7);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 	registerBoolSetting("Visual", &visual, visual);
@@ -17,8 +17,8 @@ const char* Regen::getRawModuleName() {
 }
 
 const char* Regen::getModuleName() {
-	if (mode.getSelectedValue() == 0) name = string("Regen ") + string(GRAY) + string("HiveSingle+");
-	if (mode.getSelectedValue() == 1) name = string("Regen ") + string(GRAY) + string("FlareonTest");
+	if (mode.getSelectedValue() == 0) name = string("Regen ") + string(GRAY) + string("HiveFast");
+	if (mode.getSelectedValue() == 1) name = string("Regen ") + string(GRAY) + string("HiveSafe");
 	return name.c_str();
 }
 
