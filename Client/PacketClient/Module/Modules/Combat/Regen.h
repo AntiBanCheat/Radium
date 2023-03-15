@@ -34,6 +34,7 @@ public:
     bool isregen = false;
     bool canattack = true;
     int enabledticks;
+    int minedelay = 15;
     bool visual =false;
     std::string name = "Regen";
     std::string name2 = "";
