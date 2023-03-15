@@ -20,7 +20,7 @@ private:
 	int expR = 255;
 	int expG = 50;
 	int expB = 0;
-	float delay = 0.f;
+	int delay = 0;
 	int Odelay = 0;
 	float expT = 0.4f;
 	bool inclSelf = true;
@@ -69,7 +69,7 @@ public:
 	float Range = 4;
 	float scY = 20.f;
 	float scX = 10.f;
-	int extend = 1;
+	float extend = 1.f;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
