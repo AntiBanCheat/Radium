@@ -69,7 +69,7 @@ public:
 	float Range = 4;
 	float scY = 20.f;
 	float scX = 10.f;
-	float extend = 1.f;
+	int extend = 1;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
