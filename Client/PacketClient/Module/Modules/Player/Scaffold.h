@@ -70,6 +70,7 @@ public:
 	float scY = 20.f;
 	float scX = 10.f;
 	int extend = 1;
+	int minetime = 15;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
