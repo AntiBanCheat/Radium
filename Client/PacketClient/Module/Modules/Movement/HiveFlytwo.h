@@ -6,12 +6,16 @@ class HiveFlytwo : public IModule {
 private:
 	bool dashed = false;
 	bool aurais = false;
+	bool lock = false;
+	bool tp = false;
+	bool cliplimit = false;
 	float speed = 0.5;
 	float height = 0.0;
 	float clipUp = 1.0;
+	float timer = 20.f;
+	float clipvalue = 0.0;
 	int dashTime = 0;
-	int boostTime = 200;
-	int lockTime = 1500;
+	int cliptimes = 4;
 public:
 	virtual void onMove(C_MoveInputHandler* input);
 	virtual const char* getModuleName();
