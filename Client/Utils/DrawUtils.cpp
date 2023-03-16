@@ -284,9 +284,11 @@ void DrawUtils::drawGradientText(vec2_t pos, std::string* textStr, float textSiz
 		ind++;
 		int curIndex = -ind * interface->spacing;
 		auto interfaceColor = ColorUtil::interfaceColor(curIndex);
-		int charWidth = DrawUtils::getTextWidth(&std::string(&c), textSize);
+		std::string testHave = std::string(&c).substr(0,1);
+		int charWidth = DrawUtils::getTextWidth(&std::string(testHave), textSize);
 
-		DrawUtils::drawText(pos, &std::string(&c), interfaceColor, textSize, 1, true);
+
+		DrawUtils::drawText(pos, &std::string(testHave), interfaceColor, textSize, 1, true);
 		pos.x += charWidth;
 	}
 }
