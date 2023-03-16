@@ -4959,8 +4959,8 @@ void ClickGui::renderNewCategory(Category category) {
 	std::string etx;
 	std::string rtx;
 	std::string mtx;
-	float zrs = 25;//ずらす；
-	float zrsx = 4; //ずらすx；	
+	float zrs = 25;
+	float zrsx = 4;
 	static auto clickmod = moduleMgr->getModule<ClickGUIMod>();
 	if (clickmod->Fonts.getSelectedValue() == 1)ltx = ("          Movement");
 	else ltx = ("      Movement");
