@@ -2,14 +2,15 @@
 #include "../pch.h"
 
 bool testOnGround = false;
-float speedMax = 0.69f; // inf value
-float speedMin = 0.59f; // inf value
 int packetsSent = 0;
 int enabledTicks = 0;
 int flareonticks = 0;
 int strafeTime = 0;
 int hivegroundticks = 0;
 float effectiveValue = 0.f;
+float random2 = 0.f;
+float random3 = 0.f;
+float fricspeed = 0.f;
 using namespace std;
 Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerEnumSetting("Mode", &mode, 0);
@@ -29,7 +30,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("DamageSafe", 12);
 	mode.addEntry("DmgFlySpeed", 13); //only beta
 	// Vanilla
-	registerFloatSetting("Height", &height, height, 0.000001f, 0.42f);
+	registerFloatSetting("Height", &height, height, 0.000001f, 0.60f);
 	// All Settings
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 15, 35);
@@ -41,8 +42,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerBoolSetting("Rotate", &rotate, rotate);
 
 	// Friction
-	registerFloatSetting("SpeedMax", &speedMax, speedMax, 0.f, 2.f);
-	registerFloatSetting("SpeedMin", &speedMin, speedMin, 0.f, 2.f);
+	registerFloatSetting("Random", &random2, random2, 0.f, 0.5f);
 	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.05f);
 }
 
@@ -168,7 +168,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (height <= 0.04 && !input->isJumping) { player->velocity.y += height; useVelocity = false; }
 
 		if (player->onGround && useVelocity && pressed && !input->isJumping) player->velocity.y = height;
-		MoveUtil::setSpeed(speed);
+		random3 = 0 - random2;
+		fricspeed = randomFloat(random2, random3);
+		MoveUtil::setSpeed(speed + fricspeed);
 	}
 
 	// Hive
@@ -203,7 +205,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		//speedFriction *= duration;
 		if (pressed) {
 			if (player->onGround) {
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 				if (hivegroundticks < 1) {
 					player->jumpFromGround();
 					if (0 < player->velocity.y) player->velocity.y = 0.f;
@@ -240,7 +244,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			player->lerpMotion(moveVec);
 			if (player->onGround) {
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 				player->jumpFromGround();
 			}
 		}
@@ -260,7 +266,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
@@ -280,7 +288,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 				g_Data.getClientInstance()->minecraft->setTimerSpeed(100.f);
 			}
 			else {
@@ -304,7 +314,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
@@ -324,7 +336,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
@@ -376,7 +390,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 				MoveUtil::stop(false);
 				flareonticks = 0;
 			}
@@ -394,7 +410,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 
 		if (pressed && player->onGround) {
 			if (useVelocity && !input->isJumping) player->velocity.y = height;
-			MoveUtil::setSpeed(speed);
+			random3 = 0 - random2;
+			fricspeed = randomFloat(random2, random3);
+			MoveUtil::setSpeed(speed + fricspeed);
 		}
 	}
 
@@ -414,7 +432,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				packetsSent++;
 			}
 			if (player->onGround) {
-				speedFriction = randomFloat(speedMin, speedMax);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 			}
 			else {
 				speedFriction = randomFloat(.33f, .45f);
@@ -427,7 +447,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	if (mode.getSelectedValue() == 12) {
 		if (pressed) {
 			if (player->onGround) {
-				MoveUtil::setSpeed(speed);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				MoveUtil::setSpeed(speed + fricspeed);
 				player->jumpFromGround();
 			}
 
@@ -454,7 +476,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	if (mode.getSelectedValue() == 13) {
 		if (pressed) {
 			if (player->onGround) {
-				MoveUtil::setSpeed(speed);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				MoveUtil::setSpeed(speed + fricspeed);
 				player->jumpFromGround();
 			}
 
@@ -468,7 +492,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				if (strafeTime < bypasstime) {
 					strafeTime++;
 					g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
-					MoveUtil::setSpeed((damageMotion + speed) * 2);
+					MoveUtil::setSpeed((damageMotion + speed) * damagespeed);
 
 					float calcYaw = (player->yaw + 90) * (PI / 180);
 					float c = cos(calcYaw);
@@ -488,7 +512,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 						player->velocity.x = 0;
 						player->velocity.y = 0;
 						player->velocity.z = 0;
-						g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
+						g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
 					}
 				}
 
