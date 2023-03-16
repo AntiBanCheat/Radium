@@ -33,7 +33,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.60f);
 	// All Settings
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
-	registerIntSetting("Timer", &timer, timer, 15, 35);
+	registerIntSetting("Timer", &timer, timer, 15, 40);
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
 	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
@@ -512,7 +512,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 						player->velocity.x = 0;
 						player->velocity.y = 0;
 						player->velocity.z = 0;
-						g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
+						g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 					}
 				}
 
