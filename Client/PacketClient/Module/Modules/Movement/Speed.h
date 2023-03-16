@@ -25,6 +25,7 @@ public:
 	bool needblink = false;
 	bool noslabs = false;
 	int timer = 20;
+	int dmgtimer = 20;
 	int ticks = 0;
 	bool clientmessage = false;
 	bool dboost = false;
