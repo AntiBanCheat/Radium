@@ -488,7 +488,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 						player->velocity.x = 0;
 						player->velocity.y = 0;
 						player->velocity.z = 0;
-						g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
+						g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 					}
 				}
 
