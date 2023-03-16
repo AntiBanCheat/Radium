@@ -8,7 +8,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	mode.addEntry("HiveFast", 0);
 	mode.addEntry("HiveSafe", 1);
 	registerFloatSetting("Range", &range, range, 1, 7);
-	registerIntSetting("Delay", &delay, delay, 0, 20);
+	registerIntSetting("ContinueDelay", &delay, delay, 0, 20);
 	registerIntSetting("MineDelay", &minedelay, minedelay, 0, 30);
 	registerBoolSetting("Visual", &visual, visual);
 }
