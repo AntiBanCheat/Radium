@@ -35,6 +35,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerIntSetting("Timer", &timer, timer, 15, 35);
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
+	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
 	registerBoolSetting("NoSlabs", &noslabs, noslabs);
 	registerBoolSetting("DesnycBoost", &dboost, dboost);
 	registerBoolSetting("Rotate", &rotate, rotate);
@@ -432,6 +433,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 
 			if (damageMotion != 0 && damageMotion >= 0.15f) {
 				setSpeed(damageMotion + speed * (damagespeed / 10));
+				g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
 				damageMotion = 0;
 				strafeTime = 0;
 			}
@@ -440,6 +442,10 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				if (strafeTime <= bypasstime) {
 					strafeTime++;
 					setSpeed(player->velocity.magnitudexz());
+				}
+				else
+				{
+					g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 				}
 			}
 		}
@@ -461,7 +467,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 			if (MoveUtil::isMoving()) {
 				if (strafeTime < bypasstime) {
 					strafeTime++;
-					g_Data.getClientInstance()->minecraft->setTimerSpeed(10.f);
+					g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
 					MoveUtil::setSpeed((damageMotion + speed) * 2);
 
 					float calcYaw = (player->yaw + 90) * (PI / 180);
