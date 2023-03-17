@@ -1,21 +1,35 @@
 #include "HiveFlytwo.h"
+float upsped = 2;
+vec3_t savePos;
+int nowtimes;
+bool aids = false;
 
 HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does this bypass ?!?!?") {
+	registerEnumSetting("Mode", &mode, 0);
+	mode.addEntry("Jump", 0);
+	mode.addEntry("Clip", 1);
+	mode.addEntry("SlowClip1", 2);
+	mode.addEntry("SlowClip2", 3);
+	mode.addEntry("JumpClip", 4);
 	registerFloatSetting("Speed", &speed, speed, .1f, 2.f);
 	registerFloatSetting("Height", &height, height, 0.f, 1.f);
 	registerFloatSetting("ClipUp", &clipUp, clipUp, 0.f, 5.f);
 	registerFloatSetting("Timer", &timer, timer, 0.f, 30.f);
 	registerIntSetting("DashTime", &dashTime, dashTime, 0, 3000);
 	registerBoolSetting("Freelook", &lock, lock);
-	registerBoolSetting("ClipFly", &tp, tp);
 	registerBoolSetting("ClipLimit", &cliplimit, cliplimit);
 	registerIntSetting("ClipTimes", &cliptimes, cliptimes, 1, 20);
 	registerFloatSetting("ClipValue", &clipvalue, clipvalue, 0.f, 2.f);
+	registerFloatSetting("LerpSpeed", &upsped, upsped, 1, 4);
 }
-vec3_t savePos;
-int nowtimes;
+
+const char* HiveFlytwo::getRawModuleName() {
+	return "HiveFly2";
+}
+
 const char* HiveFlytwo::getModuleName() {
-	return ("HiveFly2");
+	//name = string("Speed ") + string(GRAY) + mode.GetEntry(mode.getSelectedValue()).GetName();
+	return name.c_str();
 }
 
 
@@ -25,7 +39,7 @@ void HiveFlytwo::onEnable() {
 	auto player = g_Data.getLocalPlayer();
 	savePos = *player->getPos();
 	vec3_t myPos = *player->getPos();
-	if (!tp)
+	if (!mode.getSelectedValue() == 0) // only jump
 	{
 		myPos.y += clipUp;
 		player->setPos(myPos);
@@ -55,9 +69,27 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 	vec3_t moveVec;
 	bool blink = false;
 	if (g_Data.canUseMoveKeys()) {
+		if (mode.getSelectedValue() == 2 || mode.getSelectedValue() == 3)
+		{
+			if (!aids)
+			{
+				vec3_t checkPos = *player->getPos(); //antikick
+				if (checkPos.y > savePos.y + 0.01)
+				{
+					player->velocity.y = 0;
+					vec3_t nowPos = *player->getPos();
+					savePos.y -= clipvalue;
+					nowPos.y = savePos.y - clipvalue;
+					if (mode.getSelectedValue() == 2) player->setPos(nowPos);
+					if (mode.getSelectedValue() == 3) aids = true;
+					MoveUtil::setSpeed(speed);
+				}
+			}
+		}
 		if (TimerUtil::hasTimedElapsed(dashTime, !blink) && !dashed) {
 			dashed = true;
-			if(tp)
+			aids = false;
+			if(!mode.getSelectedValue() == 0) // clip, slowclip, jumpclip
 			{
 				if (cliplimit)
 				{
@@ -70,28 +102,81 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 					{
 						{
 							nowtimes++;
-							MoveUtil::setSpeed(speed);
 							vec3_t nowPos = *player->getPos();
 							savePos.y -= clipvalue;
-							nowPos.y = savePos.y - clipvalue;
-							player->setPos(nowPos);
-							player->velocity.y = 0;
+							if (mode.getSelectedValue() == 1 || mode.getSelectedValue() == 4)
+							{
+								MoveUtil::setSpeed(speed);
+								nowPos.y = savePos.y;
+								player->setPos(nowPos); //normal
+								player->velocity.y = 0;
+							}
+							if (mode.getSelectedValue() == 2 || mode.getSelectedValue() == 3) //slow
+							{
+								moveVec.x = 0;
+								moveVec.y = (savePos.y - nowPos.y) / (5 - upsped);
+								moveVec.z = 0;
+								player->lerpMotion(moveVec);
+							}
+							if (mode.getSelectedValue() == 4) // jump
+							{
+								float calcYaw = (player->yaw + 90) * (PI / 180);
+								vec2_t moveVec2d = { input->forwardMovement, -input->sideMovement };
+								bool pressed = moveVec2d.magnitude() > 0.01f;
+								float c = cos(calcYaw);
+								float s = sin(calcYaw);
+								moveVec2d = { moveVec2d.x * c - moveVec2d.y * s, moveVec2d.x * s + moveVec2d.y * c };
+
+								if (player->onGround && pressed)
+									player->jumpFromGround();
+								moveVec.x = moveVec2d.x * speed;
+								moveVec.y = height;
+								player->velocity.y;
+								moveVec.z = moveVec2d.y * speed;
+								if (pressed) player->lerpMotion(moveVec);
+							}
 						}
 					}
 				}
 				else
 				{
-					MoveUtil::setSpeed(speed);
 					vec3_t nowPos = *player->getPos();
 					savePos.y -= clipvalue;
-					nowPos.y = savePos.y;
-					player->setPos(nowPos);
-					player->velocity.y = 0;
+					if (mode.getSelectedValue() == 1 || mode.getSelectedValue() == 4)
+					{
+						MoveUtil::setSpeed(speed);
+						nowPos.y = savePos.y;
+						player->setPos(nowPos);
+						player->velocity.y = 0;
+					}
+					if (mode.getSelectedValue() == 2 || mode.getSelectedValue() == 3)
+					{
+						moveVec.x = 0;
+						moveVec.y = (savePos.y - nowPos.y) / (5 - upsped);
+						moveVec.z = 0;
+						player->lerpMotion(moveVec);
+					}
+					if (mode.getSelectedValue() == 4)
+					{
+						float calcYaw = (player->yaw + 90) * (PI / 180);
+						vec2_t moveVec2d = { input->forwardMovement, -input->sideMovement };
+						bool pressed = moveVec2d.magnitude() > 0.01f;
+						float c = cos(calcYaw);
+						float s = sin(calcYaw);
+						moveVec2d = { moveVec2d.x * c - moveVec2d.y * s, moveVec2d.x * s + moveVec2d.y * c };
+
+						if (player->onGround && pressed)
+							player->jumpFromGround();
+						moveVec.x = moveVec2d.x * speed;
+						moveVec.y = height;
+						player->velocity.y;
+						moveVec.z = moveVec2d.y * speed;
+						if (pressed) player->lerpMotion(moveVec);
+					}
 				}
 			}
-			else
+			else //jump only
 			{
-				dashed = true;
 				float calcYaw = (player->yaw + 90) * (PI / 180);
 				vec2_t moveVec2d = { input->forwardMovement, -input->sideMovement };
 				bool pressed = moveVec2d.magnitude() > 0.01f;
