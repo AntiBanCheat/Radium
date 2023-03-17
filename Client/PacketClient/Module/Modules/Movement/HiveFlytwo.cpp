@@ -28,7 +28,7 @@ const char* HiveFlytwo::getRawModuleName() {
 }
 
 const char* HiveFlytwo::getModuleName() {
-	//name = string("Speed ") + string(GRAY) + mode.GetEntry(mode.getSelectedValue()).GetName();
+	name = string("HiveFlyTwo ") + string(GRAY) + mode.GetEntry(mode.getSelectedValue()).GetName();
 	return name.c_str();
 }
 
