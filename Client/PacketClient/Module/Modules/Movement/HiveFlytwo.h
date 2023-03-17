@@ -7,7 +7,6 @@ private:
 	bool dashed = false;
 	bool aurais = false;
 	bool lock = false;
-	bool tp = false;
 	bool cliplimit = false;
 	float speed = 0.5;
 	float height = 0.0;
@@ -16,8 +15,11 @@ private:
 	float clipvalue = 0.0;
 	int dashTime = 0;
 	int cliptimes = 4;
+	std::string name = "HiveFly2";
+	SettingEnum mode = this;
 public:
 	virtual void onMove(C_MoveInputHandler* input);
+	virtual const char* getRawModuleName();
 	virtual const char* getModuleName();
 	virtual void onTick(C_GameMode* gm);
 	virtual void onDisable();
