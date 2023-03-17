@@ -32,6 +32,9 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerEnumSetting("Down", &downwards, 0);
 	downwards.addEntry("Vanilla", 0);
 	downwards.addEntry("None", 1);
+	registerEnumSetting("PlaceMode", &placemode, 0);
+	placemode.addEntry("Vanilla", 0);
+	placemode.addEntry("Telly", 1);
 	registerBoolSetting("BlockCount", &blockCount, blockCount);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
@@ -48,6 +51,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
 	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
+	registerFloatSetting("TellyDistance", &telly, telly, 0.0f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
@@ -221,7 +225,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		if (!jumping && velocityxz >= 0.01)
+		if (!jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly)
 		{
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aura->isEnabled())
