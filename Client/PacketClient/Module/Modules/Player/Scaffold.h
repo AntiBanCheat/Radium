@@ -41,6 +41,7 @@ private:
 	int timer = 20;
 	int range = 4;
 	int slot = 0;
+	float telly =0.1;
 	vec3_t blockBelowY;
 
 	bool sneaking = false;
@@ -79,6 +80,7 @@ public:
 	SettingEnum rotations = this;
 	SettingEnum downwards = this;
 	SettingEnum tower = this;
+	SettingEnum placemode = this;
 	SettingEnum holdType = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
