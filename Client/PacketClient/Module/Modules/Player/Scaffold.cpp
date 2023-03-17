@@ -6,6 +6,7 @@ uintptr_t HiveRotations2 = Utils::getBase() + 0x8F87C7;
 uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
+int groundtime = 0;
 
 using namespace std;
 Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
@@ -51,7 +52,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
 	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
 	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
-	registerFloatSetting("TellyDistance", &telly, telly, 0.0f, 1.f);
+	registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
@@ -162,7 +163,8 @@ void Scaffold::onTick(C_GameMode* gm) {
 	vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
 	float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
 	float cal = (player->yaw + 90) * (PI / 180);
-
+	if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
+	else groundtime = 0;
 	vec3_t blockBelow;
 	if (lockY) {
 		blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
@@ -225,7 +227,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		if (!jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly)
+		if (!jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10)
 		{
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aura->isEnabled())
@@ -236,7 +238,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 			for (int i = 0; i <= currExtend; i++)
 			{
 				Odelay++;
- 				if (Odelay > delay)
+				if (Odelay > delay)
 				{
 					int tempx = vel.x * i;
 					int tempz = vel.z * i;
@@ -276,8 +278,11 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else buildBlock(blockBelow);
+			if (groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0)
+			{
+				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			    else buildBlock(blockBelow);
+			}
 		}
 
 		if ((!(jumping || sneaking) && velocityxz <= 0.01) || !MoveUtil::isMoving) {
@@ -580,7 +585,7 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (player == nullptr) return;
 
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	if (clickGUI->Fonts.selected==1)
+	if (clickGUI->Fonts.selected == 1)
 	{
 		vec4_t testRect = vec4_t(scX, scY, 56 + scX, scY + 16);
 		vec2_t textPos(testRect.x + 20, testRect.y + 5);
@@ -614,7 +619,7 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 			string count = to_string(totalCount);
 			string text = count + " blocks";
 			MC_Color color = MC_Color();
-			if (totalCount > 99) 
+			if (totalCount > 99)
 			{
 				string text = count + "  blocks";
 			}
@@ -681,7 +686,7 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 				sca->setEnabled(false);
 			}
 			DrawUtils::drawText(vec2_t(textPos), &text, color, 1.f, true);
-	    }
+		}
 	}
 
 	if (showExposed) {
