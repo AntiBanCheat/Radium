@@ -34,7 +34,6 @@ private:
 	float towerMultiply = 1.2f;
 	float random = 1.5f;
 	bool sprint = true;
-	bool lockY = false;
 	bool zipline = false;
 	bool preventkicks = false;
 	int yLock = -1;
@@ -78,6 +77,7 @@ public:
 	int tellydalay = 5;
 	int rotspeed = 10;
 	bool telly2 = false;
+	bool lockY = false;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
