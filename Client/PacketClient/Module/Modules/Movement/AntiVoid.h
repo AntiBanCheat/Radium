@@ -14,6 +14,8 @@ private:
 	int tick = 0;
 	bool tped = false;
 	int stoptime = 0;
+	bool lockis = false;
+	bool scaffff = true;
 
 public:
 	bool blink = false;
@@ -21,6 +23,7 @@ public:
 	C_MoveInputHandler* inputHandler = nullptr;
 	SettingEnum mode = this;
 
+	virtual void onMove(C_MoveInputHandler* input);
 	virtual const char* getModuleName();
 	virtual void onTick(C_GameMode* gm);
 	virtual void onDisable();
