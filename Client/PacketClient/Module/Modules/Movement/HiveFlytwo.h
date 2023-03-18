@@ -13,6 +13,7 @@ private:
 	float clipUp = 1.0;
 	float timer = 20.f;
 	float clipvalue = 0.0;
+	float upheight;
 	int dashTime = 0;
 	int cliptimes = 4;
 	std::string name = "HiveFly2";
