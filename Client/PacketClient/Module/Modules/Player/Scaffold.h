@@ -72,6 +72,12 @@ public:
 	float scX = 10.f;
 	int extend = 1;
 	int minetime = 15;
+	int groundtime = 0;
+	int groundtime2 = 0;
+	int tellytick = 0;
+	int tellydalay = 5;
+	int rotspeed = 10;
+	bool telly2 = false;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
