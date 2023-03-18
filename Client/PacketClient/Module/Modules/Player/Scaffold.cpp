@@ -6,7 +6,7 @@ uintptr_t HiveRotations2 = Utils::getBase() + 0x8F87C7;
 uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
-int groundtime = 0;
+
 
 using namespace std;
 Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
@@ -36,6 +36,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerEnumSetting("PlaceMode", &placemode, 0);
 	placemode.addEntry("Vanilla", 0);
 	placemode.addEntry("Telly", 1);
+	placemode.addEntry("CustomTelly", 2);
 	registerBoolSetting("BlockCount", &blockCount, blockCount);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("Sprint", &sprint, sprint);
@@ -51,13 +52,15 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("G", &this->expG, this->expG, 0, 255);
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
 	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
-	registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
-	registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
+	//registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
+	//registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
+	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
 	registerIntSetting("Timer", &timer, timer, 20, 60);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
-	registerBoolSetting("ZipLine", &zipline, zipline);
+	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
+	//registerBoolSetting("ZipLine", &zipline, zipline); patched
 }
 
 const char* Scaffold::getRawModuleName() {
@@ -157,6 +160,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 		return;
 	}
 	restored = false;
+	if (telly2) telly2 = false;
+	else 
+	{
+		if (tellytick >= tellydalay)
+		{
+			telly2 = true;
+			tellytick = 0;
+		}
+		else tellytick++;
+	}
 
 
 	// Build Blocks
@@ -165,6 +178,8 @@ void Scaffold::onTick(C_GameMode* gm) {
 	float cal = (player->yaw + 90) * (PI / 180);
 	if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
 	else groundtime = 0;
+	if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
+	else groundtime2 = 0;
 	vec3_t blockBelow;
 	if (lockY) {
 		blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
@@ -227,7 +242,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 	}
 	else {
-		if (!jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10)
+		if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
 		{
 			auto aura = moduleMgr->getModule<Killaura>();
 			if (aura->isEnabled())
@@ -278,7 +293,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0)
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 || telly2)
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 			    else buildBlock(blockBelow);
@@ -454,7 +469,6 @@ void Scaffold::onPlayerTick(C_Player* plr) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 
-	static float smoothing = 10.f; // 37.f;
 	if (g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
 		vec3_t pPos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 		vec2_t blockPosition = player->getPos()->CalcAngle(vec3_t(calcPos));
@@ -465,8 +479,8 @@ void Scaffold::onPlayerTick(C_Player* plr) {
 		float speed = g_Data.getLocalPlayer()->getBlocksPerSecond();
 
 		// Normal
-		if (animYaw > blockPosition.y) animYaw -= ((animYaw - blockPosition.y) / smoothing);
-		else if (animYaw < blockPosition.y) animYaw += ((blockPosition.y - animYaw) / smoothing);
+		if (animYaw > blockPosition.y) animYaw -= ((animYaw - blockPosition.y) / rotspeed);
+		else if (animYaw < blockPosition.y) animYaw += ((blockPosition.y - animYaw) / rotspeed);
 		animPitch = blockPosition.x;
 
 		//Flareon
@@ -490,8 +504,8 @@ void Scaffold::onPlayerTick(C_Player* plr) {
 
 		// Back
 		if (rotations.getSelectedValue() == 3) {
-			if (animBack > back.y) animBack -= ((animBack - back.y) / smoothing);
-			else if (animBack < back.y) animBack += ((back.y - animBack) / smoothing);
+			if (animBack > back.y) animBack -= ((animBack - back.y) / rotspeed);
+			else if (animBack < back.y) animBack += ((back.y - animBack) / rotspeed);
 		}
 
 		if (speed > 0.05f || GameData::isKeyDown(*input->spaceBarKey)) {
