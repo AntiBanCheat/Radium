@@ -9,6 +9,7 @@ AntiVoid::AntiVoid() : IModule(0, Category::MOVEMENT, "Prevents you from falling
 	mode.addEntry("Hive", 2);
 	registerBoolSetting("VoidCheck", &voidCheck, voidCheck);
 	registerBoolSetting("tponce", &tponce, tponce);
+	registerBoolSetting("Scaffold", &scaffff, scaffff);
 	registerIntSetting("Distance", &distance, distance, 3, 10);
 }
 
@@ -22,21 +23,34 @@ void AntiVoid::onEnable() {
 	tick = 0;
 	tped = false;
 	stoptime = 0;
+	auto sca = moduleMgr->getModule<Scaffold>();
+	if (sca->lockY == true) lockis = true;
 }
-
+void AntiVoid::onMove(C_MoveInputHandler* input)
+{
+	auto player = g_Data.getLocalPlayer();
+	vec3_t blockBelow = g_Data.getLocalPlayer()->eyePos0;
+	blockBelow.y -= g_Data.getLocalPlayer()->height;
+	blockBelow.y -= 1.f;
+	if (player->onGround) {
+		savedPos = *player->getPos();
+		tped = false;
+		if (scaffff)
+		{
+			if (lockis)
+			{
+				auto sca = moduleMgr->getModule<Scaffold>();
+				sca->lockY = true;
+			}
+		}
+	}
+}
 void AntiVoid::onTick(C_GameMode* gm) {
 	float trueStop = INFINITY - 1 + NULL;
 	auto player = g_Data.getLocalPlayer();
 	vec3_t blockBelow = g_Data.getLocalPlayer()->eyePos0;
 	blockBelow.y -= g_Data.getLocalPlayer()->height;
 	blockBelow.y -= 1.f;
-
-	for (int i = 0; i < 44; i++) {
-		if (player->onGround && player->region->getBlock(blockBelow)->blockLegacy->blockId != 0) {
-			savedPos = *player->getPos();
-			tped = false;
-		}
-	}
 
 	if (player->fallDistance >= distance) {
 		tick++;
@@ -47,11 +61,23 @@ void AntiVoid::onTick(C_GameMode* gm) {
 		if (tponce) {
 			if (!tped) {
 				float dist2 = gm->player->getPos()->dist(savedPos);
-				if (mode.getSelectedValue() == 0) player->setPos(savedPos);  // Lagback
+				if (mode.getSelectedValue() == 0) player->setPos(savedPos);  
+				if (scaffff)
+				{
+					auto sca = moduleMgr->getModule<Scaffold>();
+					sca->lockY = false;
+					sca->setEnabled(true);
+				}
 				if (mode.getSelectedValue() == 1) { // Freeze
 				}
 				if (mode.getSelectedValue() == 2) { // Hive
 					player->setPos(savedPos);
+					if (scaffff)
+					{
+						auto sca = moduleMgr->getModule<Scaffold>();
+						sca->lockY = false;
+						sca->setEnabled(true);
+					}
 					stoptime = 8;
 				}
 			}
@@ -59,11 +85,23 @@ void AntiVoid::onTick(C_GameMode* gm) {
 		else
 		{
 			float dist2 = gm->player->getPos()->dist(savedPos);
-			if (mode.getSelectedValue() == 0) player->setPos(savedPos);  // Lagback
+			if (mode.getSelectedValue() == 0) player->setPos(savedPos); 
+			if (scaffff)
+			{
+				auto sca = moduleMgr->getModule<Scaffold>();
+				sca->lockY = false;
+				sca->setEnabled(true);
+			}
 			if (mode.getSelectedValue() == 1) { // Freeze
 			}
 			if (mode.getSelectedValue() == 2) { // Hive
 				player->setPos(savedPos);
+				if (scaffff)
+				{
+					auto sca = moduleMgr->getModule<Scaffold>();
+					sca->lockY = false;
+					sca->setEnabled(true);
+				}
 				stoptime = 8;
 			}
 		}
