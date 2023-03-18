@@ -3,7 +3,6 @@ float upsped = 2;
 vec3_t savePos;
 int nowtimes;
 bool aids = false;
-float upheight;
 
 HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does this bypass ?!?!?") {
 	registerEnumSetting("Mode", &mode, 0);
