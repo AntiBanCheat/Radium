@@ -1376,7 +1376,9 @@ void Hooks::chatLogHookFunc(__int64 a1, TextHolder* msg, uint32_t a2) {
 
 		// KillInsults
 		if (killsults->isEnabled()) {
-			if (textStr.find(name) != string::npos && textStr.find("killed") != string::npos || textStr.find(name) != string::npos && textStr.find("slain") != string::npos)
+			if (textStr.find(name) != string::npos && textStr.find("killed")
+				killsults->killed = true;
+			if (textStr.find(name) != string::npos && textStr.find("slain")
 				killsults->killed = true;
 		}
 
