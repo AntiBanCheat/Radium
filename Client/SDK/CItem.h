@@ -208,6 +208,22 @@ public:
 		if (((std::string)name.getText()).find("name_tag") != std::string::npos) return true;
 		if (((std::string)name.getText()).find("enchanted_book") != std::string::npos) return true;
 		if (((std::string)name.getText()).find("nautilus_shell") != std::string::npos) return true;
+		
+		if (((std::string)name.getText()).find("skyblock_settings") != std::string::npos) return true;//serveritems
+		if (((std::string)name.getText()).find("lobby_selector") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("spawn_teleport") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("social_menu") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("loot_menu") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("game_selector") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("kit_selection") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("play_again") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("weekly_items") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("game_voting") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("leave_game") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("pet_egg_alert") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("locker") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("friends") != std::string::npos) return true;
+		if (((std::string)name.getText()).find("party") != std::string::npos) return true;
 		return false;
 	}
 	bool isWeapon(void) {
