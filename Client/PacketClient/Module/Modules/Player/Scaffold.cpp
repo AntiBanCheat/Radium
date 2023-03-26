@@ -129,7 +129,7 @@ void Scaffold::onEnable() {
 	if (lockY) firstlock = true;
 	else firstlock = false;
 	
-	if (holdtype.getSelectedValue() == 2) {
+	if (holdType.getSelectedValue() == 2) {
 		selectBlock();
 	}
 }
@@ -144,7 +144,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
 	
-	if (holdtype.getSelectedValue() == 2) {
+	if (holdType.getSelectedValue() == 2) {
 		fakespoofticks++;
 		if (1 < fakespoofticks) canspoof = true;
 	}
@@ -364,8 +364,8 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else lockY = true;
 	}
-	if (holdtype.getselectedValue() > 0) {
-		if (holdtype.getSelectedValue() == 1) {
+	if (holdType.getSelectedValue() > 0) {
+		if (holdType.getSelectedValue() == 1) {
 			supplies->selectedHotbarSlot = slot;
 		}
 		else if(canspoof)
