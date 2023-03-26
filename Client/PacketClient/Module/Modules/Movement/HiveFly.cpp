@@ -17,7 +17,7 @@ HiveFly::HiveFly() : IModule(0, Category::MOVEMENT, "How the fuck does this bypa
 	registerFloatSetting("BoostSpeed", &speed, speed, 0.2f, 3.f);
 	registerFloatSetting("BoostValue", &value, value, -1.f, 1.f);
 	registerIntSetting("BoostDelay", &delay, delay, 0, 15);
-	registerIntSetting("Timer", &timer, timer, 0, 80);
+	registerIntSetting("Timer", &timer, timer, 1, 80);
 	registerIntSetting("CanFlyTicks", &canflytick, canflytick, 5, 100);
 }
 
@@ -91,6 +91,16 @@ void HiveFly::onEnable() {
 void HiveFly::onTick(C_GameMode* gm) {
 	C_LocalPlayer* player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
+	//if (mode.getSelectedValue() == 4) g_Data.getClientInstance()->minecraft->setTimerSpeed(24.f);
+
+	if (canflytick == 100 && mode.getSelectedValue() == 0 && counter69 > 9) counter69 = 9;
+}
+
+void HiveFly::onMove(C_MoveInputHandler* input) {
+	counter69++;
+	ticks++;
+	C_LocalPlayer* player = g_Data.getLocalPlayer();
+	if (player == nullptr) return;
 
 	if (sprint || mode.getSelectedValue() == 1 || mode.getSelectedValue() == 4 || mode.getSelectedValue() == 2) player->setSprinting(true);
 
@@ -103,14 +113,6 @@ void HiveFly::onTick(C_GameMode* gm) {
 	//if (mode.getSelectedValue() == 4) g_Data.getClientInstance()->minecraft->setTimerSpeed(24.f);
 
 	if (canflytick == 100 && mode.getSelectedValue() == 0 && counter69 > 9) counter69 = 9;
-}
-
-void HiveFly::onMove(C_MoveInputHandler* input) {
-	counter69++;
-	ticks++;
-	C_LocalPlayer* player = g_Data.getLocalPlayer();
-	if (player == nullptr) return;
-
 	vec2_t moveVec2d = { input->forwardMovement, -input->sideMovement };
 	bool pressed = moveVec2d.magnitude() > 0.01f;
 
