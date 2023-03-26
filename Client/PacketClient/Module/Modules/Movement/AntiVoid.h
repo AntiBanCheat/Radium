@@ -14,11 +14,11 @@ private:
 	int tick = 0;
 	bool tped = false;
 	int stoptime = 0;
-	bool lockis = false;
 	bool scaffff = true;
 
 public:
 	bool blink = false;
+	bool lockis = false;
 
 	C_MoveInputHandler* inputHandler = nullptr;
 	SettingEnum mode = this;
