@@ -36,6 +36,7 @@ private:
 	bool sprint = true;
 	bool zipline = false;
 	bool preventkicks = false;
+	bool firstlock = false;
 	int yLock = -1;
 	int timer = 20;
 	int range = 4;
@@ -47,6 +48,7 @@ private:
 	bool jumping = false;
 	bool oneDot12 = true;
 	bool aurais = false;
+	bool digbypass = false;
 
 	bool findBlocks(C_ItemStack* itemStack);
 	bool isUsefulBlock(C_ItemStack* itemStack);
