@@ -991,6 +991,7 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 	static auto blinkMod = moduleMgr->getModule<Blink>();
 	static auto freeTP = moduleMgr->getModule<FreeTP>();
 	static auto speed = moduleMgr->getModule<Speed>();
+	static auto scaffold = moduleMgr->getModule<Scaffold>();
 	static auto PacketMineMod = moduleMgr->getModule<PacketMine>();
 
 	if (PacketMineMod->isEnabled() && PacketMineMod->mode.getSelectedValue() == 1 && packet->isInstanceOf<C_PlayerActionPacket>()) {
@@ -1008,6 +1009,13 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 
 	if (noPacket->isEnabled() && g_Data.isInGame())
 		return;
+	
+	//FakeSpoof
+	if (scaffold->isEnabled() && scaffold->canspoof) {
+		if (packet->isInstanceOf<C_MobEquipmentPacket>()) {
+			return;
+		}
+	}
 
 	if (blinkMod->isEnabled() || freeTP->isEnabled() || (freecam->isEnabled() && freecam->cancelPackets) || speed->needblink) {
 		if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() || packet->isInstanceOf<C_PlayerActionPacket>()) {
