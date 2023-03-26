@@ -6,6 +6,7 @@ uintptr_t HiveRotations2 = Utils::getBase() + 0x8F87C7;
 uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
+int fakespoofticks = 0;
 
 
 using namespace std;
@@ -107,6 +108,9 @@ void Scaffold::onEnable() {
 	blockBelowY = blockBelowY.floor();
 	if (zipline) blockBelowY.y += 3.f;
 	blockBelowY = blockBelowY.floor();
+	
+	fakespoofticks = 0;
+	canspoof = false;
 
 	auto speedMod = moduleMgr->getModule<Speed>();
 	if (speedMod->isEnabled() && preventkicks) {
@@ -124,8 +128,9 @@ void Scaffold::onEnable() {
 	towerTick = 0;
 	if (lockY) firstlock = true;
 	else firstlock = false;
-	if (holdType.getSelectedValue() == 3) {
-		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(0.f);
+	
+	if (holdtype.getSelectedValue() == 2) {
+		selectBlock();
 	}
 }
 
@@ -138,6 +143,11 @@ void Scaffold::onTick(C_GameMode* gm) {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
+	
+	if (holdtype.getSelectedValue() == 2) {
+		fakespoofticks++;
+		if (1 < fakespoofticks) canspoof = true;
+	}
 
 	if (!jumping || !foundBlock)
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
@@ -354,6 +364,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else lockY = true;
 	}
+	if (holdtype.getselectedValue() > 0) {
+		if (holdtype.getSelectedValue() == 1) {
+			supplies->selectedHotbarSlot = slot;
+		}
+		else if(canspoof)
+		{
+			supplies->selectedHotbarSlot = slot;
+		}
+	}
+	
 	// Hive Bypass
 	if (rotations.getSelectedValue() == 1 || rotations.getSelectedValue() == 7 || rotations.getSelectedValue() == 8) {
 		player->pointingStruct->rayHitType = 0;
@@ -364,10 +384,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 	backPos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos2 = vec3_t(blockBelow.x, blockBelow.y, blockBelow.z);
-
-	if (holdType.getSelectedValue() == 1) {
-		supplies->selectedHotbarSlot = slot;
-	}
 }
 
 bool Scaffold::isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos) {
@@ -840,7 +856,7 @@ bool Scaffold::selectBlock() {
 	C_Inventory* inv = supplies->inventory;
 
 	auto prevSlot = supplies->selectedHotbarSlot;
-	if (holdType.getSelectedValue() == 1) {
+	if (holdType.getSelectedValue() == 1 || holdType.getSelectedValue() == 2) {
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
@@ -898,10 +914,6 @@ bool Scaffold::findBlocks(C_ItemStack* itemStack) {
 
 void Scaffold::onDisable() {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
-
-	if (holdType.getSelectedValue() == 3) {
-		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(20.f);
-	}
 	auto sprint = moduleMgr->getModule<Sprint>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	sprint->useSprint = true;
