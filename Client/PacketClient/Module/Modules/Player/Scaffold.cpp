@@ -46,6 +46,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	holdType.addEntry("Fake", 2);
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("Swing", &swing, swing);
+	registerBoolSetting("DigBypass", &digbypass, digbypass);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
 	registerBoolSetting("Visual", &this->showExposed, this->showExposed);
 	//registerIntSetting("R", &this->expR, this->expR, 0, 255);
@@ -56,7 +57,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
-	registerIntSetting("Timer", &timer, timer, 20, 60);
+	registerIntSetting("Timer", &timer, timer, 15, 60);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
@@ -114,14 +115,15 @@ void Scaffold::onEnable() {
 	else {
 		speedwasenabled = false;
 	}
-
+	auto av = moduleMgr->getModule<AntiVoid>();
+	if (av->lockis == true) lockY = true;
 	animFlareon = player->yawUnused1;
 	animFlareonPitch = player->pitch;
-
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	slot = supplies->selectedHotbarSlot;
 	towerTick = 0;
-
+	if (lockY) firstlock = true;
+	else firstlock = false;
 	if (holdType.getSelectedValue() == 3) {
 		g_Data.getClientInstance()->minecraft->setRenderTimerSpeed(0.f);
 	}
@@ -133,7 +135,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (player == nullptr) return;
 	auto sprintMod = moduleMgr->getModule<Sprint>();
 	auto speed = moduleMgr->getModule<Speed>();
-
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
@@ -336,7 +337,23 @@ void Scaffold::onTick(C_GameMode* gm) {
 		Utils::patchBytes((unsigned char*)HiveRotations2, (unsigned char*)"\xC7\x40\x18\x00\x00\x00\x00", 7);
 		Utils::patchBytes((unsigned char*)HiveRotations3, (unsigned char*)"\xA4\x60\x38\x02\x13\x86\x01\x13\x8", 11);
 	}
-
+	if (digbypass)
+	{
+		auto sped = moduleMgr->getModule<Speed>();
+		if (sped->isEnabled())
+		{
+			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06)) 
+			{
+				lockY = false; 
+				blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+				blockBelowY.y -= g_Data.getLocalPlayer()->height;
+				blockBelowY.y -= 0.5f;
+				blockBelowY = blockBelowY.floor();
+			}
+			else lockY = true;
+		}
+		else lockY = true;
+	}
 	// Hive Bypass
 	if (rotations.getSelectedValue() == 1 || rotations.getSelectedValue() == 7 || rotations.getSelectedValue() == 8) {
 		player->pointingStruct->rayHitType = 0;
@@ -891,7 +908,8 @@ void Scaffold::onDisable() {
 
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
+	if (firstlock) lockY = true;
+	else lockY = false;
 	if (speedwasenabled) { speedMod->setEnabled(true); speedwasenabled = false; }
 	auto aura = moduleMgr->getModule<Killaura>();
 	if (aurais == true)
