@@ -2,6 +2,9 @@
 #include "../pch.h"
 
 using namespace std;
+vec3_t checkPos;
+int timertime;
+bool timerstart;
 AntiVoid::AntiVoid() : IModule(0, Category::MOVEMENT, "Prevents you from falling into the void") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("Lagback", 0);
@@ -23,6 +26,8 @@ void AntiVoid::onEnable() {
 	tick = 0;
 	tped = false;
 	stoptime = 0;
+    timertime = 0;
+	timerstart = false;
 	auto sca = moduleMgr->getModule<Scaffold>();
 	if (sca->lockY == true) lockis = true;
 }
@@ -35,6 +40,7 @@ void AntiVoid::onMove(C_MoveInputHandler* input)
 	if (player->onGround) {
 		savedPos = *player->getPos();
 		tped = false;
+		timertime = 0;
 		if (scaffff)
 		{
 			if (lockis)
@@ -54,10 +60,6 @@ void AntiVoid::onTick(C_GameMode* gm) {
 
 	if (player->fallDistance >= distance) {
 		tick++;
-		if (!player->onGround && tick >= 5) { // fail safe
-			player->velocity.y += 0.1;
-			player->velocity.y = 0;
-		}
 		if (tponce) {
 			if (!tped) {
 				float dist2 = gm->player->getPos()->dist(savedPos);
@@ -71,14 +73,30 @@ void AntiVoid::onTick(C_GameMode* gm) {
 				if (mode.getSelectedValue() == 1) { // Freeze
 				}
 				if (mode.getSelectedValue() == 2) { // Hive
-					player->setPos(savedPos);
-					if (scaffff)
+					checkPos = *player->getPos();
+					if (savedPos.x - checkPos.x < 5 && savedPos.x - checkPos.x > -5 && savedPos.z - checkPos.z < 5 && savedPos.z - checkPos.z > -5)
+					{
+						player->setPos(savedPos);
+						if (scaffff)
+						{
+							auto sca = moduleMgr->getModule<Scaffold>();
+							sca->lockY = false;
+							sca->setEnabled(true);
+							auto sped = moduleMgr->getModule<Speed>();
+							sped->setEnabled(false);
+						}
+						stoptime = 8;
+					}
+					else
 					{
 						auto sca = moduleMgr->getModule<Scaffold>();
 						sca->lockY = false;
 						sca->setEnabled(true);
+						auto sped = moduleMgr->getModule<Speed>();
+						sped->setEnabled(false);
+						timertime = 10;
+						timerstart = true;
 					}
-					stoptime = 8;
 				}
 			}
 		}
@@ -95,14 +113,30 @@ void AntiVoid::onTick(C_GameMode* gm) {
 			if (mode.getSelectedValue() == 1) { // Freeze
 			}
 			if (mode.getSelectedValue() == 2) { // Hive
-				player->setPos(savedPos);
-				if (scaffff)
+				checkPos = *player->getPos();
+				if (savedPos.x - checkPos.x < 5.5 && savedPos.x - checkPos.x > -5.5 && savedPos.z - checkPos.z < 5.5 && savedPos.z - checkPos.z > -5.5)
+				{
+					player->setPos(savedPos);
+					if (scaffff)
+					{
+						auto sca = moduleMgr->getModule<Scaffold>();
+						sca->lockY = false;
+						sca->setEnabled(true);
+						auto sped = moduleMgr->getModule<Speed>();
+						sped->setEnabled(false);
+					}
+					stoptime = 8;
+				}
+				else
 				{
 					auto sca = moduleMgr->getModule<Scaffold>();
 					sca->lockY = false;
 					sca->setEnabled(true);
+					auto sped = moduleMgr->getModule<Speed>();
+					sped->setEnabled(false);
+					timertime = 10;
+					timerstart = true;
 				}
-				stoptime = 8;
 			}
 		}
 		tped = true;
@@ -110,6 +144,18 @@ void AntiVoid::onTick(C_GameMode* gm) {
 	if (stoptime > 0) {
 		MoveUtil::fullStop(false);
 		stoptime--;
+	}
+	if (timertime > 0) {
+		g_Data.getClientInstance()->minecraft->setTimerSpeed(5);
+		timertime--;
+	}
+	else
+	{
+		if (timerstart)
+		{
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(20);
+			timerstart = false;
+		}
 	}
 }
 
