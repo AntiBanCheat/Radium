@@ -11,11 +11,15 @@ private:
 	float speed = 0.5;
 	float height = 0.0;
 	float clipUp = 1.0;
-	float timer = 20.f;
 	float clipvalue = 0.0;
-	float upheight;
+	int timer = 20;
 	int dashTime = 0;
 	int cliptimes = 4;
+	float upsped = 2;
+	vec3_t savePos;
+	int nowtimes;
+	bool aids = false;
+	float upheight;
 	std::string name = "HiveFly2";
 	SettingEnum mode = this;
 public:
