@@ -69,7 +69,6 @@ void Speed::onEnable() {
 
 	oldx = player->currentPos.x;
 	oldz = player->currentPos.z;
-
 	animYaw = player->yaw;
 }
 
@@ -88,7 +87,7 @@ void Speed::onTick(C_GameMode* gm) {
 	if (noslabs) player->stepHeight = 0.3f;
 
 	C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
-	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
+	//g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 
 	// HiveLow
 	switch (mode.getSelectedValue()) {
@@ -123,7 +122,7 @@ void Speed::onTick(C_GameMode* gm) {
 void Speed::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
+	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 	bool pressed = MoveUtil::keyPressed();
 	if (!pressed) MoveUtil::stop(false);
 	if (mode.getSelectedValue() != 11) player->setSprinting(true);
