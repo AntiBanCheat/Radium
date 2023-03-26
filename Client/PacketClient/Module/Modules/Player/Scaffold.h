@@ -80,6 +80,7 @@ public:
 	int rotspeed = 10;
 	bool telly2 = false;
 	bool lockY = false;
+	bool canspoof = false;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
