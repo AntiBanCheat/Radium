@@ -1,8 +1,4 @@
 #include "HiveFlytwo.h"
-float upsped = 2;
-vec3_t savePos;
-int nowtimes;
-bool aids = false;
 
 HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does this bypass ?!?!?") {
 	registerEnumSetting("Mode", &mode, 0);
@@ -15,8 +11,8 @@ HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does thi
 	registerFloatSetting("Speed", &speed, speed, .1f, 2.f);
 	registerFloatSetting("Height", &height, height, 0.f, 1.f);
 	registerFloatSetting("ClipUp", &clipUp, clipUp, 0.f, 5.f);
-	registerFloatSetting("Timer", &timer, timer, 0.f, 30.f);
-	registerIntSetting("DashTime", &dashTime, dashTime, 0, 3000);
+	registerIntSetting("Timer", &timer, timer, 1, 30);
+	registerIntSetting("DashTime", &dashTime, dashTime, 0, 2000);
 	registerBoolSetting("Freelook", &lock, lock);
 	registerBoolSetting("ClipLimit", &cliplimit, cliplimit);
 	registerIntSetting("ClipTimes", &cliptimes, cliptimes, 1, 20);
