@@ -20,6 +20,8 @@ private:
 	int nowtimes;
 	bool aids = false;
 	float upheight;
+	float dspeed = 0.f;
+	float duration = 1.f;
 	std::string name = "HiveFly2";
 	SettingEnum mode = this;
 public:
