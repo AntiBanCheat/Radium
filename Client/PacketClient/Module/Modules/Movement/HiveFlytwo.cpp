@@ -10,6 +10,7 @@ HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does thi
 	mode.addEntry("SlowUp", 5);
 	registerFloatSetting("Speed", &speed, speed, .1f, 2.f);
 	registerFloatSetting("Height", &height, height, 0.f, 1.f);
+	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.f);
 	registerFloatSetting("ClipUp", &clipUp, clipUp, 0.f, 5.f);
 	registerIntSetting("Timer", &timer, timer, 1, 30);
 	registerIntSetting("DashTime", &dashTime, dashTime, 0, 2000);
@@ -33,6 +34,7 @@ const char* HiveFlytwo::getModuleName() {
 
 void HiveFlytwo::onEnable() {
 	dashed = false;
+	dspeed = speed;
 	nowtimes = 0;
 	auto player = g_Data.getLocalPlayer();
 	savePos = *player->getPos();
@@ -121,6 +123,7 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 		}
 		if (TimerUtil::hasTimedElapsed(dashTime, !blink) && !dashed) {
 			dashed = true;
+			dspeed = dspeed * duration;
 			if(mode.getSelectedValue() == 0) // clip, slowclip, jumpclip
 			{
 				float calcYaw = (player->yaw + 90) * (PI / 180);
@@ -132,10 +135,10 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 
 				if (player->onGround && pressed)
 					player->jumpFromGround();
-				moveVec.x = moveVec2d.x * speed;
+				moveVec.x = moveVec2d.x * dspeed;
 				moveVec.y = height;
 				player->velocity.y;
-				moveVec.z = moveVec2d.y * speed;
+				moveVec.z = moveVec2d.y * dspeed;
 				if (pressed) player->lerpMotion(moveVec);
 			}
 			else
@@ -158,7 +161,7 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 								savePos.y -= clipvalue;
 								if (mode.getSelectedValue() == 1 || mode.getSelectedValue() == 4)
 								{
-									MoveUtil::setSpeed(speed);
+									MoveUtil::setSpeed(dspeed);
 									nowPos.y = savePos.y;
 									player->setPos(nowPos); //normal
 									player->velocity.y = 0;
@@ -181,10 +184,10 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 
 									if (player->onGround && pressed)
 										player->jumpFromGround();
-									moveVec.x = moveVec2d.x * speed;
+									moveVec.x = moveVec2d.x * dspeed;
 									moveVec.y = height;
 									player->velocity.y;
-									moveVec.z = moveVec2d.y * speed;
+									moveVec.z = moveVec2d.y * dspeed;
 									if (pressed) player->lerpMotion(moveVec);
 								}
 							}
@@ -196,7 +199,7 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 						savePos.y -= clipvalue;
 						if (mode.getSelectedValue() == 1 || mode.getSelectedValue() == 4)
 						{
-							MoveUtil::setSpeed(speed);
+							MoveUtil::setSpeed(dspeed);
 							nowPos.y = savePos.y;
 							player->setPos(nowPos);
 							player->velocity.y = 0;
@@ -219,10 +222,10 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 
 							if (player->onGround && pressed)
 								player->jumpFromGround();
-							moveVec.x = moveVec2d.x * speed;
+							moveVec.x = moveVec2d.x * dspeed;
 							moveVec.y = height;
 							player->velocity.y;
-							moveVec.z = moveVec2d.y * speed;
+							moveVec.z = moveVec2d.y * dspeed;
 							if (pressed) player->lerpMotion(moveVec);
 						}
 					}
