@@ -932,8 +932,7 @@ void Scaffold::onDisable() {
 	if (tower.getSelectedValue() == 1 && foundBlock && jumping) player->velocity.y = 0.f;
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	selectBlock();
-	supplies->selectedHotbarSlot = slot;
-
+        supplies->selectedHotbarSlot = supplies->selectedHotbarSlot;
 	Utils::patchBytes((unsigned char*)HiveRotations1, (unsigned char*)"\x89\x41\x18", 3);
 	Utils::patchBytes((unsigned char*)HiveRotations2, (unsigned char*)"\xC7\x40\x18\x03\x00\x00\x00", 7);
 
