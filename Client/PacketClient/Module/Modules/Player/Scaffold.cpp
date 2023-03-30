@@ -59,6 +59,9 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
 	registerIntSetting("Timer", &timer, timer, 15, 60);
+	registerEnumSetting("Extend", &extendType, 0);
+	extendType.addEntry("Packet", 0);
+	extendType.addEntry("Radium", 1);
 	registerIntSetting("Extend", &extend, extend, 0, 20);
 	registerIntSetting("Delay", &delay, delay, 0, 20);
 	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
