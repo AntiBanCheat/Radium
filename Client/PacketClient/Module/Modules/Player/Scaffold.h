@@ -91,6 +91,7 @@ public:
 	SettingEnum tower = this;
 	SettingEnum placemode = this;
 	SettingEnum holdType = this;
+	SettingEnum extendType = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
 	virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;
