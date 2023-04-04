@@ -11,6 +11,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerIntSetting("ContinueDelay", &delay, delay, 0, 20);
 	registerIntSetting("MineDelay", &minedelay, minedelay, 0, 30);
 	registerBoolSetting("Visual", &visual, visual);
+	registerBoolSetting("HiveBypass", &bypass, bypass);
 }
 
 const char* Regen::getRawModuleName() {
@@ -377,9 +378,10 @@ void Regen::onPlayerTick(C_Player* plr) {
 		animYaw += ((angle.y - animYaw) / 10);
 	if (destroy) {
 		if (g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
-			plr->bodyYaw = animYaw;
+			if (!bypass) plr->bodyYaw = animYaw;
 			plr->yawUnused1 = animYaw;
 			plr->pitch = angle.x;
+			if (bypass) plr->setRot(angle);
 		}
 	}
 }
