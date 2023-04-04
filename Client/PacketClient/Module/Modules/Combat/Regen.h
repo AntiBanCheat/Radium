@@ -36,6 +36,7 @@ public:
     int enabledticks;
     int minedelay = 15;
     bool visual =false;
+    bool bypass = true;
     std::string name = "Regen";
     std::string name2 = "";
     SettingEnum mode = this;
