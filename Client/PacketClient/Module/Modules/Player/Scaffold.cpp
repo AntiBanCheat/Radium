@@ -31,25 +31,35 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("Flareon", 5);
 	tower.addEntry("Slow", 6);
 	tower.addEntry("None", 7);
-	registerEnumSetting("Down", &downwards, 0);
-	downwards.addEntry("Vanilla", 0);
-	downwards.addEntry("None", 1);
-	registerEnumSetting("PlaceMode", &placemode, 0);
-	placemode.addEntry("Vanilla", 0);
-	placemode.addEntry("Telly", 1);
-	placemode.addEntry("CustomTelly", 2);
-	registerBoolSetting("BlockCount", &blockCount, blockCount);
-	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
-	registerBoolSetting("Sprint", &sprint, sprint);
 	registerEnumSetting("Select", &holdType, 0);
 	holdType.addEntry("Switch", 0);
 	holdType.addEntry("Spoof", 1);
 	holdType.addEntry("Fake", 2);
+	registerEnumSetting("Extend", &extendType, 0);
+	extendType.addEntry("Drizzle", 0);
+	extendType.addEntry("Radium", 1);
+	extendType.addEntry("Packet", 2);
+	registerEnumSetting("Telly", &placemode, 0);
+	placemode.addEntry("None", 0);
+	placemode.addEntry("Telly", 1);
+	placemode.addEntry("CustomTelly", 2);
+
 	registerBoolSetting("LockY", &lockY, lockY);
-	registerBoolSetting("Swing", &swing, swing);
-	registerBoolSetting("DigBypass", &digbypass, digbypass);
+	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
-	registerBoolSetting("Visual", &this->showExposed, this->showExposed);
+	registerIntSetting("Extend", &extend, extend, 0, 20);
+	registerIntSetting("Delay", &delay, delay, 0, 5);
+	registerIntSetting("Timer", &timer, timer, 15, 60);
+	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
+	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
+	//registerEnumSetting("Down", &downwards, 0);
+	//downwards.addEntry("Vanilla", 0);
+	//downwards.addEntry("None", 1);
+	//registerBoolSetting("Sprint", &sprint, sprint);
+	//registerBoolSetting("BlockCount", &blockCount, blockCount);
+	//registerBoolSetting("Swing", &swing, swing);
+	//registerBoolSetting("DigBypass", &digbypass, digbypass);
+	//registerBoolSetting("Visual", &this->showExposed, this->showExposed);
 	//registerIntSetting("R", &this->expR, this->expR, 0, 255);
 	//registerIntSetting("G", &this->expG, this->expG, 0, 255);
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
@@ -57,14 +67,6 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
 	//registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
-	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
-	registerIntSetting("Timer", &timer, timer, 15, 60);
-	registerEnumSetting("Extend", &extendType, 0);
-	extendType.addEntry("Packet", 0);
-	extendType.addEntry("Radium", 1);
-	registerIntSetting("Extend", &extend, extend, 0, 20);
-	registerIntSetting("Delay", &delay, delay, 0, 20);
-	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
 	//registerBoolSetting("ZipLine", &zipline, zipline); patched
 }
 
@@ -187,65 +189,227 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 
 	// Build Blocks
-	vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
-	float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
-	float cal = (player->yaw + 90) * (PI / 180);
-	if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
-	else groundtime = 0;
-	if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
-	else groundtime2 = 0;
-	vec3_t blockBelow;
-	if (lockY) {
-		blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
-		blockBelow.y = blockBelowY.y;
-	}
-	else {
-		blockBelow = player->eyePos0;  // Block below the player
-		blockBelow.y -= player->height;
-		blockBelow.y -= 0.5f;
-		if (zipline) blockBelowY.y += 2.8f;
-	}
-	vec3_t blockBelowPredict = player->eyePos0;  // Block below the player
-	blockBelowPredict.y -= player->height;
-	blockBelowPredict.y -= 0.5f;
+	if (extendType.getSelectedValue() == 0) //celsius
+	{
+		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
+		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
+		float cal = (player->yaw + 90) * (PI / 180);
 
-	currExtend = extend + 1.2;
+		vec3_t blockBelow;
+		if (lockY) {
+			blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+			blockBelow.y = blockBelowY.y;
+		}
+		else {
+			blockBelow = player->eyePos0;  // Block below the player
+			blockBelow.y -= player->height;
+			blockBelow.y -= 0.5f;
+			if (zipline) blockBelowY.y += 2.8f;
+		}
+		vec3_t blockBelowPredict = player->eyePos0;  // Block below the player
+		blockBelowPredict.y -= player->height;
+		blockBelowPredict.y -= 0.5f;
 
-	if (sneaking && downwards.getSelectedValue() == 0) {
-		vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
-		blockBelow15.y -= player->height;
-		blockBelow15.y -= 1.5f;
-		blockBelowY = blockBelow15;
-		vec3_t blockBelow2 = g_Data.getLocalPlayer()->eyePos0;  // Block 2 blocks below the player
-		blockBelow2.y -= g_Data.getLocalPlayer()->height;
-		blockBelow2.y -= 2.0f;
-		g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = false;
-		blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
-		if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
-			if (velocityxz > 0.f) {
+		currExtend = extend;
+
+		if (sneaking && downwards.getSelectedValue() == 0) {
+			vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
+			blockBelow15.y -= player->height;
+			blockBelow15.y -= 1.5f;
+			blockBelowY = blockBelow15;
+			vec3_t blockBelow2 = g_Data.getLocalPlayer()->eyePos0;  // Block 2 blocks below the player
+			blockBelow2.y -= g_Data.getLocalPlayer()->height;
+			blockBelow2.y -= 2.0f;
+			g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = false;
+			blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
+			if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+				if (velocityxz > 0.f) {
+					blockBelow15.z -= vel.z * 0.4f;
+					blockBelow15.z -= vel.z * 0.4f;
+					if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+						blockBelow15.x -= vel.x * 0.4f;
+						blockBelow2.x -= vel.x * 0.4f;
+						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
+							blockBelow15.z += vel.z;
+							blockBelow15.x += vel.x;
+							blockBelow2.z += vel.z;
+							blockBelow2.x += vel.x;
+							buildBlock(blockBelow15);
+							buildBlock(blockBelow2);
+						}
+					}
+				}
+			}
+		}
+		else {
+			//extend
+			int extend2 = currExtend;
+			vec3_t defaultblockBelow = blockBelow;
+			for (int i = 0; i < extend2; i++) {
+				if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * i; blockBelow.z += vel.z * i; }
+
+				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+				else if (!buildBlock(blockBelow)) {
+					if (velocityxz > 0.f) {  // Are we actually walking?
+						blockBelow.x -= vel.x;
+						blockBelow.z -= vel.z;
+						if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+							blockBelow.x += vel.x;
+							blockBelow.z += vel.z;
+							buildBlock(blockBelow);
+						}
+					}
+				}
+			}
+			blockBelow = defaultblockBelow;
+
+			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
+
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else if (!buildBlock(blockBelow)) {
+				if (velocityxz > 0.f) {  // Are we actually walking?
+					blockBelow.x -= vel.x;
+					blockBelow.z -= vel.z;
+					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+						blockBelow.x += vel.x;
+						blockBelow.z += vel.z;
+						buildBlock(blockBelow);
+					}
+				}
+			}
+		}
+		oldpos = blockBelow.floor();
+	}
+	if (extendType.getSelectedValue() == 1) //radium
+	{
+		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
+		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
+		float cal = (player->yaw + 90) * (PI / 180);
+		if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
+		else groundtime = 0;
+		if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
+		else groundtime2 = 0;
+		vec3_t blockBelow;
+		if (lockY) {
+			blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+			blockBelow.y = blockBelowY.y;
+		}
+		else {
+			blockBelow = player->eyePos0;  // Block below the player
+			blockBelow.y -= player->height;
+			blockBelow.y -= 0.5f;
+			if (zipline) blockBelowY.y += 2.8f;
+		}
+		vec3_t blockBelowPredict = player->eyePos0;  // Block below the player
+		blockBelowPredict.y -= player->height;
+		blockBelowPredict.y -= 0.5f;
+
+		currExtend = extend + 1.2;
+
+		if (sneaking && downwards.getSelectedValue() == 0) {
+			vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
+			blockBelow15.y -= player->height;
+			blockBelow15.y -= 1.5f;
+			blockBelowY = blockBelow15;
+			vec3_t blockBelow2 = g_Data.getLocalPlayer()->eyePos0;  // Block 2 blocks below the player
+			blockBelow2.y -= g_Data.getLocalPlayer()->height;
+			blockBelow2.y -= 2.0f;
+			g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = false;
+			blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
+			if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+				if (velocityxz > 0.f) {
+					auto aura = moduleMgr->getModule<Killaura>();
+					if (aura->isEnabled())
+					{
+						aurais = true;
+						aura->setEnabled(false);
+					}
+					blockBelow15.z -= vel.z * 0.4f;
+					blockBelow15.z -= vel.z * 0.4f;
+					if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+						blockBelow15.x -= vel.x * 0.4f;
+						blockBelow2.x -= vel.x * 0.4f;
+						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
+							blockBelow15.z += vel.z;
+							blockBelow15.x += vel.x;
+							blockBelow2.z += vel.z;
+							blockBelow2.x += vel.x;
+							buildBlock(blockBelow15);
+							buildBlock(blockBelow2);
+						}
+					}
+				}
+				else
+				{
+					auto aura = moduleMgr->getModule<Killaura>();
+					if (aurais == true)
+					{
+						aura->setEnabled(true);
+						aurais = false;
+					}
+				}
+			}
+		}
+		else {
+			if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+			{
 				auto aura = moduleMgr->getModule<Killaura>();
 				if (aura->isEnabled())
 				{
 					aurais = true;
 					aura->setEnabled(false);
 				}
-				blockBelow15.z -= vel.z * 0.4f;
-				blockBelow15.z -= vel.z * 0.4f;
-				if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
-					blockBelow15.x -= vel.x * 0.4f;
-					blockBelow2.x -= vel.x * 0.4f;
-					if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-						blockBelow15.z += vel.z;
-						blockBelow15.x += vel.x;
-						blockBelow2.z += vel.z;
-						blockBelow2.x += vel.x;
-						buildBlock(blockBelow15);
-						buildBlock(blockBelow2);
+				for (int i = 0; i <= currExtend; i++)
+				{
+					Odelay++;
+					if (Odelay > delay)
+					{
+						int tempx = vel.x * i;
+						int tempz = vel.z * i;
+
+						vec3_t temp = blockBelow;
+						temp.x += tempx;
+						temp.z += tempz;
+						if (!placed.empty())
+						{
+							bool skip = false;
+							for (auto& i : placed)
+							{
+								if (i == temp)
+								{
+									skip = true;
+								}
+							}
+
+							if (skip)
+							{
+								clientMessageF("Skipped due same block");
+								continue;
+							}
+						}
+						if (isBlockReplacable(temp)) predictBlock(temp);
+						else if (buildBlock(temp))
+						{
+							placed.push_back(temp);
+							clientMessageF("Breaked due placed");
+							break;
+						}
+						Odelay = 0;
 					}
 				}
+
+				placed.clear();
 			}
 			else
 			{
+				if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 || telly2)
+				{
+					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+					else buildBlock(blockBelow);
+				}
+			}
+
+			if ((!(jumping || sneaking) && velocityxz <= 0.01) || !MoveUtil::isMoving) {
 				auto aura = moduleMgr->getModule<Killaura>();
 				if (aurais == true)
 				{
@@ -253,93 +417,95 @@ void Scaffold::onTick(C_GameMode* gm) {
 					aurais = false;
 				}
 			}
-		}
-	}
-	else {
-		if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
-		{
-			auto aura = moduleMgr->getModule<Killaura>();
-			if (aura->isEnabled())
-			{
-				aurais = true;
-				aura->setEnabled(false);
-			}
-			for (int i = 0; i <= currExtend; i++)
-			{
-				Odelay++;
-				if (Odelay > delay)
-				{
-					int tempx = vel.x * i;
-					int tempz = vel.z * i;
 
-					vec3_t temp = blockBelow;
-					temp.x += tempx;
-					temp.z += tempz;
-					if (!placed.empty())
-					{
-						bool skip = false;
-						for (auto& i : placed)
-						{
-							if (i == temp)
-							{
-								skip = true;
-							}
-						}
-
-						if (skip)
-						{
-							clientMessageF("Skipped due same block");
-							continue;
-						}
+			/*
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else if (!buildBlock(blockBelow)) {
+				if (velocityxz > 0.f) {  // Are we actually walking?
+					blockBelow.x -= vel.x;
+					blockBelow.z -= vel.z;
+					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+						blockBelow.x += vel.x;
+						blockBelow.z += vel.z;
+						buildBlock(blockBelow);
 					}
-					if (isBlockReplacable(temp)) predictBlock(temp);
-					else if (buildBlock(temp))
-					{
-						placed.push_back(temp);
-						clientMessageF("Breaked due placed");
-						break;
-					}
-					Odelay = 0;
 				}
 			}
-
-			placed.clear();
-		}
-		else
-		{
-			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 || telly2)
-			{
-				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			    else buildBlock(blockBelow);
-			}
+			*/
 		}
 
-		if ((!(jumping || sneaking) && velocityxz <= 0.01) || !MoveUtil::isMoving) {
-			auto aura = moduleMgr->getModule<Killaura>();
-			if (aurais == true)
-			{
-				aura->setEnabled(true);
-				aurais = false;
-			}
-		}
+		oldpos = blockBelow.floor();
+	}
+	if (extendType.getSelectedValue() == 2) //packet
+	{
+		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
+		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
+		float cal = (player->yaw + 90) * (PI / 180);
 
-		/*
-		if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-		else if (!buildBlock(blockBelow)) {
-			if (velocityxz > 0.f) {  // Are we actually walking?
-				blockBelow.x -= vel.x;
-				blockBelow.z -= vel.z;
-				if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-					blockBelow.x += vel.x;
-					blockBelow.z += vel.z;
-					buildBlock(blockBelow);
+		vec3_t blockBelow;
+		if (lockY) {
+			blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+			blockBelow.y = blockBelowY.y;
+		}
+		else {
+			blockBelow = player->eyePos0;  // Block below the player
+			blockBelow.y -= player->height;
+			blockBelow.y -= 0.5f;
+		}
+		vec3_t blockBelowPredict = player->eyePos0;  // Block below the player
+		blockBelowPredict.y -= player->height;
+		blockBelowPredict.y -= 0.5f;
+
+		currExtend = extend;
+
+		if (sneaking && downwards.getSelectedValue() == 0) {
+			vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
+			blockBelow15.y -= player->height;
+			blockBelow15.y -= 1.5f;
+			blockBelowY = blockBelow15;
+			vec3_t blockBelow2 = g_Data.getLocalPlayer()->eyePos0;  // Block 2 blocks below the player
+			blockBelow2.y -= g_Data.getLocalPlayer()->height;
+			blockBelow2.y -= 2.0f;
+			g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = false;
+			blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
+			if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+				if (velocityxz > 0.f) {
+					blockBelow15.z -= vel.z * 0.4f;
+					blockBelow15.z -= vel.z * 0.4f;
+					if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+						blockBelow15.x -= vel.x * 0.4f;
+						blockBelow2.x -= vel.x * 0.4f;
+						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
+							blockBelow15.z += vel.z;
+							blockBelow15.x += vel.x;
+							blockBelow2.z += vel.z;
+							blockBelow2.x += vel.x;
+							buildBlock(blockBelow15);
+							buildBlock(blockBelow2);
+						}
+					}
 				}
 			}
 		}
-		*/
+		else {
+			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
+
+
+			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+			else if (!buildBlock(blockBelow)) {
+				if (velocityxz > 0.f) {  // Are we actually walking?
+					blockBelow.x -= vel.x;
+					blockBelow.z -= vel.z;
+					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+						blockBelow.x += vel.x;
+						blockBelow.z += vel.z;
+						buildBlock(blockBelow);
+					}
+				}
+			}
+		}
 	}
 
-	oldpos = blockBelow.floor();
 
 	if (!sprint) { gm->player->setSprinting(false); sprintMod->useSprint = false; }
 
@@ -384,6 +550,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		Utils::patchBytes((unsigned char*)HiveRotations2, (unsigned char*)"\xC7\x40\x18\x00\x00\x00\x00", 7);
 		//Utils::patchBytes((unsigned char*)HiveRotations3, (unsigned char*)"\xA4\x60\x38\x02\x13\x86\x01\x13\x8", 11);
 	}
+	vec3_t blockBelow = g_Data.getLocalPlayer()->eyePos0;
 	backPos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos = vec3_t(player->getPos()->x, player->getPos()->y - 1, player->getPos()->z);
 	flareonpos2 = vec3_t(blockBelow.x, blockBelow.y, blockBelow.z);
