@@ -230,12 +230,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 						blockBelow15.x -= vel.x * 0.4f;
 						blockBelow2.x -= vel.x * 0.4f;
 						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-							blockBelow15.z += vel.z;
-							blockBelow15.x += vel.x;
-							blockBelow2.z += vel.z;
-							blockBelow2.x += vel.x;
-							buildBlock(blockBelow15);
-							buildBlock(blockBelow2);
+							Odelay++;
+							if (Odelay > delay)
+							{
+								blockBelow15.z += vel.z;
+								blockBelow15.x += vel.x;
+								blockBelow2.z += vel.z;
+								blockBelow2.x += vel.x;
+								buildBlock(blockBelow15);
+								buildBlock(blockBelow2);
+							}
 						}
 					}
 				}
@@ -330,12 +334,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 						blockBelow15.x -= vel.x * 0.4f;
 						blockBelow2.x -= vel.x * 0.4f;
 						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-							blockBelow15.z += vel.z;
-							blockBelow15.x += vel.x;
-							blockBelow2.z += vel.z;
-							blockBelow2.x += vel.x;
-							buildBlock(blockBelow15);
-							buildBlock(blockBelow2);
+							Odelay++;
+							if (Odelay > delay)
+							{
+								blockBelow15.z += vel.z;
+								blockBelow15.x += vel.x;
+								blockBelow2.z += vel.z;
+								blockBelow2.x += vel.x;
+								buildBlock(blockBelow15);
+								buildBlock(blockBelow2);
+							}
 						}
 					}
 				}
@@ -476,12 +484,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 						blockBelow15.x -= vel.x * 0.4f;
 						blockBelow2.x -= vel.x * 0.4f;
 						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-							blockBelow15.z += vel.z;
-							blockBelow15.x += vel.x;
-							blockBelow2.z += vel.z;
-							blockBelow2.x += vel.x;
-							buildBlock(blockBelow15);
-							buildBlock(blockBelow2);
+							Odelay++;
+							if (Odelay > delay)
+							{
+								blockBelow15.z += vel.z;
+								blockBelow15.x += vel.x;
+								blockBelow2.z += vel.z;
+								blockBelow2.x += vel.x;
+								buildBlock(blockBelow15);
+								buildBlock(blockBelow2);
+							}
 						}
 					}
 				}
