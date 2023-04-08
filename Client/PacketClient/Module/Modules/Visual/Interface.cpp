@@ -9,6 +9,7 @@ Interface::Interface() : IModule(0, Category::VISUAL, "Displays the HUD") {
 	color.addEntry("RGBWave", 3);
 	registerBoolSetting("ArmorHUD", &armorHUD, armorHUD);
 	registerBoolSetting("Release", &release, release);
+	registerBoolSetting("Ping", &ping, ping);
 	registerBoolSetting("Info", &info, info);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
 	registerFloatSetting("Saturation", &saturation, saturation, 0.f, 1.f);
