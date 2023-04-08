@@ -34,7 +34,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	//DrawUtils::drawImage("textures/ui/heart_new.png", vec2_t(positionX + 5, positionY + 50), vec2_t(30, 30), vec2_t(0, 0), vec2_t(1, 1));
 
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
-		string name = player->getNameTag()->getText(); name = Utils::sanitize(name); name = name.substr(0, name.find('\n')); string clientName = interfaceMod->getClientName(); string fpsText = to_string(g_Data.getFPS()) + " fps"; string skeetLen = "Packetsense | " + name + " | " + fpsText; string t = "Packet         | " + name + " | " + fpsText; string sense = "sense"; string newText = clientName + GRAY + "| " + RESET + WHITE + name; string idk = "Packet "; string idk2 = string(GRAY) + clientName; string len = idk + idk2; // why u lookin over here
+		string name = player->getNameTag()->getText(); name = Utils::sanitize(name); name = name.substr(0, name.find('\n')); string clientName = interfaceMod->getClientName(); string fpsText = to_string(g_Data.getFPS()) + " fps"; string skeetLen = "Radiumsense | " + name + " | " + fpsText; string t = "Radium         | " + name + " | " + fpsText; string sense = "sense"; string newText = clientName + GRAY + "| " + RESET + WHITE + name; string idk = "Radium "; string idk2 = string(GRAY) + clientName; string len = idk + idk2; // why u lookin over here
 		string cn = "Radium";
 		float textHeight = 12.f * scale;
 		float textPadding = 1.f * scale;
