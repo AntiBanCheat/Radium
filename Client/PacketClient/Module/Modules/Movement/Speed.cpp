@@ -29,21 +29,18 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("Flareon", 11);
 	mode.addEntry("DamageSafe", 12);
 	mode.addEntry("DmgFlySpeed", 13); //only beta
-	// Vanilla
-	registerFloatSetting("Height", &height, height, 0.000001f, 0.60f);
-	// All Settings
+
+	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
 	registerIntSetting("Timer", &timer, timer, 10, 40);
+	registerFloatSetting("Random", &random2, random2, 0.f, 0.5f);
+	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.05f);
+	registerBoolSetting("NoSlabs", &noslabs, noslabs);
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
 	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
-	registerBoolSetting("NoSlabs", &noslabs, noslabs);
-	registerBoolSetting("DesnycBoost", &dboost, dboost);
-	registerBoolSetting("Rotate", &rotate, rotate);
-
-	// Friction
-	registerFloatSetting("Random", &random2, random2, 0.f, 0.5f);
-	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.05f);
+	//registerBoolSetting("DesnycBoost", &dboost, dboost);
+	//registerBoolSetting("Rotate", &rotate, rotate);
 }
 
 const char* Speed::getRawModuleName() {
