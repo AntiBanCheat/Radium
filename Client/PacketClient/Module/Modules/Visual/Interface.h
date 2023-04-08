@@ -19,6 +19,7 @@ public:
 	bool tabGUI = false;
 	int opacity = 150;
 	bool info = true;
+	bool ping = false;
 	int spacing = 70;
 
 	float scale = 1.f;
