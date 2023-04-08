@@ -5,8 +5,8 @@
 using namespace std;
 Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerEnumSetting("Mode", &mode, 0);
-	mode.addEntry("HiveFast", 0);
-	mode.addEntry("HiveSafe", 1);
+	mode.addEntry("Hive", 0);
+	mode.addEntry("HiveTest", 1);
 	registerFloatSetting("Range", &range, range, 1, 7);
 	registerIntSetting("ContinueDelay", &delay, delay, 0, 20);
 	registerIntSetting("MineDelay", &minedelay, minedelay, 0, 30);
@@ -19,8 +19,8 @@ const char* Regen::getRawModuleName() {
 }
 
 const char* Regen::getModuleName() {
-	if (mode.getSelectedValue() == 0) name = string("Regen ") + string(GRAY) + string("HiveFast");
-	if (mode.getSelectedValue() == 1) name = string("Regen ") + string(GRAY) + string("HiveSafe");
+	if (mode.getSelectedValue() == 0) name = string("Regen ") + string(GRAY) + string("Hive");
+	if (mode.getSelectedValue() == 1) name = string("Regen ") + string(GRAY) + string("HiveTest");
 	return name.c_str();
 }
 
@@ -84,7 +84,7 @@ void Regen::onTick(C_GameMode* gm) {
 	if (tick == delay) tick = 0;
 	if (g_Data.canUseMoveKeys()) {
 		switch (mode.getSelectedValue()) {
-		case 0: // FlareonSingle+
+		case 0: // Hive
 		{
 
 			//Check Absorpription Health Check
@@ -221,7 +221,7 @@ void Regen::onTick(C_GameMode* gm) {
 			}
 		}
 		break;
-		case 1: // FlareonTest
+		case 1: // HiveTest
 		{
 			smooth = false;
 			//Check Absorpription Health Check
