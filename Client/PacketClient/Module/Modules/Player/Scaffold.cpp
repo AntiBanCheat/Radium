@@ -35,23 +35,23 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	holdType.addEntry("Switch", 0);
 	holdType.addEntry("Spoof", 1);
 	holdType.addEntry("Fake", 2);
-	registerEnumSetting("Extend", &extendType, 0);
+	registerEnumSetting("Mode", &extendType, 0);
 	extendType.addEntry("Celsius", 0);
 	extendType.addEntry("Radium", 1);
 	extendType.addEntry("Packet", 2);
-	registerEnumSetting("PlaceTime", &placemode, 0);
-	placemode.addEntry("None", 0);
+	registerEnumSetting("PlaceDelay", &placemode, 0);
+	placemode.addEntry("Normal", 0);
 	placemode.addEntry("Telly", 1);
-	placemode.addEntry("CustomTelly", 2);
+	placemode.addEntry("Custom", 2);
 
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
-	registerIntSetting("Extend", &extend, extend, 0, 20);
-	registerIntSetting("Delay", &delay, delay, 0, 5);
+	registerIntSetting("Extend", &extend, extend, 0, 15);
+	registerIntSetting("ExtendDelay", &delay, delay, 0, 5);
 	registerIntSetting("Timer", &timer, timer, 15, 60);
 	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
-	registerIntSetting("CTDelay", &tellydalay, tellydalay, 1, 20);
+	registerIntSetting("PlaceDelay", &tellydalay, tellydalay, 0, 20);
 	registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerEnumSetting("Down", &downwards, 0);
 	//downwards.addEntry("Vanilla", 0);
@@ -566,7 +566,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 		Utils::patchBytes((unsigned char*)HiveRotations2, (unsigned char*)"\xC7\x40\x18\x00\x00\x00\x00", 7);
 		Utils::patchBytes((unsigned char*)HiveRotations3, (unsigned char*)"\xA4\x60\x38\x02\x13\x86\x01\x13\x8", 11);
 	}
-	if (digbypass)
+
+	//digbypass (only asia)
+	/*if (digbypass)
 	{
 		auto sped = moduleMgr->getModule<Speed>();
 		if (sped->isEnabled())
@@ -582,7 +584,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 			else lockY = true;
 		}
 		else lockY = true;
-	}
+	}*/
 	if (holdType.getSelectedValue() > 0) {
 		if (holdType.getSelectedValue() == 1) {
 			supplies->selectedHotbarSlot = slot;
@@ -673,7 +675,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 				player->setPos(vec3_t(pos.x, pos.y + 0.8f, pos.z));
 			}
 			break;
-		case 3: // HiveClip
+		case 3: // Timer2
 			g_Data.getClientInstance()->minecraft->setTimerSpeed(30.f); // LOL
 			break;
 		case 4: // Fast
@@ -683,7 +685,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			}
 			break;
-		case 5: //FlareonTower
+		case 5: //Test
 			if (player) {
 				vec3_t myPos = *player->getPos();
 				myPos.y += 0.37;
