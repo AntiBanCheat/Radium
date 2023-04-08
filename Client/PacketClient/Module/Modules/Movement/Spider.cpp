@@ -17,7 +17,7 @@ const char* Spider::getModuleName() {
 void Spider::onMove(C_MoveInputHandler* input) 
 {
 	auto speedMod = moduleMgr->getModule<Speed>();
-	if (!speedMod->isEnabled()) 
+	if (!(speedMod->isEnabled() && speedMod->noslabs == true))
 	{
 		C_LocalPlayer* player = g_Data.getLocalPlayer();
 		if (player == nullptr)
