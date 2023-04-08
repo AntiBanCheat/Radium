@@ -75,6 +75,17 @@ void Interface::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			DrawUtils::fillRoundRectangle(fpsRectPos, MC_Color(0, 0, 0, opacity), false);
 			DrawUtils::drawGradientText(vec2_t(fpsRectPos.x + 3, fpsRectPos.y + 3.5), &releaseStr, 1, 1, true);
 		}
+		
+		if (ping) {
+            	// Ping
+            		auto getPING = g_Data.getClientInstance()->getServerPingTime();
+            		std::string pingText = "Ping: " + std::to_string(g_Data.getPING()) + "ms";
+            		float lPing = DrawUtils::getTextWidth(&pingText, 1) + 6.5;
+            		vec4_t pingRectPos = vec4_t(pingX, pingY + 7, lPing + pingX, pingY + 20);
+            		vec2_t pingTextPos = vec2_t(pingRectPos.x + 3, pingRectPos.y + 3.5);
+            		DrawUtils::drawGradientText(pingTextPos, &pingText, 1, 1, true);
+            		DrawUtils::fillRoundRectangle(pingRectPos, MC_Color(0, 0, 0, opacity), false);
+        	}
 
 		if (info) {
 			auto hudColor = ColorUtil::interfaceColor(curIndex);
