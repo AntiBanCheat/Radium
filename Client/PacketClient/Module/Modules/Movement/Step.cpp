@@ -38,7 +38,7 @@ void Step::onMove(C_MoveInputHandler* input) {
 	if (mode.getSelectedValue() == 2) 
 	{
 	auto speedMod = moduleMgr->getModule<Speed>();
-	if (!speedMod->isEnabled())
+	if (!(speedMod->isEnabled() && speedMod->noslabs == true))
 	{
 		C_LocalPlayer* player = g_Data.getLocalPlayer();
 		if (player == nullptr)
