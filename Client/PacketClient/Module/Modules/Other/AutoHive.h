@@ -10,7 +10,7 @@ private:
 	float animYaw = 0.f;
 public:
 	bool lootBoxListEmpty = true;
-	bool autoBridgeWin = true;
+	bool autoBridgeWin = false;
 	bool autoQueue = true;
 	bool doLerp = true;
 	bool sendcommand = false;
