@@ -2,7 +2,7 @@
 #include "../pch.h"
 
 Timer::Timer() : IModule(0, Category::PLAYER, "Modifies the games speed") {
-	registerIntSetting("TPS", &timer, timer, 1, 500);
+	registerIntSetting("TPS", &timer, timer, 1, 200);
 }
 
 const char* Timer::getModuleName() {
