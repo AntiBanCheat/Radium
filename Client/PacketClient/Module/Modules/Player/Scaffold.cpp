@@ -24,11 +24,11 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	rotations.addEntry("Test", 9);
 	registerEnumSetting("Tower", &tower, 0);
 	tower.addEntry("Vanilla", 0);
-	tower.addEntry("Hive", 1);
+	tower.addEntry("Timer", 1);
 	tower.addEntry("Clip", 2);
-	tower.addEntry("HiveSlow", 3);
-	tower.addEntry("Fast", 4);
-	tower.addEntry("Flareon", 5);
+	tower.addEntry("Timer2", 3);
+	tower.addEntry("HighJump", 4);
+	tower.addEntry("Test", 5);
 	tower.addEntry("Slow", 6);
 	tower.addEntry("None", 7);
 	registerEnumSetting("Select", &holdType, 0);
@@ -36,10 +36,10 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	holdType.addEntry("Spoof", 1);
 	holdType.addEntry("Fake", 2);
 	registerEnumSetting("Extend", &extendType, 0);
-	extendType.addEntry("Drizzle", 0);
+	extendType.addEntry("Celsius", 0);
 	extendType.addEntry("Radium", 1);
 	extendType.addEntry("Packet", 2);
-	registerEnumSetting("Telly", &placemode, 0);
+	registerEnumSetting("PlaceTime", &placemode, 0);
 	placemode.addEntry("None", 0);
 	placemode.addEntry("Telly", 1);
 	placemode.addEntry("CustomTelly", 2);
@@ -51,7 +51,8 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerIntSetting("Delay", &delay, delay, 0, 5);
 	registerIntSetting("Timer", &timer, timer, 15, 60);
 	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
-	registerIntSetting("TellyDelay", &tellydalay, tellydalay, 1, 20);
+	registerIntSetting("CTDelay", &tellydalay, tellydalay, 1, 20);
+	registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerEnumSetting("Down", &downwards, 0);
 	//downwards.addEntry("Vanilla", 0);
 	//downwards.addEntry("None", 1);
@@ -65,7 +66,6 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	//registerIntSetting("B", &this->expB, this->expB, 0, 255);
 	//registerFloatSetting("T", &this->expT, this->expT, 0.f, 1.f);
 	//registerIntSetting("TowerTimer", &towerTimer, towerTimer, 20, 60);
-	//registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
 	//registerFloatSetting("TowerMultiply", &towerMultiply, towerMultiply, 0.1f, 2.f);
 	//registerBoolSetting("ZipLine", &zipline, zipline); patched
 }
@@ -113,7 +113,7 @@ void Scaffold::onEnable() {
 	blockBelowY = blockBelowY.floor();
 	if (zipline) blockBelowY.y += 3.f;
 	blockBelowY = blockBelowY.floor();
-	
+
 	fakespoofticks = 0;
 	canspoof = false;
 
@@ -133,7 +133,7 @@ void Scaffold::onEnable() {
 	towerTick = 0;
 	if (lockY) firstlock = true;
 	else firstlock = false;
-	
+
 	if (holdType.getSelectedValue() == 2) {
 		selectBlock();
 	}
@@ -148,7 +148,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
-	
+
 	if (holdType.getSelectedValue() == 2) {
 		fakespoofticks++;
 		if (1 < fakespoofticks) canspoof = true;
@@ -176,8 +176,10 @@ void Scaffold::onTick(C_GameMode* gm) {
 		return;
 	}
 	restored = false;
+
+	//CustomTelly
 	if (telly2) telly2 = false;
-	else 
+	else
 	{
 		if (tellytick >= tellydalay)
 		{
@@ -187,14 +189,21 @@ void Scaffold::onTick(C_GameMode* gm) {
 		else tellytick++;
 	}
 
+	//GroundTime
+	float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
+	if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
+	else groundtime = 0;
+	if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
+	else groundtime2 = 0;
 
-	// Build Blocks
-	if (extendType.getSelectedValue() == 0) //celsius
+	// Build Block
+	
+	//Celsius
+	if (extendType.getSelectedValue() == 0)
 	{
 		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
 		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
 		float cal = (player->yaw + 90) * (PI / 180);
-
 		vec3_t blockBelow;
 		if (lockY) {
 			blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
@@ -230,69 +239,79 @@ void Scaffold::onTick(C_GameMode* gm) {
 						blockBelow15.x -= vel.x * 0.4f;
 						blockBelow2.x -= vel.x * 0.4f;
 						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-							Odelay++;
-							if (Odelay > delay)
-							{
 								blockBelow15.z += vel.z;
 								blockBelow15.x += vel.x;
 								blockBelow2.z += vel.z;
 								blockBelow2.x += vel.x;
 								buildBlock(blockBelow15);
 								buildBlock(blockBelow2);
-							}
 						}
 					}
 				}
 			}
 		}
 		else {
-			//extend
-			int extend2 = currExtend;
-			vec3_t defaultblockBelow = blockBelow;
-			for (int i = 0; i < extend2; i++) {
-				if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * i; blockBelow.z += vel.z * i; }
+			if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+			{
+				
+					//extend
+					int extend2 = currExtend;
+					vec3_t defaultblockBelow = blockBelow;
+					for (int i = 0; i < extend2; i++) {
+						Odelay++;
+						if (Odelay > delay)
+						{
+							if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * i; blockBelow.z += vel.z * i; }
 
-				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-				else if (!buildBlock(blockBelow)) {
-					if (velocityxz > 0.f) {  // Are we actually walking?
-						blockBelow.x -= vel.x;
-						blockBelow.z -= vel.z;
-						if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-							blockBelow.x += vel.x;
-							blockBelow.z += vel.z;
-							buildBlock(blockBelow);
+							if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+							else if (!buildBlock(blockBelow)) {
+								if (velocityxz > 0.f) {  // Are we actually walking?
+									blockBelow.x -= vel.x;
+									blockBelow.z -= vel.z;
+									if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+										blockBelow.x += vel.x;
+										blockBelow.z += vel.z;
+										buildBlock(blockBelow);
+									}
+								}
+							}
 						}
 					}
-				}
-			}
-			blockBelow = defaultblockBelow;
+					blockBelow = defaultblockBelow;
 
-			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
-
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else if (!buildBlock(blockBelow)) {
-				if (velocityxz > 0.f) {  // Are we actually walking?
-					blockBelow.x -= vel.x;
-					blockBelow.z -= vel.z;
-					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-						blockBelow.x += vel.x;
-						blockBelow.z += vel.z;
-						buildBlock(blockBelow);
+					if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
+					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+					else if (!buildBlock(blockBelow)) {
+						if (velocityxz > 0.f) {  // Are we actually walking?
+							blockBelow.x -= vel.x;
+							blockBelow.z -= vel.z;
+							if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+								blockBelow.x += vel.x;
+								blockBelow.z += vel.z;
+								buildBlock(blockBelow);
+							}
+						}
 					}
+			
+			}
+			else
+			{
+				if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+				{
+					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+					else buildBlock(blockBelow);
 				}
 			}
 		}
 		oldpos = blockBelow.floor();
 	}
-	if (extendType.getSelectedValue() == 1) //radium
+
+	//Radium
+	if (extendType.getSelectedValue() == 1)
 	{
 		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
 		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
 		float cal = (player->yaw + 90) * (PI / 180);
-		if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
-		else groundtime = 0;
-		if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
-		else groundtime2 = 0;
 		vec3_t blockBelow;
 		if (lockY) {
 			blockBelow = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
@@ -410,7 +429,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 			}
 			else
 			{
-				if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 || telly2)
+				if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
 				{
 					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 					else buildBlock(blockBelow);
@@ -444,7 +463,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 		oldpos = blockBelow.floor();
 	}
-	if (extendType.getSelectedValue() == 2) //packet
+
+	//Packet
+	if (extendType.getSelectedValue() == 2)
 	{
 		vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
 		float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
@@ -476,17 +497,17 @@ void Scaffold::onTick(C_GameMode* gm) {
 			blockBelow2.y -= 2.0f;
 			g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = false;
 			blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
-			if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
-				if (velocityxz > 0.f) {
-					blockBelow15.z -= vel.z * 0.4f;
-					blockBelow15.z -= vel.z * 0.4f;
-					if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
-						blockBelow15.x -= vel.x * 0.4f;
-						blockBelow2.x -= vel.x * 0.4f;
-						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
-							Odelay++;
-							if (Odelay > delay)
-							{
+			Odelay++;
+			if (Odelay > delay)
+			{
+				if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+					if (velocityxz > 0.f) {
+						blockBelow15.z -= vel.z * 0.4f;
+						blockBelow15.z -= vel.z * 0.4f;
+						if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
+							blockBelow15.x -= vel.x * 0.4f;
+							blockBelow2.x -= vel.x * 0.4f;
+							if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2) && g_Data.getLocalPlayer()->isSprinting()) {
 								blockBelow15.z += vel.z;
 								blockBelow15.x += vel.x;
 								blockBelow2.z += vel.z;
@@ -497,22 +518,39 @@ void Scaffold::onTick(C_GameMode* gm) {
 						}
 					}
 				}
+				Odelay = 0;
 			}
 		}
 		else {
-			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
+			if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+			{
+				Odelay++;
+				if (Odelay > delay)
+				{
+					if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
 
 
-			if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
-			else if (!buildBlock(blockBelow)) {
-				if (velocityxz > 0.f) {  // Are we actually walking?
-					blockBelow.x -= vel.x;
-					blockBelow.z -= vel.z;
-					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
-						blockBelow.x += vel.x;
-						blockBelow.z += vel.z;
-						buildBlock(blockBelow);
+					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+					else if (!buildBlock(blockBelow)) {
+						if (velocityxz > 0.f) {  // Are we actually walking?
+							blockBelow.x -= vel.x;
+							blockBelow.z -= vel.z;
+							if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+								blockBelow.x += vel.x;
+								blockBelow.z += vel.z;
+								buildBlock(blockBelow);
+							}
+						}
 					}
+					Odelay = 0;
+				}
+			}
+			else
+			{
+				if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+				{
+					if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+					else buildBlock(blockBelow);
 				}
 			}
 		}
@@ -533,9 +571,9 @@ void Scaffold::onTick(C_GameMode* gm) {
 		auto sped = moduleMgr->getModule<Speed>();
 		if (sped->isEnabled())
 		{
-			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06)) 
+			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06))
 			{
-				lockY = false; 
+				lockY = false;
 				blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
 				blockBelowY.y -= g_Data.getLocalPlayer()->height;
 				blockBelowY.y -= 0.5f;
@@ -549,12 +587,12 @@ void Scaffold::onTick(C_GameMode* gm) {
 		if (holdType.getSelectedValue() == 1) {
 			supplies->selectedHotbarSlot = slot;
 		}
-		else if(canspoof)
+		else if (canspoof)
 		{
 			supplies->selectedHotbarSlot = slot;
 		}
 	}
-	
+
 	// Hive Bypass
 	if (rotations.getSelectedValue() == 1 || rotations.getSelectedValue() == 7 || rotations.getSelectedValue() == 8) {
 		player->pointingStruct->rayHitType = 0;
@@ -622,8 +660,8 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			moveVec.y = 0.4f;
 			g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			break;
-		case 1: // Hive
-			g_Data.getClientInstance()->minecraft->setTimerSpeed(145.f); // LOL
+		case 1: // Timer
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(90.f); // LOL
 			/*old*/
 			/*movement = {movement.x * c - movement.y * s, movement.x * s + movement.y * c};
 			player->setPos(vec3_t(pos.x, mathGround, pos.z));
@@ -632,7 +670,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			break;
 		case 2: // Clip
 			if (player->onGround) {
-				player->setPos(vec3_t(pos.x, pos.y + 0.5f, pos.z));
+				player->setPos(vec3_t(pos.x, pos.y + 0.8f, pos.z));
 			}
 			break;
 		case 3: // HiveClip
@@ -648,7 +686,7 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 		case 5: //FlareonTower
 			if (player) {
 				vec3_t myPos = *player->getPos();
-				myPos.y += 0.61;
+				myPos.y += 0.37;
 				player->setPos(myPos);
 				moveVec.y = 0.01;
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
@@ -1114,7 +1152,7 @@ void Scaffold::onDisable() {
 	if (tower.getSelectedValue() == 1 && foundBlock && jumping) player->velocity.y = 0.f;
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	selectBlock();
-        supplies->selectedHotbarSlot = slot;
+	supplies->selectedHotbarSlot = slot;
 	Utils::patchBytes((unsigned char*)HiveRotations1, (unsigned char*)"\x89\x41\x18", 3);
 	Utils::patchBytes((unsigned char*)HiveRotations2, (unsigned char*)"\xC7\x40\x18\x03\x00\x00\x00", 7);
 
