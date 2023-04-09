@@ -814,7 +814,7 @@ private:
 public:
 	virtual void setServerPingTime(unsigned int);
 
-private:
+public:
 	virtual __int64 getServerPingTime(void) const;
 
 public:
