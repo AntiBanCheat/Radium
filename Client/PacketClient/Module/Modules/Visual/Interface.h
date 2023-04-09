@@ -19,7 +19,10 @@ public:
 	bool tabGUI = false;
 	int opacity = 150;
 	bool info = true;
-	bool ping = false;
+	bool ping = true;
+	bool fps = true;
+	bool speed = true;
+	bool position = true;
 	int spacing = 70;
 
 	float scale = 1.f;
@@ -32,8 +35,10 @@ public:
 	float armorY = 60;
 	float fpsX = 2.5;
 	float fpsY = windowSize.y - 40;
-	float RegenX = 200;
-	float RegenY = windowSize.y - 40;
+	float pingX = 2.5;
+	float pingY = windowSize.y - 50;
+	float RegenX = windowSize.x / 2;
+	float RegenY = windowSize.y - 60;
 	float bpsX = 2.5f;
 	float bpsY = windowSize.y - 30;
 	float posX = 2.5f;
