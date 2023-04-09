@@ -19,6 +19,7 @@ public:
     bool destroy = false;
     int blocksBroke = 0;
     bool swing = false;
+    bool healthvisual = true;
     bool bypassrot = false;
     bool firstbreak = false;
     bool continuemine = false;
