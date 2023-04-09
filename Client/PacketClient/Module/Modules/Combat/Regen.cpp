@@ -11,6 +11,7 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerIntSetting("ContinueDelay", &delay, delay, 0, 20);
 	registerIntSetting("MineDelay", &minedelay, minedelay, 0, 30);
 	registerBoolSetting("Visual", &visual, visual);
+	registerBoolSetting("HealthVisual", &healthvisual, healthvisual);
 	registerBoolSetting("HiveBypass", &bypass, bypass);
 }
 
