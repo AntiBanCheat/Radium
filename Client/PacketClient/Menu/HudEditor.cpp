@@ -20,6 +20,8 @@ static bool buildIsDragging = false;
 static bool fpsIsDragging = false;
 static bool bpsIsDragging = false;
 static bool posIsDragging = false;
+static bool pingIsDragging = false;
+static bool regenIsDragging = false;
 static float defaultX = 0;
 static float defaultY = 0;
 
@@ -68,10 +70,14 @@ void HudEditor::render() {
 	string position = "Position: " + to_string((int)floorf(currPos->x)) + " " + to_string((int)floorf(currPos->y)) + " " + to_string((int)floorf(currPos->z));
 	string speedText = "Speed: " + to_string((int)player->getBlocksPerSecond()) + string(".") + to_string((int)(player->getBlocksPerSecond() * 10) - ((int)player->getBlocksPerSecond() * 10));
 	string fpsText = "FPS: " + to_string(g_Data.getFPS());
+	string pingText = "Ping: 999";
+	string regenText = "Mining (" + std::to_string((int)player->getAbsorption()) + " / 10)";
 	string totalCountAids = "64 blocks";
 	string example = "Example Notification";
 	string strLength = "V2.11 - Developer Build   ";
 	float lFPS = DrawUtils::getTextWidth(&fpsText, 1) + 6.5;
+	float lPing = DrawUtils::getTextWidth(&pingText, 1) + 6.5;
+	float lRegen = DrawUtils::getTextWidth(&regenText, 1) + 6.5;
 	float lPos = DrawUtils::getTextWidth(&position, 1) + 6.5;
 	float lSpeed = DrawUtils::getTextWidth(&speedText, 1) + 6.5;
 	float lNotif = DrawUtils::getTextWidth(&example, 1) + 6.5;
@@ -80,6 +86,8 @@ void HudEditor::render() {
 	constexpr float borderPadding = 1;
 	float margin = 2.f;
 	vec4_t fpsRectPos = vec4_t(interfaceMod->fpsX, interfaceMod->fpsY + 4, lFPS + interfaceMod->fpsX, interfaceMod->fpsY + 20);
+	vec4_t pingRectPos = vec4_t(interfaceMod->pingX, interfaceMod->pingY + 4, lPing + interfaceMod->pingX, interfaceMod->pingY + 20);
+	vec4_t regenRectPos = vec4_t(interfaceMod->RegenX, interfaceMod->RegenY + 4, lRegen + interfaceMod->RegenX, interfaceMod->RegenY + 20);
 	vec4_t notificationRect = vec4_t(notifications->positionX, notifications->positionY + 4, lNotif + notifications->positionX, notifications->positionY + 20);
 	vec2_t notificationText = vec2_t(notificationRect.x + 2, notificationRect.y);
 	vec4_t speedRectPos = vec4_t(interfaceMod->bpsX, interfaceMod->bpsY + 6, lSpeed + interfaceMod->bpsX, interfaceMod->bpsY + 20);
@@ -109,6 +117,8 @@ void HudEditor::render() {
 	DrawUtils::drawRoundRectangle2(clickGUIRect, MC_Color(255, 255, 255));
 	
 	const bool fpsIsFocused = fpsRectPos.contains(&mousePos);
+	const bool pingIsFocused = pingRectPos.contains(&mousePos);
+	const bool regenIsFocused = regenRectPos.contains(&mousePos);
 	const bool playerListisFocused = playerList->rectPos2.contains(&mousePos);
 	const bool sessionInfoIsFocused = sessionInfoRect.contains(&mousePos);
 	const bool buildIsFocused = infoRect.contains(&mousePos);
@@ -132,6 +142,10 @@ void HudEditor::render() {
 
 	DrawUtils::drawText(textPos, &totalCountAids, MC_Color(255, 255, 255), 1.F, 1.F, true);
 	if (interfaceMod->info) DrawUtils::drawRectangle(fpsRectPos, MC_Color(0, 0, 0), 0.5F);
+	if (interfaceMod->info) DrawUtils::drawRectangle(pingRectPos, MC_Color(0, 0, 0), 0.5F);
+	if (interfaceMod->info) DrawUtils::fillRectangleA(pingRectPos, MC_Color(255, 255, 255, 100));
+	if (interfaceMod->info) DrawUtils::drawRectangle(regenRectPos, MC_Color(0, 0, 0), 0.5F);
+	if (interfaceMod->info) DrawUtils::fillRectangleA(regenRectPos, MC_Color(255, 255, 255, 100));
 	if (interfaceMod->armorHUD) DrawUtils::drawRectangle(armorHudRect, MC_Color(0, 0, 0), 0.5F);
 	if (interfaceMod->info) DrawUtils::fillRectangleA(fpsRectPos, MC_Color(255, 255, 255, 100));
 	if (interfaceMod->armorHUD) DrawUtils::fillRectangleA(armorHudRect, MC_Color(255, 255, 255, 100));
@@ -358,7 +372,58 @@ void HudEditor::render() {
 		fpsIsDragging = true;
 		dragStartHudEditor = mousePos;
 	}
+	if (pingIsDragging) {
+		if (leftClickDown) {
+			vec2_t diff = vec2_t(mousePos).sub(dragStartHudEditor);
+			interfaceMod->pingY = interfaceMod->pingY + diff.y;
+			interfaceMod->pingX = interfaceMod->pingX + diff.x;
+			dragStartHudEditor = mousePos;
+			// anti idiot
+			{
+				if (interfaceMod->pingX + 42 > windowSize.x)
+					interfaceMod->pingX = windowSize.x - 42;
 
+				if (interfaceMod->pingY + 15 > windowSize.y)
+					interfaceMod->pingY = windowSize.y - 15;
+
+				interfaceMod->pingX = (float)fmax(0, interfaceMod->pingX);
+				interfaceMod->pingY = (float)fmax(0, interfaceMod->pingY);
+			}
+		}
+		else {
+			pingIsDragging = false;
+		}
+	}
+	else if (pingIsFocused && leftClickDown) {
+		pingIsDragging = true;
+		dragStartHudEditor = mousePos;
+	}
+	if (regenIsDragging) {
+		if (leftClickDown) {
+			vec2_t diff = vec2_t(mousePos).sub(dragStartHudEditor);
+			interfaceMod->RegenY = interfaceMod->RegenY + diff.y;
+			interfaceMod->RegenX = interfaceMod->RegenX + diff.x;
+			dragStartHudEditor = mousePos;
+			// anti idiot
+			{
+				if (interfaceMod->RegenX + 42 > windowSize.x)
+					interfaceMod->RegenX = windowSize.x - 42;
+
+				if (interfaceMod->RegenY + 15 > windowSize.y)
+					interfaceMod->RegenY = windowSize.y - 15;
+
+				interfaceMod->RegenX = (float)fmax(0, interfaceMod->RegenX);
+				interfaceMod->RegenY = (float)fmax(0, interfaceMod->RegenY);
+			}
+		}
+		else {
+			regenIsDragging = false;
+		}
+	}
+	else if (regenIsFocused && leftClickDown) {
+		regenIsDragging = true;
+		dragStartHudEditor = mousePos;
+	}
 	if (scaffoldIsDragging) {
 		if (leftClickDown) {
 			vec2_t diff = vec2_t(mousePos).sub(dragStartHudEditor);
@@ -543,7 +608,7 @@ void HudEditor::onLoadSettings(void* confVoid) {
 		if (obj.is_null())
 			return;
 		auto Position = "pos";
-		const char* categories[12] = { "Speed","FPS","Position","Watermark","TargetHud","BlockCount","Release","ArrayList","Config","ArmorHud","SessionInfo","PlayerList" };
+		const char* categories[14] = { "Speed","FPS","Position","Watermark","TargetHud","BlockCount","Release","ArrayList","Config","ArmorHud","SessionInfo","PlayerList","Ping","Regen" };
 		//Speed
 		if (obj.contains(categories[0])) {
 			auto SpeedVal = obj.at(categories[0]);
@@ -625,6 +690,28 @@ void HudEditor::onLoadSettings(void* confVoid) {
 				if (!posVal.is_null() && posVal.contains("x") && posVal["x"].is_number_float() && posVal.contains("y") && posVal["y"].is_number_float()) {
 					interfaceMod->releaseX = { posVal["x"].get<float>() };
 					interfaceMod->releaseY = { posVal["y"].get<float>() };
+				}
+			}
+		}
+		//Ping
+		if (obj.contains(categories[12])) {
+			auto SpeedVal = obj.at(categories[12]);
+			if (!SpeedVal.is_null() && SpeedVal.contains(Position)) {
+				auto posVal = SpeedVal.at(Position);
+				if (!posVal.is_null() && posVal.contains("x") && posVal["x"].is_number_float() && posVal.contains("y") && posVal["y"].is_number_float()) {
+					interfaceMod->pingX = { posVal["x"].get<float>() };
+					interfaceMod->pingY = { posVal["y"].get<float>() };
+				}
+			}
+		}
+		//Regen
+		if (obj.contains(categories[13])) {
+			auto SpeedVal = obj.at(categories[13]);
+			if (!SpeedVal.is_null() && SpeedVal.contains(Position)) {
+				auto posVal = SpeedVal.at(Position);
+				if (!posVal.is_null() && posVal.contains("x") && posVal["x"].is_number_float() && posVal.contains("y") && posVal["y"].is_number_float()) {
+					interfaceMod->RegenX = { posVal["x"].get<float>() };
+					interfaceMod->RegenY = { posVal["y"].get<float>() };
 				}
 			}
 		}
@@ -741,6 +828,15 @@ void HudEditor::onSaveSettings(void* confVoid) {
 	BlockCountObj["pos"]["x"] = scaffold->scX;
 	BlockCountObj["pos"]["y"] = scaffold->scY;
 	obj["BlockCount"] = BlockCountObj;
-
+	//Ping
+	json pingObj = {};
+	pingObj["pos"]["x"] = interfaceMod->pingX;
+	pingObj["pos"]["y"] = interfaceMod->pingY;
+	obj["Ping"] = pingObj;
+	//Regen
+	json regenObj = {};
+	regenObj["pos"]["x"] = interfaceMod->RegenX;
+	regenObj["pos"]["y"] = interfaceMod->RegenY;
+	obj["Regen"] = regenObj;
 	conf->emplace("HudEditorMenu", obj);
 }
