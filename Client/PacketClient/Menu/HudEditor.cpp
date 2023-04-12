@@ -159,7 +159,7 @@ void HudEditor::render() {
 	if (targetHUD->isEnabled()) DrawUtils::drawRectangle(testRect, MC_Color(255, 255, 255), 1.f);
 	if (targetHUD->isEnabled() && targetHUDIsFocused) DrawUtils::fillRoundRectangle(testRect, MC_Color(255, 255, 255, 255), false);
 	if (sessionInfo->isEnabled() && sessionInfoIsFocused) DrawUtils::fillRoundRectangle(sessionInfoRect, MC_Color(255, 255, 255, 100), true);
-	if (clickGUI->Fonts.selected == 1)
+	if (interfaceMod->Fonts.selected == 1)
 	{
 		vec4_t scaffoldRect1 = vec4_t(scaffold->scX, scaffold->scY, 56 + scaffold->scX, scaffold->scY + 15);
 		DrawUtils::drawRectangle(scaffoldRect1, MC_Color(255, 255, 255), 1.F);
