@@ -1,4 +1,4 @@
-﻿#include "Killaura.h"
+#include "Killaura.h"
 #include "../pch.h"
 
 int slot;
@@ -169,7 +169,6 @@ void Killaura::onTick(C_GameMode* gm) {
 	}
 
 	if (g_Data.canUseMoveKeys() && !targetList.empty()) {
-
 		if (TimerUtil::hasTimedElapsed((1000 / APS), true)) {
 			if (hold && !g_Data.isLeftClickDown())
 				return;
@@ -180,6 +179,8 @@ void Killaura::onTick(C_GameMode* gm) {
 			for (auto& i : targetList) {
 				if (!targetListEmpty) atk = true;
 				if (atk) {
+					vec2_t angle = g_Data.getLocalPlayer()->getPos()->CalcAngle(*targetList[0]->getPos());
+					player->setRot(angle);
 					if (mode.getSelectedValue() == 0) gm->attack(i);
 					else gm->attack(targetList[0]);
 					atk = false;
