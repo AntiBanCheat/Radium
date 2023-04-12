@@ -33,7 +33,6 @@ public:
 	float txtsize = 0.9f;
 	float txtheight = 9;
 	
-	SettingEnum Fonts = this;
 	SettingEnum theme = this;
 	SettingEnum color = this;
 
