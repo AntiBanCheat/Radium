@@ -854,7 +854,8 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (player == nullptr) return;
 
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	if (clickGUI->Fonts.selected == 1)
+	static auto inter = moduleMgr->getModule<Interface>();
+	if (inter->Fonts.selected == 1)
 	{
 		vec4_t testRect = vec4_t(scX, scY, 56 + scX, scY + 16);
 		vec2_t textPos(testRect.x + 20, testRect.y + 5);
