@@ -74,9 +74,9 @@ void Interface::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 		if (release) {
 #ifdef _DEBUG
-			releaseStr = versionStr + " - Developer Build";
+			releaseStr = versionStr;
 #else
-			releaseStr = versionStr + " - Public Release";
+			releaseStr = versionStr;
 #endif
 
 			float len = DrawUtils::getTextWidth(&releaseStr, 1) + 6.5;
