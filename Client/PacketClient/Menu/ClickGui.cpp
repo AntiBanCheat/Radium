@@ -4962,19 +4962,20 @@ void ClickGui::renderNewCategory(Category category) {
 	float zrs = 25;
 	float zrsx = 4;
 	static auto clickmod = moduleMgr->getModule<ClickGUIMod>();
-	if (clickmod->Fonts.getSelectedValue() == 1)ltx = ("          Movement");
+	static auto inter = moduleMgr->getModule<Interface>();
+	if (inter->Fonts.getSelectedValue() == 1)ltx = ("          Movement");
 	else ltx = ("      Movement");
-	if (clickmod->Fonts.getSelectedValue() == 1)mtx = ("       Movement");
+	if (inter->Fonts.getSelectedValue() == 1)mtx = ("       Movement");
 	else mtx = ("    Movement");
-	if (clickmod->Fonts.getSelectedValue() == 1)ctx = ("       Combat");
+	if (inter->Fonts.getSelectedValue() == 1)ctx = ("       Combat");
 	else ctx = ("    Combat");
-	if (clickmod->Fonts.getSelectedValue() == 1)rtx = ("       Render");
+	if (inter->Fonts.getSelectedValue() == 1)rtx = ("       Render");
 	else rtx = ("    Render");
-	if (clickmod->Fonts.getSelectedValue() == 1)ptx = ("       Player");
+	if (inter->Fonts.getSelectedValue() == 1)ptx = ("       Player");
 	else ptx = ("    Player");
-	if (clickmod->Fonts.getSelectedValue() == 1)otx = ("       Other");
+	if (inter->Fonts.getSelectedValue() == 1)otx = ("       Other");
 	else otx = ("    Other");
-	if (clickmod->Fonts.getSelectedValue() == 1)etx = ("       Exploit");
+	if (inter->Fonts.getSelectedValue() == 1)etx = ("       Exploit");
 	else etx = ("    Exploit");
 
 	float tate = 12;
