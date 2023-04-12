@@ -7,6 +7,11 @@ Interface::Interface() : IModule(0, Category::VISUAL, "Displays the HUD") {
 	color.addEntry("Astolfo", 1);
 	color.addEntry("Wave", 2);
 	color.addEntry("RGBWave", 3);
+	registerEnumSetting("Fonts", &Fonts, 0);
+	Fonts.addEntry("Mojangles", 0);
+	Fonts.addEntry("Notosans", 1);
+	Fonts.addEntry("TEN", 2);
+	Fonts.addEntry("Unicod", 3);
 	registerBoolSetting("ArmorHUD", &armorHUD, armorHUD);
 	registerBoolSetting("Release", &release, release);
 	registerBoolSetting("Info", &info, info);
