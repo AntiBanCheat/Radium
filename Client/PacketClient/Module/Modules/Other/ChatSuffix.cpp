@@ -15,10 +15,16 @@ void ChatSuffix::onSendPacket(C_Packet* packet) {
 		C_TextPacket* funy = reinterpret_cast<C_TextPacket*>(packet);
 		std::string Sentence;
 		std::string end;
-
-		end = " | Radium";
+		int i = randomFloat(1, 30);
+		if (i == 1) end = " | Rolaris";
+		if (i == 2) end = " | Skidders V2";
+		if (i == 3) end = " | Radon";
+		if (i >= 4 && i <= 7) end = " | R A D I U M";
+		if (i >= 8 && i <= 11) end = " | Yadium";
+		if (i > 11) end = " | Radium";
 		Sentence = funy->message.getText() + end;
 		funy->message.resetWithoutDelete();
 		funy->message = Sentence;
 	}
 }
+
