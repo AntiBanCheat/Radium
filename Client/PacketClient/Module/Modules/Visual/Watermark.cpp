@@ -34,7 +34,16 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	//DrawUtils::drawImage("textures/ui/heart_new.png", vec2_t(positionX + 5, positionY + 50), vec2_t(30, 30), vec2_t(0, 0), vec2_t(1, 1));
 
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
-		string name = player->getNameTag()->getText(); name = Utils::sanitize(name); name = name.substr(0, name.find('\n')); string clientName = interfaceMod->getClientName(); string fpsText = to_string(g_Data.getFPS()) + " fps"; string skeetLen = "Radiumsense | " + name + " | " + fpsText; string t = "Radium         | " + name + " | " + fpsText; string sense = "sense"; string newText = clientName + GRAY + "| " + RESET + WHITE + name; string idk = "Radium "; string idk2 = string(GRAY) + clientName; string len = idk + idk2; // why u lookin over here
+		string name = player->getNameTag()->getText();
+		name = Utils::sanitize(name);
+		name = name.substr(0, name.find('\n'));
+		string clientName = interfaceMod->getClientName();
+		string fpsText = to_string(g_Data.getFPS()) + " fps";
+		string skeetLen = "Radiumsense | " + name + " | " + fpsText; string t = "Radium         | " + name + " | " + fpsText; string sense = "sense";
+		string newText = clientName + GRAY + "| " + RESET + WHITE + name;
+		string idk = "Radium";
+		string idk2 = string(GRAY) + clientName;
+		string len = idk + idk2; // why u lookin over here
 		string cn = "Radium";
 		float textHeight = 12.f * scale;
 		float textPadding = 1.f * scale;
@@ -71,7 +80,8 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			break;
 		case 2: // Weird
 			DrawUtils::drawGradientText(vec2_t(simpleRect.x, simpleRect.y), &idk, scale, 1, true);
-			DrawUtils::drawText(vec2_t(simpleRect.x + flaot + (textPadding * 2), simpleRect.y - 5), &idk2, MC_Color(), 1, 1, true);
+			//DrawUtils::drawGradientText(vec2_t(simpleRect.x + flaot, simpleRect.y - 5), &idk, scale/2, 1, true);
+			DrawUtils::drawText(vec2_t(simpleRect.x + flaot - 5 , simpleRect.y - 5), &idk2, MC_Color(), 1, 1, true);
 			break;
 		case 3: // Skeet
 			DrawUtils::fillRectangle(skeetRect, MC_Color(27, 27, 27), 1);
