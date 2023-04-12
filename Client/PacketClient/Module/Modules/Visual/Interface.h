@@ -46,6 +46,7 @@ public:
 
 	// Colors
 	SettingEnum color = this;
+	SettingEnum Fonts = this;
 	float r = 255.f, g = 255.f, b = 255.f;
 	float r2 = 32.f, g2 = 32.f, b2 = 32.f;
 
