@@ -9,8 +9,8 @@ Watermark::Watermark() : IModule(0, Category::VISUAL, "Displays the watermark") 
 	mode.addEntry("New", 1);
 	mode.addEntry("Weird", 2);
 	mode.addEntry("Skeet", 3);
-	mode.addEntry("FirstLetter", 4);
-	mode.addEntry("Radium", 5);
+	//mode.addEntry("FirstLetter", 4);
+	//mode.addEntry("Radium", 5);
 	registerBoolSetting("Gradient", &gradient, &gradient);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
 	registerFloatSetting("Scale", &scale, scale, 0.5f, 2);
