@@ -1,4 +1,4 @@
-﻿#include "DrawUtils.h"
+#include "DrawUtils.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -102,7 +102,7 @@ void DrawUtils::setColor(float r, float g, float b, float a) {
 
 C_Font* DrawUtils::getFont(Fonts font) {
 	if (true) {
-		static auto fontChangerModule = moduleMgr->getModule<ClickGUIMod>();
+		static auto fontChangerModule = moduleMgr->getModule<Interface>();
 
 		if (fontChangerModule->Fonts.selected == 1) {
 			return g_Data.getClientInstance()->minecraftGame->getTheGoodFontThankYou();
