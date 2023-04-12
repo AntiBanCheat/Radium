@@ -12,7 +12,6 @@ Regen::Regen() : IModule(0, Category::COMBAT, "Regenerates your health") {
 	registerIntSetting("MineDelay", &minedelay, minedelay, 0, 30);
 	registerBoolSetting("Visual", &visual, visual);
 	registerBoolSetting("HealthVisual", &healthvisual, healthvisual);
-	registerBoolSetting("HiveBypass", &bypass, bypass);
 }
 
 const char* Regen::getRawModuleName() {
@@ -74,9 +73,9 @@ void Regen::onTick(C_GameMode* gm) {
 	}else isregen = true;*/
 	tick++;
 	enabledticks++;
-
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	static AbsorptionAttribute attribute = AbsorptionAttribute();
+	vec2_t angle = player->getPos()->CalcAngle(vec3_t(blockPos.x, blockPos.y, blockPos.z));
 	auto timerUtil = new TimerUtil();
 	static vector<vec3_ti> blocks;
 	auto ka = moduleMgr->getModule<Killaura>();
@@ -160,6 +159,7 @@ void Regen::onTick(C_GameMode* gm) {
 						gm->startDestroyBlock(blockPos, 1, isDestroyed2);
 						continuemine = true;
 						tempblockPos = blockPos2;
+						
 					}
 				}
 
@@ -189,6 +189,13 @@ void Regen::onTick(C_GameMode* gm) {
 						clientMessageF("BlockChanged");
 					} */
 					//if (enabledticks > 12 && isregen) clientMessageF("IsDestroyed");
+					if (enabledticks > minedelay && g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
+						player->bodyYaw = angle.y;
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->setRot(angle);
+						MoveUtil::fullStop(false);
+					}
 					if (firstbreak && enabledticks > minedelay) {
 						gm->destroyBlock(&blockPos, 0); hasDestroyed = true; rot = false; enabledticks = 0; gm->stopDestroyBlock(blockPos); continuemine = false;
 					}
@@ -331,6 +338,13 @@ void Regen::onTick(C_GameMode* gm) {
 						clientMessageF("BlockChanged");
 					} */
 					//if (enabledticks > 12 && isregen) clientMessageF("IsDestroyed");
+					if (enabledticks > minedelay + 2 && g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
+						player->bodyYaw = angle.y;
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->setRot(angle);
+						MoveUtil::fullStop(false);
+					}
 					if (firstbreak && enabledticks > minedelay + 3) {
 						gm->destroyBlock(&blockPos, 0); hasDestroyed = true; rot = false; enabledticks = 0; gm->stopDestroyBlock(blockPos); continuemine = false;
 					}
@@ -378,12 +392,7 @@ void Regen::onPlayerTick(C_Player* plr) {
 	else if (animYaw < angle.y)
 		animYaw += ((angle.y - animYaw) / 10);
 	if (destroy) {
-		if (g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
-			if (!bypass) plr->bodyYaw = animYaw;
-			plr->yawUnused1 = animYaw;
-			plr->pitch = angle.x;
-			if (bypass) plr->setRot(angle);
-		}
+		//g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&at);
 	}
 }
 void Regen::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
@@ -410,8 +419,8 @@ void Regen::onSendPacket(C_Packet* packet) {
 			animYaw += ((angle.y - animYaw) / 10);
 		if (destroy) {
 			if (g_Data.canUseMoveKeys()) {
-				movePacket->headYaw = animYaw;
-				movePacket->yaw = animYaw;
+				movePacket->headYaw = angle.y;
+				movePacket->yaw = angle.y;
 				movePacket->pitch = angle.x;
 			}
 		}
