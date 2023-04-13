@@ -546,7 +546,7 @@ void Speed::onSendPacket(C_Packet* packet) {
 
 	if (packet->isInstanceOf<C_MovePlayerPacket>()) {
 		//packet
-		if (moduleMgr->getModule<Regen>()->isregen) return;
+		if (moduleMgr->getModule<Regen>()->breaknow) return;
 		if (!moduleMgr->getModule<Killaura>()->targetListEmpty) return;
 		if (!rotate) return;
 		movePacket->yaw = animYaw;
