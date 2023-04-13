@@ -19,18 +19,19 @@ Killaura::Killaura() : IModule(0, Category::COMBAT, "Attacks entities") {
 	mode.addEntry("Multi", 0);
 	mode.addEntry("Switch", 1);
 	mode.addEntry("Single", 2);
-	registerBoolSetting("Visualize", &visualize, visualize);
-	registerBoolSetting("Strafe", &strafe, strafe);
-	registerBoolSetting("Click", &click, click);
-	registerBoolSetting("Hold", &hold, hold);
-	registerBoolSetting("VisualRange", &visualrange, visualrange);
-	registerFloatSetting("Smoothing", &smoothing, smoothing, 1.f, 80.f);
-	registerFloatSetting("Random", &random, random, 0.f, 15.f);
-	registerFloatSetting("Range", &range, range, 3.f, 8.f);
 	registerEnumSetting("AutoSword", &autosword, 0);
 	autosword.addEntry("None", 0);
 	autosword.addEntry("Switch", 1);
 	autosword.addEntry("Spoof", 2);
+	registerBoolSetting("Strafe", &strafe, strafe);
+	registerBoolSetting("Click", &click, click);
+	registerBoolSetting("InstaRot", &instarot, instarot);
+	registerBoolSetting("Hold", &hold, hold);
+	registerBoolSetting("Visualize", &visualize, visualize);
+	registerBoolSetting("VisualRange", &visualrange, visualrange);
+	registerFloatSetting("Smoothing", &smoothing, smoothing, 1.f, 80.f);
+	registerFloatSetting("Random", &random, random, 0.f, 15.f);
+	registerFloatSetting("Range", &range, range, 3.f, 8.f);
 	//registerMinMaxSetting("APS", &maxAPS, maxAPS, 1, 20);
 	registerIntSetting("MaxAPS", &maxAPS, maxAPS, 1, 20);
 	registerIntSetting("MinAPS", &minAPS, minAPS, 1, 20);
@@ -103,7 +104,7 @@ void Killaura::onTick(C_GameMode* gm) {
 		return;
 	}
 
-	if (moduleMgr->getModule<Regen>()->isregen == true) {
+	if (moduleMgr->getModule<Regen>()->breaknow == true) {
 		animYaw = player->yawUnused1;
 		animPitch = player->pitch;
 		return;
@@ -121,7 +122,7 @@ void Killaura::onTick(C_GameMode* gm) {
 	g_Data.forEachEntity(findEntity);
 
 	//Prevent flag
-	if (moduleMgr->getModule<Regen>()->isEnabled() && moduleMgr->getModule<Regen>()->enabledticks < 3 && !moduleMgr->getModule<Regen>()->canattack) return;
+	//if (moduleMgr->getModule<Regen>()->isEnabled() && moduleMgr->getModule<Regen>()->enabledticks < 3 && !moduleMgr->getModule<Regen>()->canattack) return;
 	if (rotations.getSelectedValue() == 2 || rotations.getSelectedValue() == 7) {
 		if (preventflagrot) {
 			//clientMessageF("PreventFlag");
@@ -180,7 +181,47 @@ void Killaura::onTick(C_GameMode* gm) {
 				if (!targetListEmpty) atk = true;
 				if (atk) {
 					vec2_t angle = g_Data.getLocalPlayer()->getPos()->CalcAngle(*targetList[0]->getPos());
-					player->setRot(angle);
+					switch (rotations.getSelectedValue()) {
+					case 0: // Normal
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->bodyYaw = angle.y;
+						break;
+					case 1: // Smooth
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						break;
+					case 2: // Hive
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->bodyYaw = angle.y;
+						break;
+					case 3: // Hive+
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->bodyYaw = angle.y;
+						break;
+					case 6: //Old
+						player->yawUnused2 = angle.y;
+						player->pitch2 = angle.x;
+						player->bodyYaw = angle.y;
+						break;
+					case 7: // Desync
+						player->yawUnused1 = angle.y;
+						player->pitch = angle.x;
+						player->bodyYaw = angle.y;
+						break;
+					case 8: //Exhi
+						player->yawUnused1 = angle.y;
+						player->pitch = 69;
+						player->bodyYaw = angle.y;
+						break;
+					}
+
+					// Strafe
+					if (/*mode.getSelectedValue() <= 2 &&*/ strafe) {
+						player->setRot(angle);
+					}
 					if (mode.getSelectedValue() == 0) gm->attack(i);
 					else gm->attack(targetList[0]);
 					atk = false;
@@ -205,16 +246,18 @@ void Killaura::onTick(C_GameMode* gm) {
 
 void Killaura::onPlayerTick(C_Player* plr) {
 	if (plr == nullptr) return;
-	if (moduleMgr->getModule<Regen>()->isregen == true) return;
+	if (moduleMgr->getModule<Regen>()->breaknow == true) return;
+	if (!instarot)
+	{
+		if (targetList.empty() && rotations.getSelectedValue() == 2) {
+			animYaw = plr->yawUnused1;
+			animPitch = plr->pitch;
+		}
 
-	if (targetList.empty() && rotations.getSelectedValue() == 2) {
-		animYaw = plr->yawUnused1;
-		animPitch = plr->pitch;
-	}
-
-	if (targetList.empty() && rotations.getSelectedValue() == 7) {
-		animYaw = plr->yawUnused1;
-		animPitch = plr->pitch;
+		if (targetList.empty() && rotations.getSelectedValue() == 7) {
+			animYaw = plr->yawUnused1;
+			animPitch = plr->pitch;
+		}
 	}
 
 	if (g_Data.canUseMoveKeys() && !targetList.empty()) {
@@ -255,47 +298,49 @@ void Killaura::onPlayerTick(C_Player* plr) {
 
 			if (animPitch > angle.x) animPitch -= ((animPitch - angle.x) / smoothing);
 			else if (animPitch < angle.x) animPitch += ((angle.x - animPitch) / smoothing);
+			if (!instarot)
+			{
+				switch (rotations.getSelectedValue()) {
+				case 0: // Normal
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = angle.x + yRandom;
+					plr->bodyYaw = animYaw + xRandom;
+					break;
+				case 1: // Smooth
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = angle.x + yRandom;
+					break;
+				case 2: // Hive
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = animPitch + yRandom;
+					plr->bodyYaw = animYaw + xRandom;
+					break;
+				case 3: // Hive+
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = animPitch + yRandom;
+					plr->bodyYaw = animYaw + xRandom;
+					break;
+				case 6: //Old
+					plr->yawUnused2 = animYaw + xRandom;
+					plr->pitch2 = angle.x + yRandom;
+					plr->bodyYaw = animYaw + xRandom;
+					break;
+				case 7: // Desync
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = animPitch + yRandom;
+					plr->bodyYaw = angle.y;
+					break;
+				case 8: //Exhi
+					plr->yawUnused1 = animYaw + xRandom;
+					plr->pitch = 69;
+					plr->bodyYaw = animYaw + xRandom;
+					break;
+				}
 
-			switch (rotations.getSelectedValue()) {
-			case 0: // Normal
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = angle.x + yRandom;
-				plr->bodyYaw = animYaw + xRandom;
-				break;
-			case 1: // Smooth
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = angle.x + yRandom;
-				break;
-			case 2: // Hive
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = animPitch + yRandom;
-				plr->bodyYaw = animYaw + xRandom;
-				break;
-			case 3: // Hive+
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = animPitch + yRandom;
-				plr->bodyYaw = animYaw + xRandom;
-				break;
-			case 6: //Old
-				plr->yawUnused2 = animYaw + xRandom;
-				plr->pitch2 = angle.x + yRandom;
-				plr->bodyYaw = animYaw + xRandom;
-				break;
-			case 7: // Desync
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = animPitch + yRandom;
-				plr->bodyYaw = angle.y;
-				break;
-			case 8: //Exhi
-				plr->yawUnused1 = animYaw + xRandom;
-				plr->pitch = 69;
-				plr->bodyYaw = animYaw + xRandom;
-				break;
-			}
-
-			// Strafe
-			if (/*mode.getSelectedValue() <= 2 &&*/ strafe) {
-				plr->setRot(angle);
+				// Strafe
+				if (/*mode.getSelectedValue() <= 2 &&*/ strafe) {
+					plr->setRot(angle);
+				}
 			}
 		}
 	}
@@ -304,7 +349,7 @@ void Killaura::onPlayerTick(C_Player* plr) {
 void Killaura::onSendPacket(C_Packet* packet) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	if (moduleMgr->getModule<Regen>()->isregen == true) return;
+	if (moduleMgr->getModule<Regen>()->breaknow == true) return;
 
 	if (g_Data.canUseMoveKeys()) {
 		if (hold && !g_Data.isLeftClickDown())
@@ -385,7 +430,7 @@ void Killaura::onLevelRender() {
 	}
 
 	if (player == nullptr || targetStrafe->isEnabled() || !visualize) return;
-	if (moduleMgr->getModule<Regen>()->isregen == true) return;
+	if (moduleMgr->getModule<Regen>()->breaknow == true) return;
 
 	static float n = 0;
 	static float anim = 0;
