@@ -7,6 +7,8 @@ private:
 	float scale = 1.f;
 	int opacity = 150;
 	int anim = 0;
+	bool resetpos = false;
+	bool resetname = false;
 public:
 	float positionX, positionY = 10;
 	bool gradient = true;
