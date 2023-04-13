@@ -93,7 +93,8 @@ void Regen::onTick(C_GameMode* gm) {
 				continuemine = false;
 				canattack = true;
 				enabledticks = 0;
-				rot = false;
+				rot = false; 
+				breaknow = false;
 				return;
 			}
 			else
@@ -189,12 +190,20 @@ void Regen::onTick(C_GameMode* gm) {
 						clientMessageF("BlockChanged");
 					} */
 					//if (enabledticks > 12 && isregen) clientMessageF("IsDestroyed");
-					if (enabledticks > minedelay && g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
+					if ((enabledticks > minedelay && g_Data.canUseMoveKeys() && !moduleMgr->getModule<Killaura>()->atk && moduleMgr->getModule<Killaura>()->instarot) && isregen || (enabledticks > minedelay && g_Data.canUseMoveKeys() && !moduleMgr->getModule<Killaura>()->targetListEmpty && !moduleMgr->getModule<Killaura>()->instarot) && isregen) {
 						player->bodyYaw = angle.y;
 						player->yawUnused1 = angle.y;
 						player->pitch = angle.x;
 						player->setRot(angle);
-						MoveUtil::fullStop(false);
+						MoveUtil::fullStop(true);
+					}
+					if (enabledticks > minedelay)
+					{
+						breaknow = true;
+					}
+					else
+					{
+						breaknow = false;
 					}
 					if (firstbreak && enabledticks > minedelay) {
 						gm->destroyBlock(&blockPos, 0); hasDestroyed = true; rot = false; enabledticks = 0; gm->stopDestroyBlock(blockPos); continuemine = false;
@@ -221,6 +230,7 @@ void Regen::onTick(C_GameMode* gm) {
 				canattack = true;
 				enabledticks = 0;
 				rot = false;
+				breaknow = false;
 				//clientMessageF("Lost Redstone");
 			}
 			else
@@ -239,6 +249,7 @@ void Regen::onTick(C_GameMode* gm) {
 				canattack = true;
 				enabledticks = 0;
 				rot = false;
+				breaknow = false;
 				return;
 			}
 			else
@@ -338,12 +349,20 @@ void Regen::onTick(C_GameMode* gm) {
 						clientMessageF("BlockChanged");
 					} */
 					//if (enabledticks > 12 && isregen) clientMessageF("IsDestroyed");
-					if (enabledticks > minedelay + 2 && g_Data.canUseMoveKeys() && moduleMgr->getModule<Killaura>()->targetListEmpty) {
+					if ((enabledticks > minedelay && g_Data.canUseMoveKeys() && !moduleMgr->getModule<Killaura>()->atk && moduleMgr->getModule<Killaura>()->instarot) && isregen || (enabledticks > minedelay && g_Data.canUseMoveKeys() && !moduleMgr->getModule<Killaura>()->targetListEmpty && !moduleMgr->getModule<Killaura>()->instarot) && isregen) {
 						player->bodyYaw = angle.y;
 						player->yawUnused1 = angle.y;
 						player->pitch = angle.x;
 						player->setRot(angle);
-						MoveUtil::fullStop(false);
+						MoveUtil::fullStop(true);
+					}
+					if (enabledticks > minedelay)
+					{
+						breaknow = true;
+					}
+					else
+					{
+						breaknow = false;
 					}
 					if (firstbreak && enabledticks > minedelay + 3) {
 						gm->destroyBlock(&blockPos, 0); hasDestroyed = true; rot = false; enabledticks = 0; gm->stopDestroyBlock(blockPos); continuemine = false;
@@ -370,6 +389,7 @@ void Regen::onTick(C_GameMode* gm) {
 				canattack = true;
 				enabledticks = 0;
 				rot = false;
+				breaknow = false;
 				//clientMessageF("Lost Redstone");
 			}
 			else
@@ -410,7 +430,7 @@ void Regen::onSendPacket(C_Packet* packet) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 
-	if (packet->isInstanceOf<C_MovePlayerPacket>()) {
+	if (packet->isInstanceOf<C_MovePlayerPacket>() && breaknow) {
 		auto* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet);
 		vec2_t angle = player->getPos()->CalcAngle(vec3_t(blockPos.x, blockPos.y, blockPos.z));
 		if (animYaw > angle.y)
