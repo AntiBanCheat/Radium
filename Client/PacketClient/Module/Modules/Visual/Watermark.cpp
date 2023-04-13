@@ -12,6 +12,8 @@ Watermark::Watermark() : IModule(0, Category::VISUAL, "Displays the watermark") 
 	//mode.addEntry("FirstLetter", 4);
 	//mode.addEntry("Radium", 5);
 	registerBoolSetting("Gradient", &gradient, &gradient);
+	registerBoolSetting("ResetPos", &resetpos, &resetpos);
+	registerBoolSetting("ResetName", &resetname, &resetname);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
 	registerFloatSetting("Scale", &scale, scale, 0.5f, 2);
 	shouldHide = true;
@@ -32,7 +34,16 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 
 	//DrawUtils::drawImage("textures/ui/heart_new.png", vec2_t(positionX + 5, positionY + 50), vec2_t(30, 30), vec2_t(0, 0), vec2_t(1, 1));
-
+	if (resetpos)
+	{
+		positionX, positionY = 0;
+		resetpos = false;
+	}
+	if (resetname)
+	{
+		moduleMgr->getModule<Interface>()->getClientName() = "Radium";
+		resetname = false;
+	}
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
 		string name = player->getNameTag()->getText();
 		name = Utils::sanitize(name);
@@ -81,7 +92,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		case 2: // Weird
 			DrawUtils::drawGradientText(vec2_t(simpleRect.x, simpleRect.y), &idk, scale, 1, true);
 			//DrawUtils::drawGradientText(vec2_t(simpleRect.x + flaot, simpleRect.y - 5), &idk, scale/2, 1, true);
-			DrawUtils::drawText(vec2_t(simpleRect.x + flaot - 5 , simpleRect.y - 5), &idk2, MC_Color(), 1, 1, true);
+			DrawUtils::drawText(vec2_t(simpleRect.x + flaot - 5, simpleRect.y - 5), &idk2, MC_Color(), 1, 1, true);
 			break;
 		case 3: // Skeet
 			DrawUtils::fillRectangle(skeetRect, MC_Color(27, 27, 27), 1);
@@ -89,11 +100,6 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			DrawUtils::drawText(vec2_t(skeetRect.x + (textPadding * 2) + 4.f, skeetRect.y + (textPadding * 2)), &t, MC_Color(255, 255, 255), scale, 1, true);
 			DrawUtils::drawGradientText(vec2_t(skeetRect.x + te + (textPadding * 2) + 4.f, skeetRect.y + (textPadding * 2)), &sense, scale, 1, true);
 			break;
-		case 4: // FirstLetter
-			break;
-		case 5: // Image
-			DrawUtils::drawGradientText(vec2_t(RadiumRect.x, RadiumRect.y), &clientName, scale, 1, true);
-			break; 
 		}
 	}
 }
