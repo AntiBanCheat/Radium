@@ -38,6 +38,7 @@ public:
     int minedelay = 15;
     bool visual =false;
     bool bypass = true;
+    bool breaknow = false;
     std::string name = "Regen";
     std::string name2 = "";
     SettingEnum mode = this;
