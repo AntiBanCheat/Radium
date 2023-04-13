@@ -18,6 +18,7 @@ public:
     float animPitch = 0.f;
     bool strafe = false;
     bool atk = false;
+    bool instarot = true;
     float random = 1.f;
     bool click = false;
     bool hold = false;
