@@ -1021,7 +1021,7 @@ void Hooks::LoopbackPacketSender_sendToServer(C_LoopbackPacketSender* a, C_Packe
 		if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() || packet->isInstanceOf<C_PlayerActionPacket>()) {
 			if (blinkMod->isEnabled()) {
 				if (packet->isInstanceOf<C_MovePlayerPacket>()) {
-					C_MovePlayerPacket* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet); movePacket->onGround = true;
+					C_MovePlayerPacket* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet);// movePacket->onGround = true; // これいらん
 					blinkMod->getMovePlayerPacketHolder()->push_back(new C_MovePlayerPacket(*movePacket));
 				}
 				if (packet->isInstanceOf<PlayerAuthInputPacket>()) blinkMod->getPlayerAuthInputPacketHolder()->push_back(new PlayerAuthInputPacket(*reinterpret_cast<PlayerAuthInputPacket*>(packet)));
