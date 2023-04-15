@@ -1,8 +1,6 @@
 #include "InvManager.h"
 #include "../pch.h"
 
-bool noarmor = false;
-
 class ArmorStruct {
 public:
 	ArmorStruct(C_ItemStack* item, C_ArmorItem* yot, int slot) {
@@ -32,7 +30,6 @@ InvManager::InvManager() : IModule(0, Category::PLAYER, "Manages your inventory"
 	mode.addEntry("Inventory", 1);
 	//registerBoolSetting("AutoDisable", &autoDisable, autoDisable);
 	registerBoolSetting("AutoArmor", &autoArmor, autoArmor);
-	registerBoolSetting("NoArmor", &noarmor, noarmor);
 	registerBoolSetting("Clean", &clean, clean);
 	registerBoolSetting("Sort", &autoSort, autoSort);
 	registerBoolSetting("Swing", &swing, swing);
@@ -85,135 +82,67 @@ void InvManager::onTick(C_GameMode* gm) {
 			}
 		};
 
-		if (noarmor) {
-			if (gm->player->damageTime) {
-				for (int i = 0; i < 4; i++) {
-					for (int n = 0; n < 36; n++) {
-						C_ItemStack* stack = inv->getItemStack(n);
-						if (stack->item != NULL && (*stack->item)->isArmor() && reinterpret_cast<C_ArmorItem*>(*stack->item)->getArmorSlot() == i) {
-							armorList.push_back(ArmorStruct(stack, reinterpret_cast<C_ArmorItem*>(*stack->item), n));
-						}
-					}
-
-					if (player->getArmor(i)->item != nullptr)
-						armorList.push_back(ArmorStruct(player->getArmor(i), reinterpret_cast<C_ArmorItem*>(*player->getArmor(i)->item), i));
-
-					if (armorList.size() > 0) {
-						sort(armorList.begin(), armorList.end(), CompareArmorStruct());
-						C_ItemStack* armorItem = player->getArmor(i);
-
-						if (armorItem->item != nullptr && (ArmorStruct(armorItem, reinterpret_cast<C_ArmorItem*>(*armorItem->item), 0).isEqual(armorList[0])) == false) {
-							int slot = inv->getFirstEmptySlot();
-
-							first = new C_InventoryAction(i, armorItem, nullptr, 632);
-							second = new C_InventoryAction(slot, nullptr, armorItem);
-
-							*g_Data.getLocalPlayer()->getArmor(i) = *emptyItemStack;
-							*inv->getItemStack(slot) = *armorItem;
-
-							manager->addInventoryAction(*first);
-							manager->addInventoryAction(*second);
-
-							delete first;
-							delete second;
-							inv->removeItem(slot, slot);
-
-							first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
-							second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
-
-							*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
-							*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
-
-							manager->addInventoryAction(*first);
-							manager->addInventoryAction(*second);
-
-							delete first;
-							delete second;
-							inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
-						}
-						if (armorItem->item == nullptr) {
-							*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
-
-							first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
-							second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
-
-							*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
-
-							manager->addInventoryAction(*first);
-							manager->addInventoryAction(*second);
-
-							delete first;
-							delete second;
-							inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
-						}
-					}
-					armorList.clear();
+		for (int i = 0; i < 4; i++) {
+			for (int n = 0; n < 36; n++) {
+				C_ItemStack* stack = inv->getItemStack(n);
+				if (stack->item != NULL && (*stack->item)->isArmor() && reinterpret_cast<C_ArmorItem*>(*stack->item)->getArmorSlot() == i) {
+					armorList.push_back(ArmorStruct(stack, reinterpret_cast<C_ArmorItem*>(*stack->item), n));
 				}
 			}
-		}
-		else {
-			for (int i = 0; i < 4; i++) {
-				for (int n = 0; n < 36; n++) {
-					C_ItemStack* stack = inv->getItemStack(n);
-					if (stack->item != NULL && (*stack->item)->isArmor() && reinterpret_cast<C_ArmorItem*>(*stack->item)->getArmorSlot() == i) {
-						armorList.push_back(ArmorStruct(stack, reinterpret_cast<C_ArmorItem*>(*stack->item), n));
-					}
+
+			if (player->getArmor(i)->item != nullptr)
+				armorList.push_back(ArmorStruct(player->getArmor(i), reinterpret_cast<C_ArmorItem*>(*player->getArmor(i)->item), i));
+
+			if (armorList.size() > 0) {
+				sort(armorList.begin(), armorList.end(), CompareArmorStruct());
+				C_ItemStack* armorItem = player->getArmor(i);
+
+				if (armorItem->item != nullptr && (ArmorStruct(armorItem, reinterpret_cast<C_ArmorItem*>(*armorItem->item), 0).isEqual(armorList[0])) == false) {
+					int slot = inv->getFirstEmptySlot();
+
+					first = new C_InventoryAction(i, armorItem, nullptr, 632);
+					second = new C_InventoryAction(slot, nullptr, armorItem);
+
+					*g_Data.getLocalPlayer()->getArmor(i) = *emptyItemStack;
+					*inv->getItemStack(slot) = *armorItem;
+
+					manager->addInventoryAction(*first);
+					manager->addInventoryAction(*second);
+
+					delete first;
+					delete second;
+					inv->removeItem(slot, slot);
+
+					first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
+					second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
+
+					*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
+					*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
+
+					manager->addInventoryAction(*first);
+					manager->addInventoryAction(*second);
+
+					delete first;
+					delete second;
+					inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
 				}
+				if (armorItem->item == nullptr) {
+					*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
 
-				if (player->getArmor(i)->item != nullptr)
-					armorList.push_back(ArmorStruct(player->getArmor(i), reinterpret_cast<C_ArmorItem*>(*player->getArmor(i)->item), i));
+					first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
+					second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
 
-				if (armorList.size() > 0) {
-					sort(armorList.begin(), armorList.end(), CompareArmorStruct());
-					C_ItemStack* armorItem = player->getArmor(i);
+					*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
 
-					if (armorItem->item != nullptr && (ArmorStruct(armorItem, reinterpret_cast<C_ArmorItem*>(*armorItem->item), 0).isEqual(armorList[0])) == false) {
-						int slot = inv->getFirstEmptySlot();
+					manager->addInventoryAction(*first);
+					manager->addInventoryAction(*second);
 
-						first = new C_InventoryAction(i, armorItem, nullptr, 632);
-						second = new C_InventoryAction(slot, nullptr, armorItem);
-
-						*g_Data.getLocalPlayer()->getArmor(i) = *emptyItemStack;
-						*inv->getItemStack(slot) = *armorItem;
-
-						manager->addInventoryAction(*first);
-						manager->addInventoryAction(*second);
-
-						delete first;
-						delete second;
-						inv->removeItem(slot, slot);
-
-						first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
-						second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
-
-						*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
-						*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
-
-						manager->addInventoryAction(*first);
-						manager->addInventoryAction(*second);
-
-						delete first;
-						delete second;
-						inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
-					}
-					if (armorItem->item == nullptr) {
-						*g_Data.getLocalPlayer()->getArmor(i) = *inv->getItemStack(armorList[0].m_slot);
-
-						first = new C_InventoryAction(armorList[0].m_slot, armorList[0].m_item, nullptr);
-						second = new C_InventoryAction(i, nullptr, armorList[0].m_item, 632);
-
-						*inv->getItemStack(armorList[0].m_slot) = *emptyItemStack;
-
-						manager->addInventoryAction(*first);
-						manager->addInventoryAction(*second);
-
-						delete first;
-						delete second;
-						inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
-					}
+					delete first;
+					delete second;
+					inv->removeItem(armorList[0].m_slot, armorList[0].m_slot);
 				}
-				armorList.clear();
 			}
+			armorList.clear();
 		}
 		armorList.clear();
 	}
@@ -227,7 +156,6 @@ void InvManager::onTick(C_GameMode* gm) {
 				for (int i : dropSlots) {
 					player->getSupplies()->inventory->dropSlot(i);
 					dropSlots.push_back(i);
-					Odelay = 0;
 				}
 			}
 		}
@@ -275,8 +203,8 @@ void InvManager::onTick(C_GameMode* gm) {
 	}
 
 	if (autoDisable && g_Data.getLocalPlayer() == nullptr) {
-		auto notification = g_Data.addNotification("InvManager:", "Disabled");
-		notification->duration = 3;
+		//auto notification = g_Data.addNotification("InvManager:", "Disabled");
+		//notification->duration = 3;
 		setEnabled(false);
 	}
 }
@@ -320,11 +248,12 @@ vector<int> InvManager::findUselessItems() {
 						uselessItems.push_back(i);
 					else
 						items.push_back(itemStack);
-				} else if (find(items.begin(), items.end(), itemStack) == items.end()) {
+				}
+				else if (find(items.begin(), items.end(), itemStack) == items.end()) {
 					if ((*itemStack->item)->itemId == 261 && !isLastItem(*itemStack->item))
 						uselessItems.push_back(i);
 					else
-						items.push_back(itemStack);	
+						items.push_back(itemStack);
 				}
 			}
 		}
@@ -342,7 +271,7 @@ vector<int> InvManager::findUselessItems() {
 			C_ItemStack* current = const_cast<C_ItemStack*>(lhs);
 			C_ItemStack* other = const_cast<C_ItemStack*>(rhs);
 			return current->getAttackingDamageWithEnchants() > other->getAttackingDamageWithEnchants();
-		});
+			});
 
 		bool hadTheBestItem = false;
 		C_ItemStack* bestItem = items.at(0);
@@ -351,7 +280,7 @@ vector<int> InvManager::findUselessItems() {
 			if (find(uselessItems.begin(), uselessItems.end(), i) != uselessItems.end())
 				continue;
 			C_ItemStack* itemStack = g_Data.getLocalPlayer()->getSupplies()->inventory->getItemStack(i);
-			if (itemStack->item != nullptr ) {
+			if (itemStack->item != nullptr) {
 				if (!itemStack->getItem()->isPickaxe() && !itemStack->getItem()->isTool() && !itemStack->getItem()->isFood() && !itemStack->getItem()->isAxe() && !itemStack->getItem()->isBlock() && itemStack->getAttackingDamageWithEnchants() < bestItem->getAttackingDamageWithEnchants()) {
 					uselessItems.push_back(i);
 				}
@@ -384,7 +313,7 @@ vector<int> InvManager::findUselessItems() {
 				else if (stack->getItem()->isPickaxe())
 					uselessItems.push_back(n);
 				//Axe
-				if (stack->getItem()->isAxe() && currentDamage > AxeDamage) 
+				if (stack->getItem()->isAxe() && currentDamage > AxeDamage)
 					AxeDamage = currentDamage;
 				else if (stack->getItem()->isAxe())
 					uselessItems.push_back(n);
@@ -404,7 +333,7 @@ vector<int> InvManager::findUselessItems() {
 			C_ItemStack* current = const_cast<C_ItemStack*>(lhs);
 			C_ItemStack* other = const_cast<C_ItemStack*>(rhs);
 			return current->getArmorValueWithEnchants() > other->getArmorValueWithEnchants();
-		});
+			});
 
 		// Put armor items in their respective vectors
 		for (C_ItemStack* itemsteck : items) {
@@ -421,14 +350,14 @@ vector<int> InvManager::findUselessItems() {
 					boots.push_back(itemsteck);
 			}
 		}
-		bool hadBest[4] = {0, 0, 0, 0};
+		bool hadBest[4] = { 0, 0, 0, 0 };
 		for (int i = 0; i < 4; i++) {
 			C_ItemStack* itemsteck = g_Data.getLocalPlayer()->getArmor(i);
 			C_Item** item = itemsteck->item;
 			if (item != nullptr) {
-				
+
 				C_ArmorItem* armor = reinterpret_cast<C_ArmorItem*>(*item);
-				
+
 				float testArmorValue = 0;
 				switch (armor->getArmorSlot()) {
 				case 0:
@@ -462,19 +391,23 @@ vector<int> InvManager::findUselessItems() {
 				if (armor->isHelmet()) {
 					if (hadBest[0] || itemStack->getArmorValueWithEnchants() < helmets.at(0)->getArmorValueWithEnchants()) {
 						uselessItems.push_back(i);
-					} else
+					}
+					else
 						hadBest[0] = true;
-				} else if (armor->isChestplate()) {
+				}
+				else if (armor->isChestplate()) {
 					if (hadBest[1] || itemStack->getArmorValueWithEnchants() < chestplates.at(0)->getArmorValueWithEnchants())
 						uselessItems.push_back(i);
 					else
 						hadBest[1] = true;
-				} else if (armor->isLeggings()) {
+				}
+				else if (armor->isLeggings()) {
 					if (hadBest[2] || itemStack->getArmorValueWithEnchants() < leggings.at(0)->getArmorValueWithEnchants())
 						uselessItems.push_back(i);
 					else
 						hadBest[2] = true;
-				} else if (armor->isBoots()) {
+				}
+				else if (armor->isBoots()) {
 					if (hadBest[3] || itemStack->getArmorValueWithEnchants() < boots.at(0)->getArmorValueWithEnchants())
 						uselessItems.push_back(i);
 					else
