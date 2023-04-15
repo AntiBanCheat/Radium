@@ -430,8 +430,8 @@ void Regen::onSendPacket(C_Packet* packet) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 
-	if (packet->isInstanceOf<C_MovePlayerPacket>() && breaknow) {
-		auto* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet);
+	if (packet->isInstanceOf<PlayerAuthInputPacket>() && breaknow) {
+		auto* movePacket = reinterpret_cast<PlayerAuthInputPacket*>(packet);
 		vec2_t angle = player->getPos()->CalcAngle(vec3_t(blockPos.x, blockPos.y, blockPos.z));
 		if (animYaw > angle.y)
 			animYaw -= ((animYaw - angle.y) / 10);
@@ -439,9 +439,8 @@ void Regen::onSendPacket(C_Packet* packet) {
 			animYaw += ((angle.y - animYaw) / 10);
 		if (destroy) {
 			if (g_Data.canUseMoveKeys()) {
-				movePacket->headYaw = angle.y;
-				movePacket->yaw = angle.y;
-				movePacket->pitch = angle.x;
+				movePacket->pos.y = angle.y;
+				movePacket->pos.x = angle.x;
 			}
 		}
 	}
