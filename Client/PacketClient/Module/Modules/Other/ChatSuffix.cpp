@@ -15,7 +15,7 @@ void ChatSuffix::onSendPacket(C_Packet* packet) {
 		C_TextPacket* funy = reinterpret_cast<C_TextPacket*>(packet);
 		std::string Sentence;
 		std::string end;
-		int i = randomFloat(1, 30);
+		int i = randomFloat(1, 40);
 		if (i == 1) end = " | Rolaris";
 		if (i == 2) end = " | Skidders V2";
 		if (i == 3) end = " | Radon";
