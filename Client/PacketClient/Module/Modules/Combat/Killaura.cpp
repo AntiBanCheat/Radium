@@ -356,34 +356,43 @@ void Killaura::onSendPacket(C_Packet* packet) {
 			return;
 
 		sort(targetList.begin(), targetList.end(), CompareTargetEnArray());
-		if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>() && rotations.getSelectedValue() != 3 && !targetList.empty()) {
+		if (packet->isInstanceOf<C_MovePlayerPacket>() && rotations.getSelectedValue() != 3 && !targetList.empty()) {
 			vec2_t angle = g_Data.getLocalPlayer()->getPos()->CalcAngle(targetList[0]->eyePos0);
 			auto* movePacket = reinterpret_cast<C_MovePlayerPacket*>(packet);
-			auto* pkty = reinterpret_cast<PlayerAuthInputPacket*>(packet);
 
 			if (rotations.getSelectedValue() == 2 || rotations.getSelectedValue() == 3) {
-				pkty->pos.x = animPitch + yRandom;
-				pkty->pos.y = animYaw + xRandom;
-				
 				movePacket->pitch = animPitch + yRandom;
 				movePacket->headYaw = animYaw + xRandom;
 				movePacket->yaw = animYaw + xRandom;
 			}
 			else if(rotations.getSelectedValue() == 7){
-				pkty->pos.x = animPitch + yRandom;
-				pkty->pos.y = angle.y + xRandom;
-				
 				movePacket->pitch = animPitch + yRandom;
 				movePacket->headYaw = animYaw + xRandom;
 				movePacket->yaw = angle.y + xRandom;
 			}
 			else
 			{
-				pkty->pos.x = animPitch + yRandom;
-				pkty->pos.y = animYaw + xRandom;
 				movePacket->pitch = angle.x + yRandom;
 				movePacket->headYaw = animYaw + xRandom;
 				movePacket->yaw = animYaw + xRandom;
+			}
+		}
+		if (packet->isInstanceOf<PlayerAuthInputPacket>() && rotations.getSelectedValue() != 3 && !targetList.empty()) {
+			vec2_t angle = g_Data.getLocalPlayer()->getPos()->CalcAngle(targetList[0]->eyePos0);
+			auto* authPacket = reinterpret_cast<PlayerAuthInputPacket*>(packet);
+
+			if (rotations.getSelectedValue() == 2 || rotations.getSelectedValue() == 3) {
+				authPacket->pos.y = animPitch + yRandom;
+				authPacket->pos.x = animYaw + xRandom;
+			}
+			else if (rotations.getSelectedValue() == 7) {
+				authPacket->pos.y = animPitch + yRandom;
+				authPacket->pos.x = angle.y + xRandom;
+			}
+			else
+			{
+				authPacket->pos.y = angle.x + yRandom;
+				authPacket->pos.x = animYaw + xRandom;
 			}
 		}
 	}
