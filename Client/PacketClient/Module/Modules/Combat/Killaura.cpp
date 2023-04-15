@@ -364,15 +364,26 @@ void Killaura::onSendPacket(C_Packet* packet) {
 			if (rotations.getSelectedValue() == 2 || rotations.getSelectedValue() == 3) {
 				pkty->pos.x = animPitch + yRandom;
 				pkty->pos.y = animYaw + xRandom;
+				
+				movePacket->pitch = animPitch + yRandom;
+				movePacket->headYaw = animYaw + xRandom;
+				movePacket->yaw = animYaw + xRandom;
 			}
 			else if(rotations.getSelectedValue() == 7){
 				pkty->pos.x = animPitch + yRandom;
 				pkty->pos.y = angle.y + xRandom;
+				
+				movePacket->pitch = animPitch + yRandom;
+				movePacket->headYaw = animYaw + xRandom;
+				movePacket->yaw = angle.y + xRandom;
 			}
 			else
 			{
 				pkty->pos.x = animPitch + yRandom;
 				pkty->pos.y = animYaw + xRandom;
+				movePacket->pitch = angle.x + yRandom;
+				movePacket->headYaw = animYaw + xRandom;
+				movePacket->yaw = animYaw + xRandom;
 			}
 		}
 	}
