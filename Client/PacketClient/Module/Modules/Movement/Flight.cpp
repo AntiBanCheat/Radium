@@ -466,9 +466,6 @@ void Flight::onSendPacket(C_Packet* packet) {
 		if (mode.getSelectedValue() == 4) {
 			movePacket->onGround = true;
 		}
-		if (mode.getSelectedValue() == 5) {
-			authInputPacket->velocity.y = -1.f;
-		}
 
 		if (mode.getSelectedValue() == 10) {
 			movePacket->onGround = false;
