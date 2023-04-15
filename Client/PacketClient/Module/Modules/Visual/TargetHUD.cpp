@@ -128,7 +128,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			if (showItems && mode.getSelectedValue() == 1) defaultRectHeight = (5, 2) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
 			string position = "Position: " + to_string((int)floorf(pos->x)) + " " + to_string((int)floorf(pos->y)) + " " + to_string((int)floorf(pos->z));
 			string distance = string(GRAY) + "Distance: " + string(RESET) + to_string((int)dist) + string(".") + to_string((int)(dist * 10) - ((int)dist * 10));
-
+			string distancev2 =  "Distance: " + string(RESET) + to_string((int)dist) + string(".") + to_string((int)(dist * 10) - ((int)dist * 10)) + "m";
 			string targetName = targetList[0]->getNameTag()->getText();
 			targetName = Utils::sanitize(targetName);
 			targetName = targetName.substr(0, targetName.find('\n'));
