@@ -467,6 +467,7 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 				}
 				
 			        if (mode.getSelectedValue() == 10) {
+						auto player = g_Data.getLocalPlayer();
 					int selfScore = entScore(g_Data.getLocalPlayer());
 					float Absorbtionhp = ((int)targetList[0]->getAbsorption());
 					int oppenantScore = entScore(targetList[0]);
