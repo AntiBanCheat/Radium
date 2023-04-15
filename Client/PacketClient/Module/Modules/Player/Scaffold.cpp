@@ -827,18 +827,30 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 					movePacket->headYaw = blockPosition.y;
 					movePacket->yaw = blockPosition.y;
 					movePacket->pitch = blockPosition.x;
+						
+					authInputPacket->pos.y = blockPosition.y;
+					authInputPacket->pos.x = blockPosition.x;
 					break;
 				case 3: // Back
 					movePacket->headYaw = animBack;
 					movePacket->yaw = animBack;
 					movePacket->pitch = 75;
+						
+					authInputPacket->pos.y = animBack;
+					authInputPacket->pos.x = 75;
 					break;
 				case 6: // Smooth
 					movePacket->headYaw = animFlareon;
 					movePacket->yaw = animFlareon;
 					movePacket->pitch = 80;
+						
+					authInputPacket->pos.y = animFlareon;
+					authInputPacket->pos.x = 80;
 					break;
 				case 8: // Smart
+					authInputPacket->pos.y = animFlareon;
+					authInputPacket->pos.x = animFlareonPitch;	
+						
 					movePacket->headYaw = animFlareon;
 					movePacket->yaw = animFlareon;
 					movePacket->pitch = animFlareonPitch;
