@@ -10,6 +10,7 @@ private:
 	bool spin = true;
 	int delay = 1;
 	int tick = 0;
+	int rots = -179;
 
 public:
 	virtual void onSendPacket(C_Packet* packet) override;
