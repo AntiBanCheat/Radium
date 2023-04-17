@@ -365,7 +365,7 @@ void Killaura::onSendPacket(C_Packet* packet) {
 				movePacket->headYaw = animYaw + xRandom;
 				movePacket->yaw = animYaw + xRandom;
 			}
-			else if(rotations.getSelectedValue() == 7){
+			else if (rotations.getSelectedValue() == 7) {
 				movePacket->pitch = animPitch + yRandom;
 				movePacket->headYaw = animYaw + xRandom;
 				movePacket->yaw = angle.y + xRandom;
