@@ -12,6 +12,7 @@ private:
 	
 	float pct = 100.f;
 	float displayhealth = 20.f;
+	float displayhealth2 = 20.f;
 	float size = 30.f;
 	float animationsize = 1.f;
 public:
