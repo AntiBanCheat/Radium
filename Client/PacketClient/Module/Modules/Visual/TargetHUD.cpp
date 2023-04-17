@@ -80,6 +80,7 @@ void TargetHUD::onTick(C_GameMode* gm) {
 	else {
 		entityChanged = false;
 		displayhealth = 0;
+		displayhealth2 = 0;
 		size = 30.f;
 		animationsize = 0.f;
 	}
@@ -116,10 +117,17 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			vec3_t* pos = targetList[0]->getPos();
 			auto health = targetList[0]->getHealth();
 			int inthealth = health;
+			float Absorbtionhp = ((int)targetList[0]->getAbsorption());
 			int percentage = (health / 20) * 100;
 			string displaypercent = to_string(percentage);
 			if (displayhealth > health) displayhealth -= ((displayhealth - health) / 15);
 			else if (displayhealth < health) displayhealth += ((health - displayhealth) / 15);
+			if (displayhealth > health) displayhealth -= ((displayhealth - health) / 15);
+			else if (displayhealth < health) displayhealth += ((health - displayhealth) / 15);
+			if (displayhealth2 > Absorbtionhp) displayhealth2 -= ((displayhealth2 - Absorbtionhp) / 15);
+			else if (displayhealth2 < Absorbtionhp) displayhealth2 += ((Absorbtionhp - displayhealth2) / 15);
+			if (displayhealth2 > Absorbtionhp) displayhealth2 -= ((displayhealth2 - Absorbtionhp) / 15);
+			else if (displayhealth2 < Absorbtionhp) displayhealth2 += ((Absorbtionhp - displayhealth2) / 15);
 			string smoothtext = to_string(inthealth) + ".0 health left";
 			float steveOpacity = (targetList[0]->damageTime * 80) / 8;
 			float dist = (*targetList[0]->getPos()).dist(*g_Data.getLocalPlayer()->getPos());
@@ -465,16 +473,34 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					DrawUtils::drawText(distPos, &infoStr, MC_Color(255, 255, 255), 1, 1, true);
 					DrawUtils::drawText(namePos, &name, MC_Color(255, 255, 255), 1, 1, true);
 				}
-				
-			        if (mode.getSelectedValue() == 10) {
-						auto player = g_Data.getLocalPlayer();
+				//hvh
+				if (mode.getSelectedValue() == 10) 
+				{
+					auto player = g_Data.getLocalPlayer();
 					int selfScore = entScore(g_Data.getLocalPlayer());
 					float Absorbtionhp = ((int)targetList[0]->getAbsorption());
 					int oppenantScore = entScore(targetList[0]);
 					std::string absorptionString = std::to_string((int)(Absorbtionhp));
 					string healthDisplay = " " + absorptionString + "/" + "10";
 					int hpDifference = player->getAbsorption() - Absorbtionhp;
-					std::string hpDifferenceStr = " " + std::to_string(hpDifference);
+					string winr;
+					std::string hpDifferenceStr = std::to_string(hpDifference);
+					string hpDifferenceStr2;
+					if (hpDifference >= 1)
+					{
+						winr = GREEN + string("Winning");
+						hpDifferenceStr2 = GREEN + hpDifferenceStr;
+
+					}
+					if (hpDifference <= -1)
+					{
+						winr = RED + string(" Losing");
+						hpDifferenceStr2 = RED + hpDifferenceStr;
+					}
+					if (hpDifference < 1 && hpDifference > -1)
+					{
+						winr = YELLOW + string("Samerate");
+					}
 					string Difference = to_string(hpDifference);
 					MC_Color color = MC_Color();
 					if (player->getAbsorption() > Absorbtionhp) color = MC_Color(0, 255, 0);
@@ -491,42 +517,26 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), true);
 					DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 0, 0, steveOpacity), true);
 					//		DrawUtils::drawRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), false);
-					vec4_t healthRect = vec4_t(testRect.x + 37, testRect.y + 29, testRect.x + ((targetLen - 23) / 20) * health, testRect.y + 34);
-					vec4_t healthSubRect = vec4_t(testRect.x + 37, testRect.y + 29, testRect.x + ((targetLen - 23) / 20) * health, testRect.y + 34 + 5);
+					vec4_t healthRect = vec4_t(testRect.x + 38, testRect.y + 27, testRect.x + 38 + ((targetLen + 10.5) / 18) * displayhealth2, testRect.y + 30);
 					string s = healthDisplay + "";
 					vec2_t textPoss = {
 						healthRect.z,
-						healthSubRect.y
+						healthRect.y - 1
 					};
-					string winr;
-					if (selfScore > oppenantScore) {
-						winr = GREEN + string("Winning");
-					}
-					else if (selfScore < oppenantScore) {
-						winr = RED + string(" Losing");
-					}
-					else {
-						winr = GRAY + string("Samerate");
-					}
-					if (targetList[0]->damageTime > 1) {
-						DrawUtils::fillRoundRectangleGradient(healthRect, RiseQuality);
-					}
-					else {
-						DrawUtils::fillRoundRectangleGradient(healthRect, RiseQuality);
-					}
 					vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + absorbtion * 4.f, testRect.y + 29);
 					if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + absorbtion * 4.f, testRect.y + 41);
 					vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + targetLen - 4.f, testRect.y + 30);
 					if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + targetLen - 4.f, testRect.y + 41);
-						vec2_t distPos = vec2_t(testRect.x + 39, testRect.y + 15);
-						vec2_t hpdpos = vec2_t(testRect.x + 74, testRect.y + 15);
-						DrawUtils::drawText(distPos, &winr, MC_Color(255, 255, 255), 0.8, 1, true);//winr
-						DrawUtils::drawText(textPoss, &s, MC_Color(255, 255, 255), 0.8, 1, true);
-						DrawUtils::drawText(hpdpos, &hpDifferenceStr, MC_Color(color), 0.8, 1, true);
-						DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
-						if (targetList[0]->damageTime > 1) {
-							DrawUtils::fillRectangleA(vec4_t(positionX + 5, positionY + 5, 35 + positionX, positionY + 35), MC_Color(255, 0, 0, steveOpacity));
-						}
+					vec2_t distPos = vec2_t(testRect.x + 39, testRect.y + 15);
+					vec2_t hpdpos = vec2_t(testRect.x + 74, testRect.y + 15);
+					DrawUtils::fillRoundRectangle(healthRect, interfaceColor, 255);
+					DrawUtils::drawText(distPos, &winr, MC_Color(255, 255, 255), 0.8, 1, true);//winr
+					DrawUtils::drawText(textPoss, &s, MC_Color(255, 255, 255), 0.8, 1, true);
+					DrawUtils::drawText(hpdpos, &hpDifferenceStr2, MC_Color(color), 0.8, 1, true);
+					DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
+					if (targetList[0]->damageTime > 1) {
+						DrawUtils::fillRectangleA(vec4_t(positionX + 5, positionY + 5, 35 + positionX, positionY + 35), MC_Color(255, 0, 0, steveOpacity));
+					}
 				}
 				
 				if (mode.getSelectedValue() == 1) {
