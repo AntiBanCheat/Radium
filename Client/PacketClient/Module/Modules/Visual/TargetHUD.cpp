@@ -92,6 +92,7 @@ void TargetHUD::onTick(C_GameMode* gm) {
 void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+	static auto interface = moduleMgr->getModule<Interface>();
 
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
 
@@ -505,37 +506,75 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					MC_Color color = MC_Color();
 					if (player->getAbsorption() > Absorbtionhp) color = MC_Color(0, 255, 0);
 					if (player->getAbsorption() < Absorbtionhp) color = MC_Color(255, 0, 0);
-					string distance = string(GRAY) + "          Distance: " + string(RESET) + to_string((int)dist) + string(".") + to_string((int)(dist * 10) - ((int)dist * 10));
-					string name = string(GRAY) + "                    Name: " + string(RESET);
-					string rawName = targetList[0]->getNameTag()->getText();
-					rawName = Utils::sanitize(rawName);
-					rawName = name + rawName;
-					rawName = rawName.substr(0, rawName.find('\n'));
-					if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
-					else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
-					vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
-					DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), true);
-					DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 0, 0, steveOpacity), true);
-					//		DrawUtils::drawRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), false);
-					vec4_t healthRect = vec4_t(testRect.x + 38, testRect.y + 27, testRect.x + 38 + ((targetLen + 10.5) / 18) * displayhealth2, testRect.y + 30);
-					string s = healthDisplay + "";
-					vec2_t textPoss = {
-						healthRect.z,
-						healthRect.y - 1
-					};
-					vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + absorbtion * 4.f, testRect.y + 29);
-					if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + absorbtion * 4.f, testRect.y + 41);
-					vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + targetLen - 4.f, testRect.y + 30);
-					if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + targetLen - 4.f, testRect.y + 41);
-					vec2_t distPos = vec2_t(testRect.x + 39, testRect.y + 15);
-					vec2_t hpdpos = vec2_t(testRect.x + 74, testRect.y + 15);
-					DrawUtils::fillRoundRectangle(healthRect, interfaceColor, 255);
-					DrawUtils::drawText(distPos, &winr, MC_Color(255, 255, 255), 0.8, 1, true);//winr
-					DrawUtils::drawText(textPoss, &s, MC_Color(255, 255, 255), 0.8, 1, true);
-					DrawUtils::drawText(hpdpos, &hpDifferenceStr2, MC_Color(color), 0.8, 1, true);
-					DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
-					if (targetList[0]->damageTime > 1) {
-						DrawUtils::fillRectangleA(vec4_t(positionX + 5, positionY + 5, 35 + positionX, positionY + 35), MC_Color(255, 0, 0, steveOpacity));
+					if (interface->Fonts.getSelectedValue() == 0)
+					{
+						string distance = string(GRAY) + "          Distance: " + string(RESET) + to_string((int)dist) + string(".") + to_string((int)(dist * 10) - ((int)dist * 10));
+						string name = string(GRAY) + "                    Name: " + string(RESET);
+						string rawName = targetList[0]->getNameTag()->getText();
+						rawName = Utils::sanitize(rawName);
+						rawName = name + rawName;
+						rawName = rawName.substr(0, rawName.find('\n'));
+						if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
+						else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
+						vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight - 11);
+						DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), true);
+						DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 0, 0, steveOpacity), true);
+						//		DrawUtils::drawRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), false);
+						vec4_t healthRect = vec4_t(testRect.x + 38, testRect.y + 27, testRect.x + 38 + ((targetLen + 10.5) / 18) * displayhealth2, testRect.y + 30);
+						string s = healthDisplay + "";
+						vec2_t textPoss = {
+							healthRect.z,
+							healthRect.y - 1
+						};
+						vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + absorbtion * 4.f, testRect.y + 29);
+						if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + absorbtion * 4.f, testRect.y + 41);
+						vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + targetLen - 4.f, testRect.y + 30);
+						if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + targetLen - 4.f, testRect.y + 41);
+						vec2_t distPos = vec2_t(testRect.x + 39, testRect.y + 15);
+						vec2_t hpdpos = vec2_t(testRect.x + 74, testRect.y + 15);
+						DrawUtils::fillRoundRectangle(healthRect, interfaceColor, 255);
+						DrawUtils::drawText(distPos, &winr, MC_Color(255, 255, 255), 0.8, 1, true);//winr
+						DrawUtils::drawText(textPoss, &s, MC_Color(255, 255, 255), 0.8, 1, true);
+						DrawUtils::drawText(hpdpos, &hpDifferenceStr2, MC_Color(color), 0.8, 1, true);
+						DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
+						if (targetList[0]->damageTime > 1) {
+							DrawUtils::fillRectangleA(vec4_t(positionX + 5, positionY + 5, 35 + positionX, positionY + 35), MC_Color(255, 0, 0, steveOpacity));
+						}
+					}
+					else
+					{
+						string distance = string(GRAY) + "          Distance: " + string(RESET) + to_string((int)dist) + string(".") + to_string((int)(dist * 10) - ((int)dist * 10));
+						string name = string(GRAY) + "                    Name: " + string(RESET);
+						string rawName = targetList[0]->getNameTag()->getText();
+						rawName = Utils::sanitize(rawName);
+						rawName = name + rawName;
+						rawName = rawName.substr(0, rawName.find('\n'));
+						if (rawName.length() < distance.length()) targetLen = DrawUtils::getTextWidth(&distance, 1) + 10.5;
+						else targetLen = DrawUtils::getTextWidth(&rawName, 1) + 6.5;
+						vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight + 1);
+						DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), true);
+						DrawUtils::fillRoundRectangle(testRect, MC_Color(33, 0, 0, steveOpacity), true);
+						//		DrawUtils::drawRoundRectangle(testRect, MC_Color(33, 33, 33, opacity), false);
+						vec4_t healthRect = vec4_t(testRect.x + 38, testRect.y + 27, testRect.x + 38 + ((targetLen + 10.5) / 18) * displayhealth2, testRect.y + 30);
+						string s = healthDisplay + "";
+						vec2_t textPoss = {
+							healthRect.z,
+							healthRect.y - 2
+						};
+						vec4_t absorbtionRect = vec4_t(testRect.x + 39, testRect.y + 26, testRect.x + absorbtion * 4.f, testRect.y + 29);
+						if (showItems) absorbtionRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + absorbtion * 4.f, testRect.y + 41);
+						vec4_t absorbtionSubRect = vec4_t(testRect.x + 39, testRect.y + 28, testRect.x + targetLen - 4.f, testRect.y + 30);
+						if (showItems) absorbtionSubRect = vec4_t(testRect.x + 4, testRect.y + 38, testRect.x + targetLen - 4.f, testRect.y + 41);
+						vec2_t distPos = vec2_t(testRect.x + 39, testRect.y + 15);
+						vec2_t hpdpos = vec2_t(testRect.x + 74, testRect.y + 15);
+						DrawUtils::fillRoundRectangle(healthRect, interfaceColor, 255);
+						DrawUtils::drawText(distPos, &winr, MC_Color(255, 255, 255), 0.8, 1, true);//winr
+						DrawUtils::drawText(textPoss, &s, MC_Color(255, 255, 255), 0.8, 1, true);
+						DrawUtils::drawText(hpdpos, &hpDifferenceStr2, MC_Color(color), 0.8, 1, true);
+						DrawUtils::drawImage("textures/entity/steve.png", vec2_t(positionX + 5, positionY + 5), vec2_t(30, 30), vec2_t(0.125f, 0.125f), vec2_t(0.125f, 0.125f));
+						if (targetList[0]->damageTime > 1) {
+							DrawUtils::fillRectangleA(vec4_t(positionX + 5, positionY + 5, 35 + positionX, positionY + 35), MC_Color(255, 0, 0, steveOpacity));
+						}
 					}
 				}
 				
@@ -593,7 +632,9 @@ void TargetHUD::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 				
 				if (mode.getSelectedValue() == 10) {
 						string namestr = "Name: ";
-						string namestrv2 = "       " +  targetName;
+						string namestrv2;
+						if (interface->Fonts.getSelectedValue() == 0) namestrv2 = "       " +  targetName;
+						else namestrv2 = "             " + targetName;
 						vec4_t testRect = vec4_t(positionX, positionY, targetLen + positionX, positionY + defaultRectHeight);
 						vec2_t namePos = vec2_t(testRect.x + 39, testRect.y + 5);
 						vec2_t winrPos = vec2_t(testRect.x + 86, testRect.y + 15);
