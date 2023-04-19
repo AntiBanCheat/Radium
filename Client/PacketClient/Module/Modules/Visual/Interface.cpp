@@ -1,6 +1,5 @@
 #include "Interface.h"
 #include "../pch.h"
-
 Interface::Interface() : IModule(0, Category::VISUAL, "Displays the HUD") {
 	registerEnumSetting("Color", &color, 0);
 	color.addEntry("Rainbow", 0);
@@ -46,7 +45,7 @@ void Interface::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 void Interface::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
+	versionStr = "Beta Build 11";
 	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 
 	static int index = 0;
