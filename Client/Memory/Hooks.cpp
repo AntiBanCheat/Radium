@@ -1,4 +1,4 @@
-﻿#include "Hooks.h"
+#include "Hooks.h"
 
 #include <algorithm>
 #include <glm/ext/matrix_clip_space.hpp>
@@ -607,7 +607,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			string fix = gray + "[*] " + string(RESET);
 
 			string changeLog = (gray + bold + string("RadiumClient-Release") + ": \n" + RESET +
-				gray + bold + interfaceMod->versionStr + ": \n" + RESET +
+				gray + bold + "Beta Build 11: \n" + RESET +
 				gray + bold + "Credits \n" + RESET +
 				fix + "Packet(dead) \n" +
 				fix + "Deq \n" +
