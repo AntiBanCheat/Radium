@@ -1,5 +1,4 @@
 #include "HiveFlytwo.h"
-
 HiveFlytwo::HiveFlytwo() : IModule(0, Category::MOVEMENT, "How the fuck does this bypass ?!?!?") {
 	registerEnumSetting("Mode", &mode, 0);
 	mode.addEntry("Jump", 0);
@@ -50,11 +49,26 @@ void HiveFlytwo::onEnable() {
 		lock->setEnabled(true);
 	}
 	auto aura = moduleMgr->getModule<Killaura>();
+	auto disa = moduleMgr->getModule<Disabler>();
+	auto sped = moduleMgr->getModule<Speed>();
 	if (aura->isEnabled())
 	{
 		aurais = true;
 		aura->setEnabled(false);
 	}
+	else aurais = false;
+	if (disa->isEnabled())
+	{
+		disableris = true;
+		disa->setEnabled(false);
+	}
+	else disableris = false;
+	if (sped->isEnabled())
+	{
+		speedis = true;
+		sped->setEnabled(false);
+	}
+	else speedis = false;
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 }
 
@@ -252,9 +266,21 @@ void HiveFlytwo::onDisable() {
 		lock->setEnabled(false);
 	}
 	auto aura = moduleMgr->getModule<Killaura>();
+	auto disa = moduleMgr->getModule<Disabler>();
+	auto sped = moduleMgr->getModule<Speed>();
 	if (aurais == true)
 	{
 		aura->setEnabled(true);
 		aurais = false;
+	}
+	if (disableris == true)
+	{
+		disa->setEnabled(true);
+		disableris = false;
+	}
+	if (speedis == true)
+	{
+		sped->setEnabled(true);
+		speedis = false;
 	}
 }
