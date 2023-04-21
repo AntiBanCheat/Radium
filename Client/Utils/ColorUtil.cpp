@@ -57,7 +57,7 @@ MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
 
 MC_Color ColorUtil::interfaceColor(int index) {
 	auto i = moduleMgr->getModule<Interface>();
-	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, i->opacity);
+	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
 
 	switch (i->color.getSelectedValue()) {
 	case 0: color = ColorUtil::rainbowColor(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
