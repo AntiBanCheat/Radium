@@ -6,6 +6,8 @@ class HiveFlytwo : public IModule {
 private:
 	bool dashed = false;
 	bool aurais = false;
+	bool disableris = false;
+	bool speedis = false;
 	bool lock = false;
 	bool cliplimit = false;
 	float speed = 0.5;
