@@ -81,8 +81,15 @@ void HiveFlytwo::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
 	vec3_t moveVec;
+	auto sped = moduleMgr->getModule<Speed>();
 	bool blink = false;
 	if (g_Data.canUseMoveKeys()) {
+		if (sped->isEnabled())
+		{
+			speedis = true;
+			sped->setEnabled(false);
+		}
+		else speedis = false;
 		if (mode.getSelectedValue() == 2 || mode.getSelectedValue() == 3)
 		{
 			if (!aids)
