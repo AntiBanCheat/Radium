@@ -12,12 +12,12 @@ private:
 	float spacing = 0.f;
 public:
 	int opacity = 150;
-	int coloropacity = 150;
+	int arraycoloropa = 150;
+	int whiteopacity = 0;
 	bool focused = false;
 	bool invert = false;
 	bool modes = true;
 	bool keybinds = false;
-	bool backgroundsync = false;
 	// Positions
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 	float positionX = windowSize.x;
