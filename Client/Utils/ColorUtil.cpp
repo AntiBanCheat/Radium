@@ -72,8 +72,8 @@ MC_Color ColorUtil::rainbowColortwo(float seconds, float saturation, float brigh
 	float hue6 = (((TimerUtil::getCurrentMs() + index) % (int)(6000)) / (float)(6000));
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
-
-	return MC_Color(r * 255, g * 255, b * 255, 255);
+	auto arrayl = moduleMgr->getModule<ArrayList>();
+	return MC_Color(r * 255, g * 255, b * 255, arrayl->coloropacity);
 }
 
 MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -89,8 +89,8 @@ MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green
 	int redPart = (int)(r * red * inverse_percent + r * red2 * aids123);
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
-
-	return MC_Color(redPart, greenPart, bluePart);
+	auto arrayl = moduleMgr->getModule<ArrayList>();
+	return MC_Color(redPart, greenPart, bluePart, arrayl->coloropacity);
 }
 
 MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -102,8 +102,8 @@ MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int gre
 	int redPart = (int)(red * inverse_percent + red2 * aids123);
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
-
-	return MC_Color(redPart, greenPart, bluePart);
+	auto arrayl = moduleMgr->getModule<ArrayList>();
+	return MC_Color(redPart, greenPart, bluePart, arrayl->coloropacity);
 }
 
 MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
@@ -114,8 +114,8 @@ MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
 	if (hue > 0.5) { hue = 0.5F - (hue - 0.5f); } hue += 0.5f;
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
-
-	return MC_Color(r * 255, g * 255, b * 255, 255);
+	auto arrayl = moduleMgr->getModule<ArrayList>();
+	return MC_Color(r * 255, g * 255, b * 255, arrayl->coloropacity);
 }
 
 MC_Color ColorUtil::interfaceColortwo(int index) {
