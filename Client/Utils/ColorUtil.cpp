@@ -9,7 +9,7 @@ MC_Color ColorUtil::rainbowColor(float seconds, float saturation, float brightne
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
+	return MC_Color(r * 255, g * 255, b * 255, interface->coloropacity);
 }
 
 MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -26,7 +26,7 @@ MC_Color ColorUtil::RGBWave(int red, int green, int blue, int red2, int green2, 
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
+	return MC_Color(redPart, greenPart, bluePart, interface->coloropacity);
 }
 
 MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -40,7 +40,7 @@ MC_Color ColorUtil::waveColor(int red, int green, int blue, int red2, int green2
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
 
-	return MC_Color(redPart, greenPart, bluePart, interface->opacity);
+	return MC_Color(redPart, greenPart, bluePart, interface->coloropacity);
 }
 
 MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
@@ -52,12 +52,12 @@ MC_Color ColorUtil::astolfoRainbow(int yOffset, int yTotal) {
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
 
-	return MC_Color(r * 255, g * 255, b * 255, interface->opacity);
+	return MC_Color(r * 255, g * 255, b * 255, interface->coloropacity);
 }
 
 MC_Color ColorUtil::interfaceColor(int index) {
 	auto i = moduleMgr->getModule<Interface>();
-	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
+	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, i->coloropacity);
 
 	switch (i->color.getSelectedValue()) {
 	case 0: color = ColorUtil::rainbowColor(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
@@ -73,7 +73,7 @@ MC_Color ColorUtil::rainbowColortwo(float seconds, float saturation, float brigh
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
 	auto arrayl = moduleMgr->getModule<ArrayList>();
-	return MC_Color(r * 255, g * 255, b * 255, arrayl->coloropacity);
+	return MC_Color(r * 255, g * 255, b * 255, arrayl->arraycoloropa);
 }
 
 MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -90,7 +90,7 @@ MC_Color ColorUtil::RGBWavetwo(int red, int green, int blue, int red2, int green
 	int greenPart = (int)(g * green * inverse_percent + g * green2 * aids123);
 	int bluePart = (int)(b * blue * inverse_percent + b * blue2 * aids123);
 	auto arrayl = moduleMgr->getModule<ArrayList>();
-	return MC_Color(redPart, greenPart, bluePart, arrayl->coloropacity);
+	return MC_Color(redPart, greenPart, bluePart, arrayl->arraycoloropa);
 }
 
 MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int green2, int blue2, long index) {
@@ -103,7 +103,7 @@ MC_Color ColorUtil::waveColortwo(int red, int green, int blue, int red2, int gre
 	int greenPart = (int)(green * inverse_percent + green2 * aids123);
 	int bluePart = (int)(blue * inverse_percent + blue2 * aids123);
 	auto arrayl = moduleMgr->getModule<ArrayList>();
-	return MC_Color(redPart, greenPart, bluePart, arrayl->coloropacity);
+	return MC_Color(redPart, greenPart, bluePart, arrayl->arraycoloropa);
 }
 
 MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
@@ -115,12 +115,13 @@ MC_Color ColorUtil::astolfoRainbowtwo(int yOffset, int yTotal) {
 	float r, g, b = 0;
 	Utils::HSVtoRGB(hue, 0.5, 1.f, r, g, b);
 	auto arrayl = moduleMgr->getModule<ArrayList>();
-	return MC_Color(r * 255, g * 255, b * 255, arrayl->coloropacity);
+	return MC_Color(r * 255, g * 255, b * 255, arrayl->arraycoloropa);
 }
 
 MC_Color ColorUtil::interfaceColortwo(int index) {
 	auto i = moduleMgr->getModule<Interface>();
-	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
+	auto a = moduleMgr->getModule<ArrayList>();
+	auto color = ColorUtil::rainbowColor(8, 1.F, 1.F, a->arraycoloropa);
 
 	switch (i->color.getSelectedValue()) {
 	case 0: color = ColorUtil::rainbowColortwo(8, i->saturation, 1.F, -index * 4.f); break; /* Rainbow */
