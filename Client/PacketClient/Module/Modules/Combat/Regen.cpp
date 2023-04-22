@@ -195,7 +195,7 @@ void Regen::onTick(C_GameMode* gm) {
 						player->yawUnused1 = angle.y;
 						player->pitch = angle.x;
 					}
-					if (enabledticks > minedelay)
+					if (enabledticks > minedelay - 1)
 					{
 						breaknow = true;
 					}
@@ -354,7 +354,7 @@ void Regen::onTick(C_GameMode* gm) {
 						player->setRot(angle);
 						MoveUtil::fullStop(true);
 					}
-					if (enabledticks > minedelay)
+					if (enabledticks > minedelay - 1)
 					{
 						breaknow = true;
 					}
