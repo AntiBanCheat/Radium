@@ -17,9 +17,9 @@ ArrayList::ArrayList() : IModule(0, Category::VISUAL, "Displays enabled modules"
 	registerBoolSetting("Modes", &modes, modes);
 	registerBoolSetting("Keybinds", &keybinds, keybinds);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
-	registerIntSetting("ColorOpacity", &coloropacity, coloropacity, 0, 255);
+	registerIntSetting("ColorOpacity", &arraycoloropa, arraycoloropa, 0, 255);
+	registerIntSetting("WhiteOpacity", &whiteopacity, whiteopacity, 0, 255);
 	registerFloatSetting("Spacing", &spacing, spacing, 0.f, 1.f);
-	registerBoolSetting("BackGroundSync", &backgroundsync, backgroundsync);
 	shouldHide = true;
 }
 
@@ -173,10 +173,9 @@ void ArrayList::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 			// Drawing
 			auto interfaceColor = ColorUtil::interfaceColor(curIndex);
 			auto interfaceColortwo = ColorUtil::interfaceColortwo(curIndex);
-			if (backgroundsync) {
-				if (coloropacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(interfaceColortwo));
-			}
+			if (arraycoloropa > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(interfaceColortwo));
 			if (opacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(0, 0, 0, opacity));
+			if (whiteopacity > 0) DrawUtils::fillRectangleA(rectPos, MC_Color(255, 255, 255, whiteopacity));
 
 			switch (mode.getSelectedValue()) {
 			case 0:
