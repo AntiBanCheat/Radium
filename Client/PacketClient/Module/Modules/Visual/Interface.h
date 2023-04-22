@@ -18,6 +18,7 @@ public:
 	bool release = true;
 	bool tabGUI = false;
 	int opacity = 150;
+	int coloropacity = 255;
 	bool info = true;
 	bool ping = true;
 	bool fps = true;
