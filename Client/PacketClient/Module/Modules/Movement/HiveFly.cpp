@@ -230,9 +230,7 @@ void HiveFly::onDisable() {
 		//player->velocity.x = 0.f;
 		//player->velocity.y = 0.f;
 		//player->velocity.z = 0.f;
-		if (mode.getSelectedValue() == 3) {
-			MoveUtil::stop(false);
-		}
+		MoveUtil::stop(false);
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
 	}
 }
