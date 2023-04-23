@@ -1,12 +1,14 @@
 #include "Derp.h"
 #include "../pch.h"
 
+int b;
+
 Derp::Derp() : IModule(0, Category::OTHER, "Makes you look retarded") {
 	registerBoolSetting("Headless", &headless, headless);
 	registerBoolSetting("Twerk", &twerk, twerk);
 	registerBoolSetting("Spin", &spin, spin);
 	registerBoolSetting("Silent", &silent, silent);
-	registerFloatSetting("Speed", &speed, speed, 0, 200);
+	registerFloatSetting("Speed", &speed, speed, 1, 50);
 	registerIntSetting("Delay", &delay, delay, 0, 10);
 }
 
@@ -17,12 +19,17 @@ const char* Derp::getModuleName() {
 void Derp::onEnable() {
 	tick = -2;
 }
-
+int bodyy = 0;
 void Derp::onTick(C_GameMode* gm) {
 	C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
 	auto player = g_Data.getLocalPlayer();
+
+	if (spin) {
+		b += speed;
+		if (b >= 3600000000) b = 0;
+	}
+
 	if (player == nullptr) return;
-	rots += speed;
 	if (twerk) {
 		tick++;
 		if (tick >= delay) { g_Data.getClientInstance()->getMoveTurnInput()->isSneakDown = true; tick = -2; }
@@ -31,13 +38,13 @@ void Derp::onTick(C_GameMode* gm) {
 }
 
 void Derp::onPlayerTick(C_Player* plr) {
+
 	if (plr == nullptr || silent) return;
+
 	if (headless) plr->pitch = -180;
 	if (spin) {
-		if (plr->yawUnused1 > 178) rots = -180;
-		plr->yawUnused1 = rots;
-		plr->pitch = 79;
-		plr->bodyYaw = rots;
+		plr->bodyYaw = b;
+		plr->yawUnused1 = b;
 	}
 }
 
@@ -58,16 +65,11 @@ void Derp::onSendPacket(C_Packet* packet) {
 					authPacket->pitch = -180;
 				}
 				if (spin) {
-					movePacket->headYaw = rots;
-					movePacket->yaw = rots;
-					authPacket->pos.x = 79;
-					authPacket->pos.y = rots;
 				}
-			} else if (spin) {
-				movePacket->headYaw = rots;
-				movePacket->yaw = rots;
-				authPacket->pos.x = 79;
-				authPacket->pos.y = rots;
+			}
+			else if (spin) {
+				movePacket->yaw = b;
+				movePacket->headYaw = b;
 			}
 		}
 	}
