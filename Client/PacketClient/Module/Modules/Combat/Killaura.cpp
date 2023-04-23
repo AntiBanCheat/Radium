@@ -151,7 +151,7 @@ void Killaura::onTick(C_GameMode* gm) {
 
 	float SwordDamage = 0;
 
-	int Sword;
+	int Sword = -1;
 
 	if (!targetList.empty() && autosword.getSelectedValue() > 0) {
 		for (int n = 0; n < 36; n++) {
@@ -166,7 +166,9 @@ void Killaura::onTick(C_GameMode* gm) {
 				}
 			}
 		}
-		supplies->selectedHotbarSlot = Sword;
+
+		if (Sword != -1)
+			supplies->selectedHotbarSlot = Sword;
 	}
 
 	if (g_Data.canUseMoveKeys() && !targetList.empty()) {
