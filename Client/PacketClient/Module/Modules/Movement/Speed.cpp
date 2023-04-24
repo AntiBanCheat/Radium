@@ -26,9 +26,10 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	//mode.addEntry("Packet", 9);
 	mode.addEntry("TPBoost", 9);
 	mode.addEntry("Halcyon", 10);
-	mode.addEntry("Flareon", 11);
-	mode.addEntry("DamageSafe", 12);
-	mode.addEntry("DmgFlySpeed", 13); //only beta
+	mode.addEntry("DamageSafe", 11);
+#ifdef _DEBUG
+	mode.addEntry("DmgFlySpeed", 12); //only beta
+#endif // _DEBUG
 
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
@@ -72,8 +73,6 @@ void Speed::onEnable() {
 void Speed::onTick(C_GameMode* gm) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
-	if (mode.getSelectedValue() == 11) player->setSprinting(true);
 
 	if (enabledTicks > 10) enabledTicks++;
 	else enabledTicks = 0;
@@ -314,29 +313,13 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				fricspeed = randomFloat(random2, random3);
 				speedFriction = speed + fricspeed;
 			}
-			else MoveUtil::setSpeed(speedFriction);
-		}
-	}
-
-	// Flareon2
-	if (mode.getSelectedValue() == 11) {
-		static bool useVelocity = false;
-		// eat my absctrionalie
-		if (height >= 0.385) {
-			if (player->onGround && pressed) { player->jumpFromGround(); useVelocity = false; }
-		}
-		else useVelocity = true;
-		if (height <= 0.04 && !input->isJumping) { player->jumpFromGround(); player->velocity.y += height; useVelocity = false; }
-
-		if (speedFriction > 0.25) speedFriction *= duration;
-		if (pressed) {
-			if (player->onGround) {
-				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				random3 = 0 - random2;
-				fricspeed = randomFloat(random2, random3);
-				speedFriction = speed + fricspeed;
+			else {
+				if (damageMotion != 0 && damageMotion >= 0.15f) {
+					speedFriction = damageMotion + speed * (damagespeed / 10);
+					damageMotion = 0;
+				}
+				MoveUtil::setSpeed(speedFriction);
 			}
-			else MoveUtil::setSpeed(speedFriction);
 		}
 	}
 
@@ -440,7 +423,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	}
 
 	//DamageBoost
-	if (mode.getSelectedValue() == 12) {
+	if (mode.getSelectedValue() == 11) {
 		if (pressed) {
 			if (player->onGround) {
 				random3 = 0 - random2;
@@ -469,7 +452,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		}
 	}
 	//DamageFly       only beta
-	if (mode.getSelectedValue() == 13) {
+	if (mode.getSelectedValue() == 12) {
 		if (pressed) {
 			if (player->onGround) {
 				random3 = 0 - random2;
