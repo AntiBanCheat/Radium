@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ModuleManager.h"
-#include "Module.h"
+#include "../../ModuleManager.h"
+#include "../Module.h"
 
 class AutoTool : public IModule {
 public:

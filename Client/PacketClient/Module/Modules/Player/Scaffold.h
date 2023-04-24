@@ -6,8 +6,10 @@ class Scaffold : public IModule {
 private:
 	int offGroundTicks = 0;
 	bool uwu = false;
+	bool awa = false;
 
 	int intPosY = 0;
+	bool placeMoreUnder = false;
 	bool shouldSwing = false;
 	bool towerOnlyNoMove = false;
 	bool foundBlock = false;
