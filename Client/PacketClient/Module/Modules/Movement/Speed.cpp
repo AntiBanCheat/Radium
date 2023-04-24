@@ -313,13 +313,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				fricspeed = randomFloat(random2, random3);
 				speedFriction = speed + fricspeed;
 			}
-			else {
-				if (damageMotion != 0 && damageMotion >= 0.15f) {
-					speedFriction = damageMotion + speed * (damagespeed / 10);
-					damageMotion = 0;
-				}
-				MoveUtil::setSpeed(speedFriction);
-			}
+			else MoveUtil::setSpeed(speedFriction);
 		}
 	}
 
