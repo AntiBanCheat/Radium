@@ -23,7 +23,7 @@ void ChatSuffix::onSendPacket(C_Packet* packet) {
 		if (i >= 7 && i <= 9) end = " | Yadium";
 		if (i > 9) end = " | Radium";
 #ifdef _DEBUG
-		end = " | RadiumBeta";
+		end += "Beta";
 #endif // _DEBUG
 
 		Sentence = funy->message.getText() + end;

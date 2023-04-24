@@ -12,6 +12,7 @@ private:
 	int damagespeed = 2;
 	bool groundcheck;
 	bool rotate;
+	bool fullstop;
 	float oldx;
 	float oldz;
 	float animYaw = 0.0;

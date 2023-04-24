@@ -40,6 +40,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
 	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
+	registerBoolSetting("FullStop", &fullstop, fullstop); // Prevents flags cause instantly stops
 	//registerBoolSetting("DesnycBoost", &dboost, dboost);
 	//registerBoolSetting("Rotate", &rotate, rotate);
 }
@@ -120,7 +121,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	if (player == nullptr) return;
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 	bool pressed = MoveUtil::keyPressed();
-	if (!pressed) MoveUtil::stop(false);
+	if (!pressed && fullstop) MoveUtil::stop(false);
 	if (mode.getSelectedValue() != 11) player->setSprinting(true);
 
 	float yaw = player->yaw;
@@ -535,7 +536,7 @@ void Speed::onDisable() {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	MoveUtil::stop(false);
+	if (fullstop) MoveUtil::stop(false);
 
 	preventKick = false;
 	packetsSent = 0;
