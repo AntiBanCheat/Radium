@@ -7,6 +7,7 @@ uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
 int fakespoofticks = 0;
+int rundown;
 
 
 using namespace std;
@@ -117,6 +118,7 @@ void Scaffold::onEnable() {
 
 	fakespoofticks = 0;
 	canspoof = false;
+	rundown = 0;
 
 	auto speedMod = moduleMgr->getModule<Speed>();
 	if (speedMod->isEnabled() && preventkicks) {
@@ -224,9 +226,16 @@ void Scaffold::onTick(C_GameMode* gm) {
 	blockBelowPredict.y -= player->height;
 	blockBelowPredict.y -= 0.5f;
 
+	//underblock
 	if (placeMoreUnder) {
-		if (awa) blockBelow.y = blockBelowPredict.y - 1;
-		awa = !awa;
+		if (rundown > 0)
+		{
+			blockBelow.y -= 1;
+			buildBlock(blockBelow);
+			blockBelow.y += 1;
+			rundown = 0;
+		}
+		else rundown++;
 	}
 
 	bool downwardPlaced = false;
@@ -740,7 +749,7 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 					movePacket->headYaw = blockPosition.y;
 					movePacket->yaw = blockPosition.y;
 					movePacket->pitch = blockPosition.x;
-						
+
 					authInputPacket->pos.y = blockPosition.y;
 					authInputPacket->pos.x = blockPosition.x;
 					break;
@@ -748,7 +757,7 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 					movePacket->headYaw = animBack;
 					movePacket->yaw = animBack;
 					movePacket->pitch = 75;
-						
+
 					authInputPacket->pos.y = animBack;
 					authInputPacket->pos.x = 75;
 					break;
@@ -756,14 +765,14 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 					movePacket->headYaw = animFlareon;
 					movePacket->yaw = animFlareon;
 					movePacket->pitch = 80;
-						
+
 					authInputPacket->pos.y = animFlareon;
 					authInputPacket->pos.x = 80;
 					break;
 				case 8: // Smart
 					authInputPacket->pos.y = animFlareon;
-					authInputPacket->pos.x = animFlareonPitch;	
-						
+					authInputPacket->pos.x = animFlareonPitch;
+
 					movePacket->headYaw = animFlareon;
 					movePacket->yaw = animFlareon;
 					movePacket->pitch = animFlareonPitch;
