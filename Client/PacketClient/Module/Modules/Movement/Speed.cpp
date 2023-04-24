@@ -40,7 +40,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
 	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
-	registerBoolSetting("FullStop", &fullstop, fullstop); // Prevents flags cause instantly stops
+	///registerBoolSetting("FullStop", &fullstop, fullstop); // Prevents flags cause instantly stops
 	//registerBoolSetting("DesnycBoost", &dboost, dboost);
 	//registerBoolSetting("Rotate", &rotate, rotate);
 }
