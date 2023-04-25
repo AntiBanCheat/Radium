@@ -6,8 +6,6 @@ uintptr_t HiveRotations2 = Utils::getBase() + 0x8F87C7;
 uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
-int fakespoofticks = 0;
-int rundown;
 
 
 using namespace std;
@@ -40,6 +38,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	extendType.addEntry("Celsius", 0);
 	extendType.addEntry("Radium", 1);
 	extendType.addEntry("Packet", 2);
+	extendType.addEntry("Zephyr", 3);
 	registerEnumSetting("PlaceDelay", &placemode, 0);
 	placemode.addEntry("Normal", 0);
 	placemode.addEntry("Telly", 1);
@@ -252,12 +251,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 		blockBelow.x = blockBelow.x += cos(cal) * 0.5f; blockBelow.z = blockBelow.z += sin(cal) * 0.5f;
 		if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
 			if (velocityxz > 0.f) {
-				auto aura = moduleMgr->getModule<Killaura>();
-				if (aura->isEnabled())
-				{
-					aurais = true;
-					aura->setEnabled(false);
-				}
 				blockBelow15.z -= vel.z * 0.4f;
 				blockBelow15.z -= vel.z * 0.4f;
 				if (!buildBlock(blockBelow15) && !buildBlock(blockBelow2)) {
@@ -275,15 +268,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 							buildBlock(blockBelow2);
 						}
 					}
-				}
-			}
-			else
-			{
-				auto aura = moduleMgr->getModule<Killaura>();
-				if (aurais)
-				{
-					aura->setEnabled(true);
-					aurais = false;
 				}
 			}
 		}
@@ -351,16 +335,10 @@ void Scaffold::onTick(C_GameMode* gm) {
 	//Radium
 	if (extendType.getSelectedValue() == 1)
 	{
-		currExtend = extend + 1.2;
+		currExtend = extend;
 
 		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
 		{
-			auto aura = moduleMgr->getModule<Killaura>();
-			if (aura->isEnabled())
-			{
-				aurais = true;
-				aura->setEnabled(false);
-			}
 			for (int i = 0; i <= currExtend; i++)
 			{
 				Odelay++;
@@ -408,15 +386,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 				else buildBlock(blockBelow);
-			}
-		}
-
-		if ((!(jumping || sneaking) && velocityxz <= 0.01) || !MoveUtil::isMoving) {
-			auto aura = moduleMgr->getModule<Killaura>();
-			if (aurais == true)
-			{
-				aura->setEnabled(true);
-				aurais = false;
 			}
 		}
 
@@ -476,6 +445,87 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 
 		oldpos = blockBelow.floor();
+	}
+
+	//Zephyr
+	if (extendType.getSelectedValue() == 3)
+	{
+		currExtend = extend;
+		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+		{
+			//extend
+			if (Odelay > 3) Odelay = 0;
+			Odelay++;
+			int extend2 = currExtend;
+			vec3_t defaultblockBelow = blockBelow;
+			for (int i = 0; i < extend2; i++) {
+				if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * i; blockBelow.z += vel.z * i; }
+
+				if (isBlockReplacable(blockBelow))
+				{
+					if (Odelay == 0)
+					{
+						for (int i = 0; i < 5; i++) {
+							if (isBlockReplacable(blockBelow)) {
+								predictBlock(blockBelow);
+							}
+						}
+					}
+					else
+					{
+						predictBlock(blockBelow);
+					}
+				}
+				else if (!buildBlock(blockBelow)) {
+					if (velocityxz > 0.f) {  // Are we actually walking?
+						blockBelow.x -= vel.x;
+						blockBelow.z -= vel.z;
+						if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+							blockBelow.x += vel.x;
+							blockBelow.z += vel.z;
+							buildBlock(blockBelow);
+						}
+					}
+				}
+			}
+
+			blockBelow = defaultblockBelow;
+			if (!jumping && velocityxz >= 0.01) { blockBelow.x += vel.x * currExtend; blockBelow.z += vel.z * currExtend; }
+
+			if (isBlockReplacable(blockBelow)) {
+				if (Odelay == 0)
+				{
+					for (int i = 0; i < 5; i++) {
+						if (isBlockReplacable(blockBelow)) {
+							predictBlock(blockBelow);
+						}
+					}
+				}
+				else
+				{
+					predictBlock(blockBelow);
+				}
+			}
+			else if (!buildBlock(blockBelow)) {
+				if (velocityxz > 0.f) {  // Are we actually walking?
+					blockBelow.x -= vel.x;
+					blockBelow.z -= vel.z;
+					if (!buildBlock(blockBelow) && g_Data.getLocalPlayer()->isSprinting()) {
+						blockBelow.x += vel.x;
+						blockBelow.z += vel.z;
+						buildBlock(blockBelow);
+					}
+				}
+			}
+		}
+		else
+		{
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+			{
+				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
+				else buildBlock(blockBelow);
+			}
+		}
 	}
 
 
@@ -571,13 +621,6 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 
 	if (jumping && foundBlock) {
 		uwu = true;
-
-		auto aura = moduleMgr->getModule<Killaura>();
-		if (aura->isEnabled())
-		{
-			aurais = true;
-			aura->setEnabled(false);
-		}
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(towerTimer);
 		switch (tower.getSelectedValue()) {
 		case 0: // Vanilla
@@ -685,7 +728,7 @@ void Scaffold::onPlayerTick(C_Player* plr) {
 			else if (animBack < back.y) animBack += ((back.y - animBack) / rotspeed);
 		}
 
-		if (speed > 0.05f || GameData::isKeyDown(*input->spaceBarKey)) {
+		if ((speed > 0.05f || GameData::isKeyDown(*input->spaceBarKey)) && !moduleMgr->getModule<Killaura>()->atk) {
 			switch (rotations.getSelectedValue()) {
 			case 0: // Normal
 			case 1: // Hive
@@ -1080,12 +1123,6 @@ void Scaffold::onDisable() {
 	if (firstlock) lockY = true;
 	else lockY = false;
 	if (speedwasenabled) { speedMod->setEnabled(true); speedwasenabled = false; }
-	auto aura = moduleMgr->getModule<Killaura>();
-	if (aurais == true)
-	{
-		aura->setEnabled(true);
-		aurais = false;
-	}
 	if (tower.getSelectedValue() == 1 && foundBlock && jumping) player->velocity.y = 0.f;
 	C_PlayerInventoryProxy* supplies = player->getSupplies();
 	selectBlock();
