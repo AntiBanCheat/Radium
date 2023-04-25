@@ -43,13 +43,14 @@ private:
 	int timer = 20;
 	int range = 4;
 	int slot = 0;
-	float telly =0.1;
+	float telly = 0.1;
+	int fakespoofticks = 0;
+	int rundown;
 	vec3_t blockBelowY;
 
 	bool sneaking = false;
 	bool jumping = false;
 	bool oneDot12 = true;
-	bool aurais = false;
 	bool digbypass = false;
 
 	bool findBlocks(C_ItemStack* itemStack);
@@ -60,7 +61,7 @@ private:
 	bool selectBlock();
 
 	// Positions
-	vec3_t calcPos = vec3_t{0, 0, 0};
+	vec3_t calcPos = vec3_t{ 0, 0, 0 };
 	vec3_t initialPos;
 	vec3_t blockPos;
 	vec3_t backPos;
