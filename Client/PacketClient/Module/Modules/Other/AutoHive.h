@@ -10,9 +10,10 @@ private:
 	float animYaw = 0.f;
 public:
 	bool lootBoxListEmpty = true;
-	bool autoBridgeWin = false;
+	bool autoBridgeWin = true;
 	bool autoQueue = true;
 	bool doLerp = true;
+	bool autosb = false;
 	bool sendcommand = false;
 
 	virtual void onSendPacket(C_Packet* packet) override;
