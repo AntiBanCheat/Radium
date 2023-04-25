@@ -7,6 +7,7 @@ using namespace std;
 AutoHive::AutoHive() : IModule(0, Category::OTHER, "Automates things on The Hive") {
 	registerBoolSetting("AutoLootBox", &autoLootBox, autoLootBox);
 	registerBoolSetting("AutoQueue", &autoQueue, autoQueue);
+	registerBoolSetting("AutoSnow", &autosb, autosb);
 	registerBoolSetting("AutoBridgeWin", &autoBridgeWin, autoBridgeWin);
 }
 
@@ -47,6 +48,35 @@ void findEntity_AH(C_Entity* currentEntity, bool isRegularEntity) {
 	}
 }
 
+static vector<C_Entity*> entityList2;
+void findEntity_AH2(C_Entity* currentEntity, bool isRegularEntity) {
+	static auto autoHive = moduleMgr->getModule<AutoHive>();
+	static auto killaura = moduleMgr->getModule<Killaura>();
+
+	if (autoHive->autosb) {
+
+		if (currentEntity == nullptr) return;
+		if (currentEntity == g_Data.getLocalPlayer()) return;
+		if (!g_Data.getLocalPlayer()->canAttack(currentEntity, false)) return;
+		if (!g_Data.getLocalPlayer()->isAlive()) return;
+		if (!currentEntity->isAlive()) return;
+		if (currentEntity->getEntityTypeId() == 80 || currentEntity->getEntityTypeId() == 69) return;
+
+		if (killaura->mobs) {
+			if (currentEntity->getNameTag()->getTextLength() <= 1 && currentEntity->getEntityTypeId() == 63) return;
+			if (currentEntity->width <= 0.01f || currentEntity->height <= 0.01f) return;
+			if (currentEntity->getEntityTypeId() == 64) return;
+		}
+		else {
+			if (!TargetUtil::isValidTarget(currentEntity)) return;
+			if (currentEntity->getEntityTypeId() == 51 || currentEntity->getEntityTypeId() == 1677999) return;
+		}
+
+		float dist = (*currentEntity->getPos()).dist(*g_Data.getLocalPlayer()->getPos());
+		if (dist < killaura->range) entityList2.push_back(currentEntity);
+	}
+}
+
 struct CompareTargetEnArray {
 	bool operator()(C_Entity* lhs, C_Entity* rhs) {
 		C_LocalPlayer* localPlayer = g_Data.getLocalPlayer();
@@ -56,11 +86,20 @@ struct CompareTargetEnArray {
 
 void AutoHive::onEnable() {
 	entityList.clear();
+	entityList2.clear();
 	if (autoBridgeWin) doLerp = true;
 	sendcommand = false;
 }
 
+vector<string> snowball = {
+	"snowball"
+};
+
+
 void AutoHive::onTick(C_GameMode* gm) {
+
+	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+
 	auto killaura = moduleMgr->getModule<Killaura>();
 	auto player = g_Data.getLocalPlayer();
 	auto timerUtil = new TimerUtil();
@@ -68,12 +107,34 @@ void AutoHive::onTick(C_GameMode* gm) {
 
 	entityList.clear();
 	g_Data.forEachEntity(findEntity_AH);
+	entityList2.clear();
+	g_Data.forEachEntity(findEntity_AH2);
 	lootBoxListEmpty = entityList.empty();
+
+	C_Inventory* inv = supplies->inventory;
+	auto prevSlot = supplies->selectedHotbarSlot;
+
+	if (autosb && !entityList2.empty()) {
+		for (int n = 0; n < 36; n++) {
+			C_ItemStack* stack = inv->getItemStack(n);
+			if (stack->item != nullptr) {
+				string ItemName2 = stack->getItem()->name.getText();
+				if (ItemName2.find("snowball") != string::npos) {
+					if (prevSlot != n) {
+						supplies->selectedHotbarSlot = n;
+						gm->useItem(*stack);
+						supplies->selectedHotbarSlot = prevSlot;
+						return;
+					}
+				}
+			}
+		}
+	}
 
 	//AutoQueue
 	if (sendcommand) {
 		CommandRequestPacket commandPacket;
-		commandPacket.payload = string("q sky");
+		commandPacket.payload = string("/me");
 		commandPacket.one = 1;
 		commandPacket.two = 2;
 		g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&commandPacket);
@@ -100,6 +161,12 @@ void AutoHive::onPlayerTick(C_Player* plr) {
 	auto killaura = moduleMgr->getModule<Killaura>();
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
+
+	auto selectedItem = player->getSelectedItem();
+
+	if (autosb) {
+		auto selectedItem = plr->getSelectedItem();
+	}
 
 	if (g_Data.canUseMoveKeys() && killaura->targetListEmpty && !autoBridgeWin) {
 		vec2_t angle;
