@@ -3,6 +3,8 @@
 #include "../../../../SDK/CAttribute.h"
 #include "../pch.h"
 
+int Odelay;
+
 using namespace std;
 AutoHive::AutoHive() : IModule(0, Category::OTHER, "Automates things on The Hive") {
 	registerBoolSetting("AutoLootBox", &autoLootBox, autoLootBox);
@@ -89,6 +91,7 @@ void AutoHive::onEnable() {
 	entityList2.clear();
 	if (autoBridgeWin) doLerp = true;
 	sendcommand = false;
+	Odelay = 0;
 }
 
 vector<string> snowball = {
@@ -122,7 +125,11 @@ void AutoHive::onTick(C_GameMode* gm) {
 				if (ItemName2.find("snowball") != string::npos) {
 					if (prevSlot != n) {
 						supplies->selectedHotbarSlot = n;
-						gm->useItem(*stack);
+						Odelay++;
+						if (Odelay >= 3) {
+							gm->useItem(*stack);
+							Odelay = 0;
+						}
 						supplies->selectedHotbarSlot = prevSlot;
 						return;
 					}
