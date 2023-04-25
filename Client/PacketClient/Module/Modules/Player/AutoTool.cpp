@@ -1,4 +1,5 @@
 #include "AutoTool.h"
+#include "../pch.h"
 
 AutoTool::AutoTool() : IModule(0, Category::PLAYER, "Automatically selects the best tool.") {
 	registerBoolSetting("Weapons", &weapon, weapon);
@@ -16,7 +17,6 @@ void AutoTool::onEnable() {
 bool attacknow = false;
 int attacktime = 0;
 int prevslotWeapon = 0;
-
 void AutoTool::onAttack(C_Entity* attackedEnt) {
 	auto player = g_Data.getLocalPlayer();
 	if (!weapon) return;
@@ -44,11 +44,9 @@ void AutoTool::onAttack(C_Entity* attackedEnt) {
 		attacktime = 0;
 	}
 }
-
 void AutoTool::onTick(C_GameMode* gm) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	if (player->pointingStruct->block == nullptr) return;
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
 	if (attacknow) attacktime++;
@@ -71,7 +69,8 @@ void AutoTool::onTick(C_GameMode* gm) {
 			if (!hasClicked) {
 				prevslot = supplies->selectedHotbarSlot;
 				hasClicked = true;
-			} else {
+			}
+			else {
 				int slot = -1;
 				for (int n = 0; n < 9; n++) {
 					C_ItemStack* stack = inv->getItemStack(n);
@@ -86,7 +85,8 @@ void AutoTool::onTick(C_GameMode* gm) {
 				}
 				if (slot != -1) supplies->selectedHotbarSlot = slot;
 			}
-		} else if (hasClicked) {
+		}
+		else if (hasClicked) {
 			supplies->selectedHotbarSlot = prevslot;
 			hasClicked = false;
 		}
