@@ -228,7 +228,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 	//underblock
 	if (placeMoreUnder) {
-		if (rundown > 0)
+		if (rundown > 1)
 		{
 			blockBelow.y -= 1;
 			buildBlock(blockBelow);
