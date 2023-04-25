@@ -36,7 +36,6 @@ InvManager::InvManager() : IModule(0, Category::PLAYER, "Manages your inventory"
 	registerIntSetting("Sword", &swordSlot, swordSlot, 1, 9);
 	registerIntSetting("Pickaxe", &pickSlot, pickSlot, 1, 9);
 	registerIntSetting("Axe", &axeSlot, axeSlot, 1, 9);
-	registerIntSetting("Blocks", &blockSlot, blockSlot, 1, 9);
 	registerIntSetting("Delay", &delay, delay, 0, 30);
 }
 const char* InvManager::getRawModuleName() {
@@ -154,7 +153,7 @@ void InvManager::onTick(C_GameMode* gm) {
 		if (Odelay > delay) {
 			if (!dropSlots.empty()) {
 				for (int i : dropSlots) {
-					player->getSupplies()->inventory->dropSlot(i);
+					player->getSupplies()->inventory->dropSlot(dropSlots[0]);
 					dropSlots.push_back(i);
 				}
 			}
@@ -189,17 +188,12 @@ void InvManager::onTick(C_GameMode* gm) {
 					AxeDamage = currentDamage;
 					Axe = n;
 				}
-				if (stack->getItem()->isBlock() && blockCount > BlockCount) {
-					BlockCount = blockCount;
-					Block = n;
-				}
 			}
 		}
 
 		if (Sword != swordSlot - 1) inv->swapSlots(Sword, swordSlot - 1);
 		if (Pickaxe != pickSlot - 1) inv->swapSlots(Pickaxe, pickSlot - 1);
 		if (Axe != axeSlot - 1) inv->swapSlots(Axe, axeSlot - 1);
-		if (Block != blockSlot - 1) inv->swapSlots(Block, blockSlot - 1);
 	}
 
 	if (autoDisable && g_Data.getLocalPlayer() == nullptr) {
@@ -237,6 +231,8 @@ vector<int> InvManager::findUselessItems() {
 	// Filter by options
 
 	vector<int> uselessItems;
+	vector<int> uselessItems2;
+	vector<int> uselessItems3;
 	vector<C_ItemStack*> items;
 
 	{
@@ -305,17 +301,17 @@ vector<int> InvManager::findUselessItems() {
 				//Sword
 				if (stack->getItem()->isSword() && currentDamage > SwordDamage)
 					SwordDamage = currentDamage;
-				else if (stack->getItem()->isSword())
+				else if (stack->getItem()->isSword() && currentDamage <= SwordDamage)
 					uselessItems.push_back(n);
 				//Pickaxe
 				if (stack->getItem()->isPickaxe() && currentDamage > PickaxeDamage)
 					PickaxeDamage = currentDamage;
-				else if (stack->getItem()->isPickaxe())
+				else if (stack->getItem()->isPickaxe() && currentDamage <= PickaxeDamage)
 					uselessItems.push_back(n);
 				//Axe
 				if (stack->getItem()->isAxe() && currentDamage > AxeDamage)
 					AxeDamage = currentDamage;
-				else if (stack->getItem()->isAxe())
+				else if (stack->getItem()->isAxe() && currentDamage <= AxeDamage)
 					uselessItems.push_back(n);
 			}
 		}
