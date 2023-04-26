@@ -122,7 +122,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 	bool pressed = MoveUtil::keyPressed();
 	if (!pressed && fullstop) MoveUtil::stop(false);
-	if (mode.getSelectedValue() != 11) player->setSprinting(true);
+	if (mode.getSelectedValue() != 10) player->setSprinting(true);
 
 	float yaw = player->yaw;
 
@@ -175,7 +175,8 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				player->jumpFromGround();
-				speedFriction = randomFloat(0.5285087823867798f, 0.49729517102241516f);
+				//speedFriction = randomFloat(0.5285087823867798f, 0.49729517102241516f);
+				speedFriction = 0.5185087823867798f;
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
@@ -183,7 +184,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 
 	// HiveSafe
 	if (mode.getSelectedValue() == 2) {
-		speedFriction *= 0.9400610828399658f;
+		speedFriction *= 0.9500610828399658f;
 		if (pressed) {
 			if (player->onGround) {
 				player->jumpFromGround();
@@ -301,10 +302,19 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		static bool useVelocity = false;
 		// eat my absctrionalie
 		if (height >= 0.385) {
-			if (player->onGround && pressed) { player->jumpFromGround(); useVelocity = false; }
+			if (player->onGround && pressed) { 
+				//player->setRot(vec2_t(yaw, player->pitch));
+				player->jumpFromGround(); 
+				useVelocity = false; 
+			}
 		}
 		else useVelocity = true;
-		if (height <= 0.04 && !input->isJumping) { player->jumpFromGround(); player->velocity.y += height; useVelocity = false; }
+		if (height <= 0.04 && !input->isJumping) { 
+			//player->setRot(vec2_t(yaw, player->pitch));
+			player->jumpFromGround(); 
+			player->velocity.y += height; 
+			useVelocity = false; 
+		}
 
 		if (speedFriction > 0.25) speedFriction *= duration;
 		if (pressed) {
