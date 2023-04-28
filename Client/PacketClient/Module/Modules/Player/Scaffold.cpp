@@ -50,6 +50,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
+	registerBoolSetting("Downwards", &downmode, downmode);
 	registerIntSetting("Extend", &extend, extend, 0, 15);
 	registerIntSetting("ExtendDelay", &delay, delay, 0, 5);
 	registerIntSetting("Timer", &timer, timer, 15, 60);
@@ -115,7 +116,7 @@ void Scaffold::onEnable() {
 	blockBelowY = blockBelowY.floor();
 	if (zipline) blockBelowY.y += 3.f;
 	blockBelowY = blockBelowY.floor();
-	if (diagType.getSelectedValue() == 1) tellydalay = 1;
+	if (diagType.getSelectedValue() == 2) tellydalay = 1;
 	fakespoofticks = 0;
 	canspoof = false;
 	rundown = 0;
@@ -261,7 +262,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 	//Build Down Block
 	bool downwardPlaced = false;
-	if (sneaking && downwards.getSelectedValue() == 0) {
+	if (sneaking && downmode) {
 		downwardPlaced = true;
 		vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
 		blockBelow15.y -= player->height;
@@ -300,7 +301,6 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (extendType.getSelectedValue() == 0)
 	{
 		currExtend = extend;
-
 		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			//extend
