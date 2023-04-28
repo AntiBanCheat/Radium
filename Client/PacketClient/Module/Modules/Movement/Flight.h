@@ -6,6 +6,8 @@
 class Flight : public IModule {
 private:
 	bool speedWasEnabled = false;
+	bool auraWasEnabled = false;
+	bool disablerWasEnabled = false;
 	float speedDuration = 1.f;
 	bool hasJumped = false;
 	bool clip = false;
@@ -20,6 +22,7 @@ private:
 	int tick = 0;
 	bool isUp = false;
 	bool isDown = false;
+	bool dash = false;
 	vec3_t enabledpos;
 	vec3_t oldpos;
 	float falldist;
