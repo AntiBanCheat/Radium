@@ -41,7 +41,7 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	}
 	if (resetname)
 	{
-		moduleMgr->getModule<Interface>()->getClientName() = "Radium";
+		moduleMgr->getModule<Interface>()->getClientName() = "Actinium";
 		resetname = false;
 	}
 	if (g_Data.canUseMoveKeys() && !clickGUI->hasOpenedGUI) {
@@ -50,12 +50,12 @@ void Watermark::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		name = name.substr(0, name.find('\n'));
 		string clientName = interfaceMod->getClientName();
 		string fpsText = to_string(g_Data.getFPS()) + " fps";
-		string skeetLen = "Radiumsense | " + name + " | " + fpsText; string t = "Radium         | " + name + " | " + fpsText; string sense = "sense";
+		string skeetLen = "Actiniumsense | " + name + " | " + fpsText; string t = "Actinium         | " + name + " | " + fpsText; string sense = "sense";
 		string newText = clientName + GRAY + "| " + RESET + WHITE + name;
-		string idk = "Radium";
+		string idk = "Actinium";
 		string idk2 = string(GRAY) + clientName;
 		string len = idk + idk2; // why u lookin over here
-		string cn = "Radium";
+		string cn = "Actinium";
 		float textHeight = 12.f * scale;
 		float textPadding = 1.f * scale;
 
