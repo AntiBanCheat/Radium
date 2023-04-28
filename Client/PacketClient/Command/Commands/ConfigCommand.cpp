@@ -21,8 +21,8 @@ bool ConfigCommand::execute(std::vector<std::string>* args) {
 	} else if (args->at(1) == "save" || args->at(1) == "s") {
 		configMgr->saveConfig();
 		SettingMgr->saveSettings();
-		clientMessageF("[Packet] %sSuccessfully saved config %s%s%s!", GREEN, GRAY, configMgr->currentConfig.c_str(), GREEN);
-		clientMessageF("[Packet] %sSuccessfully saved %s%s%s!", GREEN, GRAY, SettingMgr->currentSettings.c_str(), GREEN);
+		clientMessageF("[Actinium] %sSuccessfully saved config %s%s%s!", GREEN, GRAY, configMgr->currentConfig.c_str(), GREEN);
+		clientMessageF("[Actinium] %sSuccessfully saved %s%s%s!", GREEN, GRAY, SettingMgr->currentSettings.c_str(), GREEN);
 		return true;
 	}
 	return false;
