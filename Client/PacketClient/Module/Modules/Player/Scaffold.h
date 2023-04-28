@@ -83,13 +83,13 @@ public:
 	bool telly2 = false;
 	bool lockY = false;
 	bool canspoof = false;
+	bool downmode = false;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
 	std::vector<vec3_t> exposee;
 	std::string name = ("Scaffold");
 	SettingEnum rotations = this;
-	SettingEnum downwards = this;
 	SettingEnum tower = this;
 	SettingEnum holdType = this;
 	SettingEnum extendType = this;
