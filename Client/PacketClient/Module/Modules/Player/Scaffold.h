@@ -51,7 +51,6 @@ private:
 	bool sneaking = false;
 	bool jumping = false;
 	bool oneDot12 = true;
-	bool digbypass = false;
 
 	bool findBlocks(C_ItemStack* itemStack);
 	bool isUsefulBlock(C_ItemStack* itemStack);
@@ -84,17 +83,17 @@ public:
 	bool telly2 = false;
 	bool lockY = false;
 	bool canspoof = false;
-	bool downmode = false;
 
 	std::vector<vec3_t> placed;
 	std::vector<vec3_ti> highlightCity;
 	std::vector<vec3_t> exposee;
 	std::string name = ("Scaffold");
 	SettingEnum rotations = this;
+	SettingEnum downwards = this;
 	SettingEnum tower = this;
-	SettingEnum placemode = this;
 	SettingEnum holdType = this;
 	SettingEnum extendType = this;
+	SettingEnum diagType = this;
 	bool isBlockAGoodCity(vec3_ti* blk, vec3_ti* personPos);
 
 	virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;
