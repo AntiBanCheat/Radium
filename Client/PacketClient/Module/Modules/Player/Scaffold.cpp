@@ -20,7 +20,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	rotations.addEntry("Smooth", 6);
 	rotations.addEntry("Flareon", 7);
 	rotations.addEntry("Smart", 8);
-	rotations.addEntry("Test", 9);
+	//rotations.addEntry("Test", 9);
 	registerEnumSetting("Tower", &tower, 0);
 	tower.addEntry("Vanilla", 0);
 	tower.addEntry("Timer", 1);
@@ -39,22 +39,22 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	extendType.addEntry("Radium", 1);
 	extendType.addEntry("Packet", 2);
 	extendType.addEntry("Zephyr", 3);
-	registerEnumSetting("PlaceDelay", &placemode, 0);
-	placemode.addEntry("Normal", 0);
-	placemode.addEntry("Telly", 1);
-	placemode.addEntry("Custom", 2);
+	registerEnumSetting("DiagBypass", &diagType, 0);
+	diagType.addEntry("None", 0);
+	diagType.addEntry("UnderBlock", 1);
+	diagType.addEntry("DelayPlace", 2);
+	diagType.addEntry("UpBlock", 3);
+	diagType.addEntry("NoSpeed", 4);
+	//diagType.addEntry("CustomDelay", 5);
 
 	registerBoolSetting("LockY", &lockY, lockY);
 	registerBoolSetting("TowerNoMove", &towerOnlyNoMove, towerOnlyNoMove);
 	registerBoolSetting("NoSpeed", &preventkicks, preventkicks);
-	registerBoolSetting("Downwards", &downmode, downmode);
 	registerIntSetting("Extend", &extend, extend, 0, 15);
 	registerIntSetting("ExtendDelay", &delay, delay, 0, 5);
 	registerIntSetting("Timer", &timer, timer, 15, 60);
 	registerIntSetting("RotSpeed", &rotspeed, rotspeed, 1, 50);
 	registerIntSetting("PlaceDelay", &tellydalay, tellydalay, 0, 20);
-	registerFloatSetting("TellyDistance", &telly, telly, 0.01f, 1.f);
-	registerBoolSetting("PlaceMoreUnder", &placeMoreUnder, placeMoreUnder);
 	//registerEnumSetting("Down", &downwards, 0);
 	//downwards.addEntry("Vanilla", 0);
 	//downwards.addEntry("None", 1);
@@ -115,7 +115,7 @@ void Scaffold::onEnable() {
 	blockBelowY = blockBelowY.floor();
 	if (zipline) blockBelowY.y += 3.f;
 	blockBelowY = blockBelowY.floor();
-
+	if (diagType.getSelectedValue() == 1) tellydalay = 1;
 	fakespoofticks = 0;
 	canspoof = false;
 	rundown = 0;
@@ -194,13 +194,10 @@ void Scaffold::onTick(C_GameMode* gm) {
 
 	//GroundTime
 	float velocityxz = g_Data.getLocalPlayer()->velocity.magnitudexz();
-	if (placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime++;
-	else groundtime = 0;
-	if (placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
+	if (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && player->velocity.y <= 0.01) groundtime2++;
 	else groundtime2 = 0;
 
 	// Build Block
-
 	vec3_t vel = g_Data.getLocalPlayer()->velocity; vel = vel.normalize();
 	float cal = (player->yaw + 90) * (PI / 180);
 	vec3_t blockBelow;
@@ -226,8 +223,8 @@ void Scaffold::onTick(C_GameMode* gm) {
 	blockBelowPredict.y -= player->height;
 	blockBelowPredict.y -= 0.5f;
 
-	//underblock
-	if (placeMoreUnder) {
+	//UnderBlock
+	if (diagType.getSelectedValue() == 1) {
 		if (rundown > 1)
 		{
 			blockBelow.y -= 1;
@@ -238,8 +235,33 @@ void Scaffold::onTick(C_GameMode* gm) {
 		else rundown++;
 	}
 
+	//UpPlace
+	if (diagType.getSelectedValue() == 3 || diagType.getSelectedValue() == 4)
+	{
+		auto sped = moduleMgr->getModule<Speed>();
+		if (sped->isEnabled())
+		{
+			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 3)
+			{
+				lockY = false;
+				blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+				blockBelowY.y -= g_Data.getLocalPlayer()->height;
+				blockBelowY.y -= 0.5f;
+				blockBelowY = blockBelowY.floor();
+			}
+			else if (diagType.getSelectedValue() == 3) lockY = true;
+			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 4) sped->enabled = false;
+			else if (diagType.getSelectedValue() == 4)
+			{
+				if (speedwasenabled) sped->enabled = true;
+			}
+		}
+		else lockY = true;
+	}
+
+	//Build Down Block
 	bool downwardPlaced = false;
-	if (sneaking && downmode) {
+	if (sneaking && downwards.getSelectedValue() == 0) {
 		downwardPlaced = true;
 		vec3_t blockBelow15 = player->eyePos0;  // Block 1 block below the player
 		blockBelow15.y -= player->height;
@@ -279,7 +301,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	{
 		currExtend = extend;
 
-		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			//extend
 			int extend2 = currExtend;
@@ -323,7 +345,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || diagType.getSelectedValue() == !2 && player->onGround || telly2)
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 				else buildBlock(blockBelow);
@@ -338,7 +360,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	{
 		currExtend = extend;
 
-		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			for (int i = 0; i <= currExtend; i++)
 			{
@@ -383,7 +405,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || diagType.getSelectedValue() == !2 && player->onGround || telly2)
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 				else buildBlock(blockBelow);
@@ -413,7 +435,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	{
 		currExtend = extend;
 
-		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			Odelay++;
 			if (Odelay > delay)
@@ -438,7 +460,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || diagType.getSelectedValue() == !2 && player->onGround || telly2)
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 				else buildBlock(blockBelow);
@@ -452,7 +474,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (extendType.getSelectedValue() == 3)
 	{
 		currExtend = extend;
-		if (!downwardPlaced && placemode.getSelectedValue() == 1 && !jumping && velocityxz >= 0.01 && g_Data.getLocalPlayer()->fallDistance >= telly || placemode.getSelectedValue() == 0 && !jumping && velocityxz >= 0.01 || groundtime >= 10 || groundtime2 >= 10 || placemode.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2)
+		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			//extend
 			if (Odelay > 3) Odelay = 0;
@@ -521,7 +543,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 		}
 		else
 		{
-			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || placemode.getSelectedValue() == 0 && player->onGround || telly2)
+			if (groundtime2 >= 5 || groundtime >= 5 || velocityxz <= 0.01 || diagType.getSelectedValue() == !2 && player->onGround || telly2)
 			{
 				if (isBlockReplacable(blockBelow)) predictBlock(blockBelow);
 				else buildBlock(blockBelow);
