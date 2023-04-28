@@ -27,9 +27,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("TPBoost", 9);
 	mode.addEntry("Flareon", 10);
 	mode.addEntry("DamageSafe", 11);
-#ifdef _DEBUG
 	mode.addEntry("DmgFlySpeed", 12); //only beta
-#endif // _DEBUG
 
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
