@@ -18,7 +18,7 @@ public:
     bool slowSwing = false;
     bool noswing = false;
     float swingticks;
-
+    bool sloww =false;
     // Unused
     bool translate = true;
     bool rotate = false;
