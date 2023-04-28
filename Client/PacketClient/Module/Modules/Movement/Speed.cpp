@@ -311,7 +311,7 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(speedMin, speedMax);
+				speedFriction = randomFloat(random2, random3);
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
