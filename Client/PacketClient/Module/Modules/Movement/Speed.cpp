@@ -25,7 +25,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	mode.addEntry("NoGround", 8);
 	//mode.addEntry("Packet", 9);
 	mode.addEntry("TPBoost", 9);
-	mode.addEntry("Halcyon", 10);
+	mode.addEntry("Flareon", 10);
 	mode.addEntry("DamageSafe", 11);
 #ifdef _DEBUG
 	mode.addEntry("DmgFlySpeed", 12); //only beta
@@ -297,32 +297,23 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		}
 	}
 
-	// Halcyon
+	// Flareon
 	if (mode.getSelectedValue() == 10) {
 		static bool useVelocity = false;
 		// eat my absctrionalie
-		if (height >= 0.385) {
-			if (player->onGround && pressed) { 
-				//player->setRot(vec2_t(yaw, player->pitch));
-				player->jumpFromGround(); 
-				useVelocity = false; 
-			}
-		}
+		if (height >= 0.385) { if (player->onGround && pressed) player->jumpFromGround(); useVelocity = false; }
 		else useVelocity = true;
-		if (height <= 0.04 && !input->isJumping) { 
-			//player->setRot(vec2_t(yaw, player->pitch));
-			player->jumpFromGround(); 
-			player->velocity.y += height; 
-			useVelocity = false; 
-		}
+		if (height <= 0.04 && !input->isJumping) { player->velocity.y += height; useVelocity = false; }
 
-		if (speedFriction > 0.25) speedFriction *= duration;
+		float smoothing = 10.f;
+		float miniumSpeed = 0.25f;
+		speedFriction *= duration;
+		if (speedFriction > miniumSpeed) speedFriction -= ((speedFriction - miniumSpeed) / smoothing);
+		else if (speedFriction < miniumSpeed) speedFriction += ((miniumSpeed - speedFriction) / smoothing);
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				random3 = 0 - random2;
-				fricspeed = randomFloat(random2, random3);
-				speedFriction = speed + fricspeed;
+				speedFriction = randomFloat(speedMin, speedMax);
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
