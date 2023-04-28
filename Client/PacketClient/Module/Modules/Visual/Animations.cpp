@@ -102,7 +102,7 @@ void Animations::onPlayerTick(C_Player* plr) {
 	for (int i = 0; i < 173; i++) {
 		SwingArray[i] = i * 0.01;
 	}
-       	float SwingSpeedArray = SwingArray[hiveSpeedIndex++ % 173];
+       	float SwingSpeedArray = SwingArray[SwingSpeedIndex++ % 173];
 	{
 	float* speedAdr = reinterpret_cast<float*>(reinterpret_cast<__int64>(player) + 0x79C);
 	*speedAdr = SwingSpeedArray;
