@@ -9,6 +9,7 @@ private:
     bool swing = true;
     bool requireswing = false;
     bool _189 = false;
+    int SwingSpeedIndex = 0;
 public:
     float xPos = 0.f, yPos = 0.f, zPos = 0.f;
     bool shouldBlock = false;
