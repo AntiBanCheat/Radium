@@ -4,7 +4,8 @@
 
 void* SmoothSwing = (void*)FindSignature("0F 84 ? ? ? ? 48 8B 56 ? 48 85 D2 74 ? 48 8B 02");
 void* TapAddress = (void*)FindSignature("F3 0F 51 F0 0F 28 C8");
-
+int swingsped = 50;
+int resetsped = 50;
 using namespace std;
 Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitting animation") {
 	registerEnumSetting("Mode", &mode, 0);
@@ -13,7 +14,7 @@ Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitti
 	mode.addEntry("Slide", 2);
 	mode.addEntry("Old", 3);
 	mode.addEntry("Spin", 4);
-	mode.addEntry("1.7+", 5);
+	//mode.addEntry("1.7+", 5);
 	mode.addEntry("Exhi", 6);
 	//registerBoolSetting("SmoothSwing", &smoothSwing, smoothSwing);
 	registerEnumSetting("Swing", &type, 0);
@@ -24,9 +25,11 @@ Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitti
 	//registerBoolSetting("TapSwing", &tapswing, tapswing);
 	registerBoolSetting("SlowSwing", &sloww, sloww);
 	registerBoolSetting("NoSwing", &noswing, noswing);
-	registerBoolSetting("NoSwingV2", &slowSwing, slowSwing);
-	registerBoolSetting("Swing", &swing, swing);
+	//registerBoolSetting("NoSwingV2", &slowSwing, slowSwing);
+	//registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("Reset", &reset, reset);
+	registerIntSetting("SwingSpeed", &swingsped, swingsped, 1, 200);
+	registerIntSetting("ResetSwing", &resetsped, resetsped, 1, 200);
 	registerFloatSetting("X", &xPos, xPos, -3.f, 3.f);
 	registerFloatSetting("Y", &yPos, yPos, -3.f, 3.f);
 	registerFloatSetting("Z", &zPos, zPos, -3.f, 3.f);
@@ -97,16 +100,17 @@ float swingSpeed = 0.f;
 void Animations::onPlayerTick(C_Player* plr) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-        if(shouldBlock && sloww){
-		float SwingArray[173];
-	for (int i = 0; i < 173; i++) {
-		SwingArray[i] = i * 0.01;
-	}
-       	float SwingSpeedArray = SwingArray[SwingSpeedIndex++ % 173];
+	if (shouldBlock && sloww)
 	{
-	float* speedAdr = reinterpret_cast<float*>(reinterpret_cast<__int64>(player) + 0x79C);
-	*speedAdr = SwingSpeedArray;
-	}
+		float SwingArray[500];
+		for (int i = 0; i < resetsped; i++) {
+			SwingArray[i] = i * 0.01;
+		}
+		float SwingSpeedArray = SwingArray[SwingSpeedIndex++ % swingsped];
+		{
+			float* speedAdr = reinterpret_cast<float*>(reinterpret_cast<__int64>(player) + 0x79C);
+			*speedAdr = SwingSpeedArray;
+		}
 	}
 	if (swingSpeed >= 2005) swingSpeed = 340;
 	else swingSpeed += 1.f;
