@@ -55,11 +55,11 @@ void ConfigManager::loadConfig(std::string name, bool create) {
 			saveConfig();
 
 		if (g_Data.getLocalPlayer() != nullptr) {
-			g_Data.getGuiData()->displayClientMessageF("[Packet] %sSuccessfully %s config %s%s%s!", GREEN, !configExists ? "created" : "loaded", GRAY, name.c_str(), GREEN);
+			g_Data.getGuiData()->displayClientMessageF("[Actinium] %sSuccessfully %s config %s%s%s!", GREEN, !configExists ? "created" : "loaded", GRAY, name.c_str(), GREEN);
 		}
 	} else {
 		if (g_Data.getLocalPlayer() != nullptr) 
-			g_Data.getGuiData()->displayClientMessageF("[Packet] %sCould not load config %s%s%s!", RED, GRAY, name.c_str(), RED);
+			g_Data.getGuiData()->displayClientMessageF("[Actinium] %sCould not load config %s%s%s!", RED, GRAY, name.c_str(), RED);
 		auto notification = g_Data.addNotification("", "Couldn't load config!");
 		notification->duration = 10;
 	}
