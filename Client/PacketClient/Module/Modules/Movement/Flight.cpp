@@ -14,12 +14,12 @@ Flight::Flight() : IModule(0, Category::MOVEMENT, "Allows you to fly") {
 	mode.addEntry("Jetpack", 2);
 	mode.addEntry("Jump", 3);
 	mode.addEntry("Mineplex", 4);
-	mode.addEntry("Hive", 5);
-	mode.addEntry("HiveSafe", 6);
+	mode.addEntry("OldHive", 5);
+	mode.addEntry("OldHiveSafe", 6);
 	mode.addEntry("FallFly", 7);
 	mode.addEntry("HiveTest", 8);
 	mode.addEntry("CubeCraft", 9);
-	mode.addEntry("HiveJump", 10);
+	mode.addEntry("HiveNew", 10);
 	//mode.addEntry("Cubecraft", 5);
 	registerBoolSetting("Clip Up", &clip, clip);
 	registerBoolSetting("ViewBobbing", &viewBobbing, viewBobbing);
@@ -88,8 +88,12 @@ void Flight::onEnable() {
 			player->setPos(myPos);
 		}
 	// Variables
+	auto auraMod = moduleMgr->getModule<Killaura>();
+	auto disablerMod = moduleMgr->getModule<Disabler>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	auto blinkMod = moduleMgr->getModule<Blink>();
+	if (auraMod->isEnabled()) auraWasEnabled = true;
+	if (disablerMod->isEnabled()) disablerWasEnabled = true;
 	if (speedMod->isEnabled()) speedWasEnabled = true;
 	PointingStruct* level = player->pointingStruct;
 	vec3_t pos2 = *player->getPos();
@@ -99,7 +103,7 @@ void Flight::onEnable() {
 	oldpos.z = player->getPos()->z;
 	viewBobbingEffective = false;
 	tick = 0;
-
+	dash = false;
 	if (damage) { level->playSound("game.player.hurt", *pos, 1, 1); player->animateHurt(); }
 	if (boost) speedDuration = speed;
 
@@ -129,6 +133,20 @@ void Flight::onEnable() {
 		if (enabledTick >= 1) {
 			//pos2.y += 0.1f;
 			//player->setPos(pos2);
+		}
+		break;
+	case 10: // Jump
+		if (auraWasEnabled)
+		{
+			auraMod->enabled = false;
+		}
+		if (disablerWasEnabled)
+		{
+			disablerMod->enabled = false;
+		}
+		if (speedWasEnabled)
+		{
+			speedMod->enabled = false;
 		}
 		break;
 	}
@@ -268,23 +286,6 @@ void Flight::onTick(C_GameMode* gm) {
 		else hasJumped = false;
 	}
 
-	// HiveJump
-	if (mode.getSelectedValue() == 10) {
-		if (g_Data.canUseMoveKeys()) {
-			if (jumping && targetStrafe->targetListEmpty)
-				effectiveValue += currSpeed;
-			if (sneaking)
-				effectiveValue -= currSpeed;
-		}
-		if (input->forwardKey && input->backKey && input->rightKey && input->leftKey) MoveUtil::fullStop(false);
-		gm->player->velocity.y = effectiveValue;
-		effectiveValue = value;
-
-		C_MovePlayerPacket mp;
-		mp.onGround = false;
-		g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&mp);
-	}
-
 	// Hive
 	if (mode.getSelectedValue() == 5 || mode.getSelectedValue() == 6) { player->setSprinting(true); hiveTick++; }
 
@@ -413,6 +414,31 @@ void Flight::onMove(C_MoveInputHandler* input) {
 		else MoveUtil::stop(false);
 	}
 
+	//HiveNew
+	if (mode.getSelectedValue() == 10) 
+	{
+		if (TimerUtil::hasTimedElapsed(0, !blink) && !dash) 
+		{
+			dash = true;
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(2);
+			float calcYaw = (player->yaw + 90) * (PI / 180);
+			vec2_t moveVec2d = { input->forwardMovement, -input->sideMovement };
+			bool pressed = moveVec2d.magnitude() > 0.01f;
+			float c = cos(calcYaw);
+			float s = sin(calcYaw);
+			moveVec2d = { moveVec2d.x * c - moveVec2d.y * s, moveVec2d.x * s + moveVec2d.y * c };
+
+			if (player->onGround && pressed)
+				player->jumpFromGround();
+			moveVec.x = moveVec2d.x * 0.9;
+			moveVec.y = 0;
+			player->velocity.y;
+			moveVec.z = moveVec2d.y * 0.9;
+			if (pressed) player->lerpMotion(moveVec);
+		}
+		else dash = false;
+	}
+
 	// Cubecraft
 	if (mode.getSelectedValue() == 12) {
 		g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
@@ -483,6 +509,8 @@ void Flight::onSendPacket(C_Packet* packet) {
 void Flight::onDisable() {
 	Utils::patchBytes((unsigned char*)ViewBobbing, (unsigned char*)"\x0F\xB6\x80\xDB\x01\x00\x00", 7);
 	g_Data.getClientInstance()->minecraft->setTimerSpeed(20.f);
+	auto disablerMod = moduleMgr->getModule<Disabler>();
+	auto auraMod = moduleMgr->getModule<Killaura>();
 	auto speedMod = moduleMgr->getModule<Speed>();
 	auto blink = moduleMgr->getModule<Blink>();
 	auto player = g_Data.getLocalPlayer();
@@ -491,6 +519,8 @@ void Flight::onDisable() {
 	player->velocity.x = 0.f;
 	player->velocity.z = 0.f;
 
+	if (disablerWasEnabled) { disablerMod->setEnabled(true); disablerWasEnabled = false; }
+	if (auraWasEnabled) { auraMod->setEnabled(true); auraWasEnabled = false; }
 	if (speedWasEnabled) { speedMod->setEnabled(true); speedWasEnabled = false; }
 	if (viewBobbing) player->onGround = false;
 	velocityEffective = false;
