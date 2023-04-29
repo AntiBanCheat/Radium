@@ -530,7 +530,6 @@ void Speed::onSendPacket(C_Packet* packet) {
 		movePacket->yaw = animYaw;
 		movePacket->headYaw = animYaw;
 		authinputPacket->pos.x = animYaw;
-		authinputPacket->pos.y = animYaw;
 	}
 }
 
