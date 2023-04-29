@@ -122,7 +122,7 @@ void Scaffold::onEnable() {
 	rundown = 0;
 
 	auto speedMod = moduleMgr->getModule<Speed>();
-	if (speedMod->isEnabled() && preventkicks) {
+	if (speedMod->isEnabled()) {
 		speedwasenabled = true;
 	}
 	else {
@@ -240,24 +240,20 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (diagType.getSelectedValue() == 3 || diagType.getSelectedValue() == 4)
 	{
 		auto sped = moduleMgr->getModule<Speed>();
-		if (sped->isEnabled())
+		if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 3)
 		{
-			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 3)
-			{
-				lockY = false;
-				blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
-				blockBelowY.y -= g_Data.getLocalPlayer()->height;
-				blockBelowY.y -= 0.5f;
-				blockBelowY = blockBelowY.floor();
-			}
-			else if (diagType.getSelectedValue() == 3) lockY = true;
-			if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 4) sped->enabled = false;
-			else if (diagType.getSelectedValue() == 4)
-			{
-				if (speedwasenabled) sped->enabled = true;
-			}
+			lockY = false;
+			blockBelowY = g_Data.getLocalPlayer()->eyePos0;  // Block below the player
+			blockBelowY.y -= g_Data.getLocalPlayer()->height;
+			blockBelowY.y -= 0.5f;
+			blockBelowY = blockBelowY.floor();
 		}
-		else lockY = true;
+		else if (diagType.getSelectedValue() == 3) lockY = true;
+		if ((player->velocity.x > 0.06 || player->velocity.x < -0.06) && (player->velocity.z > 0.06 || player->velocity.z < -0.06) && diagType.getSelectedValue() == 4) sped->enabled = false;
+		else if (diagType.getSelectedValue() == 4 && speedwasenabled)
+		{
+			sped->enabled = true;
+		}
 	}
 
 	//Build Down Block
@@ -301,7 +297,7 @@ void Scaffold::onTick(C_GameMode* gm) {
 	if (extendType.getSelectedValue() == 0)
 	{
 		currExtend = extend;
-		if ((diagType.getSelectedValue() == !2 && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
+		if (((diagType.getSelectedValue() == 0 || diagType.getSelectedValue() == 1 || diagType.getSelectedValue() == 3 || diagType.getSelectedValue() == 4) && !jumping && velocityxz >= 0.01) || groundtime >= 10 || groundtime2 >= 10 || (diagType.getSelectedValue() == 2 && !jumping && velocityxz >= 0.01 && telly2))
 		{
 			//extend
 			int extend2 = currExtend;
