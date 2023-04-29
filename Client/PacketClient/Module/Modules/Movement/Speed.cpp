@@ -311,7 +311,9 @@ void Speed::onMove(C_MoveInputHandler* input) {
 		if (pressed) {
 			if (player->onGround) {
 				if (useVelocity && !input->isJumping) player->velocity.y = height;
-				speedFriction = randomFloat(random2, random3);
+				random3 = 0 - random2;
+				fricspeed = randomFloat(random2, random3);
+				speedFriction = speed + fricspeed;
 			}
 			else MoveUtil::setSpeed(speedFriction);
 		}
@@ -520,14 +522,15 @@ void Speed::onSendPacket(C_Packet* packet) {
 	auto* authinputPacket = reinterpret_cast<PlayerAuthInputPacket*>(packet);
 	NetworkLatencyPacket* netStack = (NetworkLatencyPacket*)packet;
 	if (player == nullptr || input == nullptr) return;
-
-	if (packet->isInstanceOf<C_MovePlayerPacket>()) {
+	if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>()) {
 		//packet
 		if (moduleMgr->getModule<Regen>()->breaknow) return;
 		if (!moduleMgr->getModule<Killaura>()->targetListEmpty) return;
 		if (!rotate) return;
 		movePacket->yaw = animYaw;
 		movePacket->headYaw = animYaw;
+		authinputPacket->pos.x = animYaw;
+		authinputPacket->pos.y = animYaw;
 	}
 }
 
