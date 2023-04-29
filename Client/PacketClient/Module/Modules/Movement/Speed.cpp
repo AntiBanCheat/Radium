@@ -525,6 +525,7 @@ void Speed::onSendPacket(C_Packet* packet) {
 	if (packet->isInstanceOf<C_MovePlayerPacket>() || packet->isInstanceOf<PlayerAuthInputPacket>()) {
 		//packet
 		if (moduleMgr->getModule<Regen>()->breaknow) return;
+		if (moduleMgr->getModule<Scaffold>()->isEnabled()) return;
 		if (!moduleMgr->getModule<Killaura>()->targetListEmpty) return;
 		if (!rotate) return;
 		movePacket->yaw = animYaw;
