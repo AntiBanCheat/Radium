@@ -2,8 +2,12 @@
 #include "../../../../Utils/TimerUtil.h"
 #include "../../../../SDK/CAttribute.h"
 #include "../pch.h"
+#include <iphlpapi.h>
+#include <stdlib.h>
+#include <time.h>
 
 int Odelay;
+int Odelay2;
 
 using namespace std;
 AutoHive::AutoHive() : IModule(0, Category::OTHER, "Automates things on The Hive") {
@@ -90,7 +94,6 @@ void AutoHive::onEnable() {
 	entityList.clear();
 	entityList2.clear();
 	if (autoBridgeWin) doLerp = true;
-	sendcommand = false;
 	Odelay = 0;
 }
 
@@ -104,6 +107,8 @@ void AutoHive::onTick(C_GameMode* gm) {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 
 	auto killaura = moduleMgr->getModule<Killaura>();
+	auto regen = moduleMgr->getModule<Regen>();
+	auto scaffold = moduleMgr->getModule<Scaffold>();
 	auto player = g_Data.getLocalPlayer();
 	auto timerUtil = new TimerUtil();
 	if (player == nullptr) return;
@@ -117,7 +122,7 @@ void AutoHive::onTick(C_GameMode* gm) {
 	C_Inventory* inv = supplies->inventory;
 	auto prevSlot = supplies->selectedHotbarSlot;
 
-	if (autosb && !entityList2.empty()) {
+	if (autosb && !entityList2.empty() && !moduleMgr->getModule<Regen>()->isregen) {
 		for (int n = 0; n < 36; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
@@ -138,15 +143,27 @@ void AutoHive::onTick(C_GameMode* gm) {
 		}
 	}
 
-	//AutoQueue
-	if (sendcommand) {
-		CommandRequestPacket commandPacket;
-		commandPacket.payload = string("/me");
-		commandPacket.one = 1;
-		commandPacket.two = 2;
-		g_Data.getClientInstance()->loopbackPacketSender->sendToServer(&commandPacket);
-		auto notififcation = g_Data.addNotification("AutoQueue:", "Queueing"); notififcation->duration = 5;
-		sendcommand = false;
+	if (autoQueue) {
+		for (int n = 0; n < 36; n++) {
+			C_ItemStack* stack = inv->getItemStack(n);
+			if (stack->item != nullptr) {
+				string ItemName2 = stack->getItem()->name.getText();
+				if (ItemName2.find("heart_of_the_sea") != string::npos) {
+					if (prevSlot != n) {
+						Odelay2++;
+						if (Odelay2 >= 17) {
+							supplies->selectedHotbarSlot = n;
+							gm->useItem(*stack);
+							supplies->selectedHotbarSlot = prevSlot;
+							auto notififcation = g_Data.addNotification("", "Queueing");
+							notififcation->duration = 5;
+							break;
+							Odelay2 = 0;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	static int delay = 0;
