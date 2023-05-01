@@ -2,6 +2,8 @@
 #include "../../Utils/Logger.h"
 #include "../../Utils/Json.hpp"
 
+#include "Modules/Visual/SwingSpeed.h"
+
 using json = nlohmann::json;
 
 ModuleManager::ModuleManager(GameData* gameData) {
@@ -47,6 +49,7 @@ void ModuleManager::initModules() {
 		moduleList.push_back(std::shared_ptr<IModule>(new BlockOutline()));
 		moduleList.push_back(std::shared_ptr<IModule>(new BreadCrumbs()));
 		moduleList.push_back(std::shared_ptr<IModule>(new SessionInfo()));
+		moduleList.push_back(std::shared_ptr<IModule>(new SlowSwing()));
 		moduleList.push_back(std::shared_ptr<IModule>(new Animations()));
 		moduleList.push_back(std::shared_ptr<IModule>(new PlayerList()));
 		moduleList.push_back(std::shared_ptr<IModule>(new ArrayList()));
