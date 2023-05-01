@@ -296,6 +296,7 @@
     <ClCompile Include="PacketClient\Module\Modules\Combat\AutoPot.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Player\AutoTotem.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Visual\BlockESP.cpp" />
+    <ClCompile Include="PacketClient\Module\Modules\Visual\SwingSpeed.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Visual\BlockOutline.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Visual\BreadCrumbs.cpp" />
     <ClCompile Include="PacketClient\Module\Modules\Other\ClickTP.cpp" />
@@ -504,6 +505,7 @@
     <ClInclude Include="PacketClient\Module\Modules\Player\AutoTotem.h" />
     <ClInclude Include="PacketClient\Module\Modules\Visual\BlockESP.h" />
     <ClInclude Include="PacketClient\Module\Modules\Visual\BlockOutline.h" />
+    <ClCompile Include="PacketClient\Module\Modules\Visual\SwingSpeed.h" />
     <ClInclude Include="PacketClient\Module\Modules\Visual\BreadCrumbs.h" />
     <ClInclude Include="PacketClient\Module\Modules\Other\ClickTP.h" />
     <ClInclude Include="PacketClient\Module\Modules\Other\ChatSuffix.h" />
