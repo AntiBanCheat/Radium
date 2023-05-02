@@ -14,7 +14,7 @@ Interface::Interface() : IModule(0, Category::VISUAL, "Displays the HUD") {
 	registerBoolSetting("ArmorHUD", &armorHUD, armorHUD);
 	registerBoolSetting("Release", &release, release);
 	registerBoolSetting("Info", &info, info);
-	registerBoolSetting("Ping", &ping, ping);
+	//registerBoolSetting("Ping", &ping, ping);
 	registerBoolSetting("FPS", &fps, fps);
 	registerBoolSetting("Speed", &speed, speed);
 	registerBoolSetting("Position", &position, position);
@@ -45,7 +45,7 @@ void Interface::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 void Interface::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	versionStr = "Beta Build 11";
+	versionStr = "Beta Build 1";
 	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 
 	static int index = 0;
