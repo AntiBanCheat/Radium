@@ -188,6 +188,11 @@ void InvManager::onTick(C_GameMode* gm) {
 					AxeDamage = currentDamage;
 					Axe = n;
 				}
+				
+				if (stack->getItem()->isBlock() && blockCount > BlockCount) {
+					BlockCount = blockCount;
+					Block = n;
+				}
 			}
 		}
 
