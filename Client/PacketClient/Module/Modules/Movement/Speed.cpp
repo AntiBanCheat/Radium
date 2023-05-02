@@ -514,7 +514,7 @@ void Speed::setSpeed(float speed) {
 }
 
 void Speed::onSendPacket(C_Packet* packet) {
-	C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
+	/*C_GameSettingsInput* input = g_Data.getClientInstance()->getGameSettingsInput();
 	auto scaffold = moduleMgr->getModule<Scaffold>();
 	auto player = g_Data.getLocalPlayer();
 	auto* LatencyPacket = reinterpret_cast<NetworkLatencyPacket*>(packet);
@@ -531,7 +531,7 @@ void Speed::onSendPacket(C_Packet* packet) {
 		movePacket->yaw = animYaw;
 		movePacket->headYaw = animYaw;
 		authinputPacket->pos.x = animYaw;
-	}
+	}*/
 }
 
 void Speed::onDisable() {
