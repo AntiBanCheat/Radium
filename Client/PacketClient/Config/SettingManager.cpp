@@ -51,7 +51,7 @@ void SettingManager::loadSettings(std::string name, bool create) {
 			saveSettings();
 
 		if (g_Data.getLocalPlayer() != nullptr) {
-			g_Data.getGuiData()->displayClientMessageF("[Packet] %sSuccessfully %s %s%s%s!", GREEN, !SettingsExists ? "created" : "loaded", GRAY, name.c_str(), GREEN);
+			g_Data.getGuiData()->displayClientMessageF("[Actinium] %sSuccessfully %s %s%s%s!", GREEN, !SettingsExists ? "created" : "loaded", GRAY, name.c_str(), GREEN);
 		}
 	}
 
