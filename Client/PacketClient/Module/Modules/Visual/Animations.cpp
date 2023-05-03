@@ -23,13 +23,10 @@ Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitti
 	type.addEntry("Tap", 2);
 	type.addEntry("Exhi", 3);
 	//registerBoolSetting("TapSwing", &tapswing, tapswing);
-	registerBoolSetting("SlowSwing", &sloww, sloww);
 	registerBoolSetting("NoSwing", &noswing, noswing);
 	//registerBoolSetting("NoSwingV2", &slowSwing, slowSwing);
 	//registerBoolSetting("Swing", &swing, swing);
 	registerBoolSetting("Reset", &reset, reset);
-	registerIntSetting("SwingSpeed", &swingsped, swingsped, 1, 200);
-	registerIntSetting("ResetSwing", &resetsped, resetsped, 1, 200);
 	registerFloatSetting("X", &xPos, xPos, -3.f, 3.f);
 	registerFloatSetting("Y", &yPos, yPos, -3.f, 3.f);
 	registerFloatSetting("Z", &zPos, zPos, -3.f, 3.f);
@@ -100,18 +97,6 @@ float swingSpeed = 0.f;
 void Animations::onPlayerTick(C_Player* plr) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	if (shouldBlock && sloww)
-	{
-		float SwingArray[500];
-		for (int i = 0; i < resetsped; i++) {
-			SwingArray[i] = i * 0.01;
-		}
-		float SwingSpeedArray = SwingArray[SwingSpeedIndex++ % swingsped];
-		{
-			float* speedAdr = reinterpret_cast<float*>(reinterpret_cast<__int64>(player) + 0x79C);
-			*speedAdr = SwingSpeedArray;
-		}
-	}
 	if (swingSpeed >= 2005) swingSpeed = 340;
 	else swingSpeed += 1.f;
 	if (swingSpeed <= 339) swingSpeed = 340;
