@@ -4,8 +4,6 @@
 
 void* SmoothSwing = (void*)FindSignature("0F 84 ? ? ? ? 48 8B 56 ? 48 85 D2 74 ? 48 8B 02");
 void* TapAddress = (void*)FindSignature("F3 0F 51 F0 0F 28 C8");
-int swingsped = 50;
-int resetsped = 50;
 using namespace std;
 Animations::Animations() : IModule(0, Category::VISUAL, "Changes the swing/hitting animation") {
 	registerEnumSetting("Mode", &mode, 0);
