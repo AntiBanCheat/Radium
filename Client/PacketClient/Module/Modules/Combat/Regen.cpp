@@ -117,7 +117,7 @@ void Regen::onTick(C_GameMode* gm) {
 				for (int x = -range; x <= range; x++) {
 					for (int z = -range; z <= range; z++) {
 						for (int y = -range; y <= range; y++) {
-							blocks.push_back(vec3_ti(x, y, z));
+							if((*player->getPos()).dist(player->currentPos.add(vec3_t(x, y, z))) < range) blocks.push_back(vec3_ti(x, y, z));
 						}
 					}
 				}
@@ -270,7 +270,7 @@ void Regen::onTick(C_GameMode* gm) {
 				for (int x = -range; x <= range; x++) {
 					for (int z = -range; z <= range; z++) {
 						for (int y = -range; y <= range; y++) {
-							blocks.push_back(vec3_ti(x, y, z));
+							if((*player->getPos()).dist(player->currentPos.add(vec3_t(x, y, z))) < range) blocks.push_back(vec3_ti(x, y, z));
 						}
 					}
 				}
