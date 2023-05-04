@@ -606,7 +606,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			string remove = gray + "[-] " + string(RESET);
 			string fix = gray + "[*] " + string(RESET);
 
-			string changeLog = (gray + bold + string("RadiumClient-Release") + ": \n" + RESET +
+			string changeLog = (gray + bold + string("ActiniumClient-Release") + ": \n" + RESET +
 				gray + bold + "Beta Build 1: \n" + RESET +
 				gray + bold + "Credits \n" + RESET +
 				fix + "Packet(dead) \n" +
@@ -623,7 +623,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				fix + "As4r1 \n" +
 				fix + "giyo000 \n" +
 				fix + "SBreality \n" +
-				fix + "Ika286(lol) \n"
+				fix + "Ika286 \n" +
+				fix + "Rasky \n"
 				);
 
 			//float size = g_Data.getClientInstance()->getGuiData()->widthGame / g_Data.getClientInstance()->getGuiData()->heightGame - 1.7769f; // interesting
