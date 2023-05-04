@@ -624,7 +624,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				fix + "giyo000 \n" +
 				fix + "SBreality \n" +
 				fix + "Ika286 \n" +
-				fix + "Rasky \n"
+				fix + "Rasky1 \n"
 				);
 
 			//float size = g_Data.getClientInstance()->getGuiData()->widthGame / g_Data.getClientInstance()->getGuiData()->heightGame - 1.7769f; // interesting
