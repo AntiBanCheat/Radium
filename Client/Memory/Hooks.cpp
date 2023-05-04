@@ -616,9 +616,9 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				fix + "NRG#4200 \n" +
 				fix + "z98#3636 \n" +
 				"\n" +
-				gray + bold + "Developers(Radium) \n" + RESET +
+				gray + bold + "Developers(Actinium) \n" + RESET +
 				fix + "DarkNBTHax(cool) \n" +
-				fix + "KaeruKing(nice) \n" +
+				fix + "KaeruClient() \n" +
 				fix + "AntiBanCheat \n" +
 				fix + "As4r1 \n" +
 				fix + "giyo000 \n" +
@@ -733,7 +733,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 					// - steal the code from drawline and improve on that
 					// no i got enough aids from making a shitty rectangle 
 					// colors:
-					// success: 50, 255, 50
+				success: 50, 255, 50;
 				warning: 255, 200, 50;
 				error: 255, 50, 50;
 					vec2_t textPos = vec2_t(rect.x + 9, rect.y + 1);
@@ -750,41 +750,86 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		else
 		{
 			vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
-			vec2_t pos;
-
 			auto notifications = g_Data.getInfoBoxList();
-			float yOffset = windowSize.y;
-
-			if (arraylist->invert) yOffset = 60;
-			if (arraylist->invert && !interfaceMod->release) yOffset = 30;
-			if (!arraylist->invert && !interfaceMod->release) yOffset = windowSize.y - 30;
-
+			float yPos = windowSize.y - 10;
+			constexpr float margin = 6;
+			if (arraylist->invert) {
+				constexpr float notificationMessage = 1;
+				constexpr float unused = 0.7f;
+				static const float textHeight = (notificationMessage + unused * 1) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
+				yPos = margin + textHeight + 10;
+			}
+			int index = 0;
 			for (auto& notification : notifications) {
-				notification->fade();
-				if (notification->fadeTarget == 1 && notification->duration <= 0 && notification->duration > -1) notification->fadeTarget = 0;
-				else if (notification->duration > 0) notification->duration -= 1.f / 60;
+				int curIndex = -index * 10;
+				auto rainbow = ColorUtil::rainbowColortwo(32, 1.f, 1.f, -notification->colorIndex * 30);
+				if (notification->check) {
 
-				float textSize = 1.f;
-				float textPadding = 1.f * textSize;
-				float textHeight = 22.0f * textSize;
+					notification->fadeVal += (notification->fadeTarget - notification->fadeVal) * 0.08f;
+					if (notification->fadeTarget == 0 && notification->fadeVal < 0.001f)
+						notification->isOpen = false;
+					if (notification->fadeTarget == 1 && notification->duration <= 0 && notification->duration > -1)
+						notification->fadeTarget = 0;
+					else if (notification->duration > 0)
+						notification->duration -= 1.f / 60;
 
-				string message = notification->message + " (" + to_string((int)notification->duration) + string(".") + to_string((int)(notification->duration * 10) - ((int)notification->duration * 10)) + ")";
-				string title = string(BOLD) + notification->title + string(RESET);
-				string textStr = " " + title + "\n" + message;
+					vec2_t* pos;
+					int lines = 1;
 
-				float textWidth = DrawUtils::getTextWidth(&message, textSize);
-				float xOffset = windowSize.x - textWidth;
+					std::string substring = notification->message;
+					std::string title = std::string(BOLD) + notification->title;
 
-				vec4_t rectPos = vec4_t(xOffset - 6.f, yOffset, windowSize.x + (textPadding * 2.f), yOffset + textPadding * 2.f + textHeight);
-				vec2_t textPos = vec2_t(rectPos.x + 4.f, rectPos.y + 2.f);
-				if (notification->duration > 1.f) {
-					DrawUtils::fillRoundRectangle(rectPos, MC_Color(notification->colorR, notification->colorG, notification->colorB, notificationsMod->opacity), true);
-					DrawUtils::drawText(textPos, &textStr, MC_Color(255, 255, 255), textSize, 1.f, true);
+					while (lines < 5) {
+						auto brea = substring.find("\n");
+						if (brea == std::string::npos || brea + 1 >= substring.size())
+							break;
+						substring = substring.substr(brea + 1);
+						lines++;
+					}
+					if (notification->message.size() == 0)
+						lines = 0;
+
+					constexpr float notificationMessage = 1;
+					constexpr float unused = 0.7f;
+					static const float textHeight = (notificationMessage + unused * 1) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
+					constexpr float borderPadding = 10;
+					float nameLength = DrawUtils::getTextWidth(&substring, notificationMessage);
+					float fullTextLength = nameLength + DrawUtils::getTextWidth(&std::string(""), unused) + 2;
+
+					notification->animate.y += (yPos - notification->animate.y) * 0.1f;
+					if (notification->fadeTarget == 1)
+						notification->animate.x += ((windowSize.x - margin - fullTextLength - 2 - borderPadding * 2) - notification->animate.x) * 0.1f;
+					else
+						notification->animate.x += (windowSize.x - notification->animate.x) * 0.1f;
+
+					vec4_t rect = vec4_t(
+						notification->animate.x,
+						notification->animate.y - margin - textHeight - 4,
+						(notification->animate.x + margin + fullTextLength + 2 + borderPadding * 2) + margin - borderPadding - 2,
+						notification->animate.y - margin);
+
+					float duration = (rect.z - rect.x) * (notification->duration / notification->maxDuration);
+					if (duration < 1) duration = 1;
+					vec2_t textPos = vec2_t(rect.x + 11, rect.y + 5.5);
+
+					DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &substring, MC_Color(255, 255, 255), 1, 1, 1);
+					DrawUtils::fillRoundRectangle(rect, MC_Color(0.f, 0.f, 0.f, 100), true);
+					DrawUtils::fillRoundRectangle(vec4_t{ rect.x, rect.y, rect.z - duration, rect.w }, rainbow, true);
 				}
-
-				if (notification->isOpen) {
-					if (arraylist->invert) yOffset += 36; else yOffset -= 36;
+				else {
+					notification->maxDuration = notification->duration;
+					notification->check = true;
+					notification->animate.y = yPos;
+					notification->animate.x = windowSize.x;
+					notification->colorIndex = curIndex;
 				}
+				if (notification->animate.x < windowSize.x + margin - 12 || notification->fadeTarget == 1) {
+					if (arraylist->invert)
+						yPos += margin + 20;
+					else
+						yPos -= margin + 20;
+				}
+				index++;
 			}
 		}
 	}

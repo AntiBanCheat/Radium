@@ -40,6 +40,10 @@ struct InfoBoxData {
 	float fadeTarget = 1;
 	float fadeVal = 0;
 	float duration = 0;
+	bool check = false;
+	vec2_t animate;
+	float maxDuration = 0;
+	float colorIndex = 0;
 	int colorR = 0;
 	int colorG = 0;
 	int colorB = 0;
