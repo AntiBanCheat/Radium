@@ -77,8 +77,8 @@ void Regen::onTick(C_GameMode* gm) {
 	static AbsorptionAttribute attribute = AbsorptionAttribute();
 	vec2_t angle = player->getPos()->CalcAngle(vec3_t(blockPos.x, blockPos.y, blockPos.z));
 	auto timerUtil = new TimerUtil();
-	static vector<vec3_ti> blocks;
-	auto ka = moduleMgr->getModule<Killaura>();
+	vector<vec3_ti> blocks;
+	static auto ka = moduleMgr->getModule<Killaura>();
 	if (ka->atk) return;
 
 	if (tick == delay) tick = 0;
