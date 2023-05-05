@@ -44,6 +44,7 @@ void AutoSpellBook::onTick(C_GameMode* gm) {
 							supplies->selectedHotbarSlot = n;
 							gm->useItem(*stack);
 							supplies->selectedHotbarSlot = prevSlot;
+							auto notififcation = g_Data.addNotification("AutoSpellBook:", "Using SpellBooks..."); notififcation->duration = 5;
 							return;
 						}
 					}
