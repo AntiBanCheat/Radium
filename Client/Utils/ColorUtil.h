@@ -12,4 +12,5 @@ public:
 	static MC_Color rainbowColortwo(float seconds, float saturation, float brightness, long index);
 	static MC_Color astolfoRainbowtwo(int yOffset, int yTotal);
 	static MC_Color interfaceColortwo(int index);
+	static MC_Color rainbowColorthree(float seconds, float saturation, float brightness, long index);
 };
