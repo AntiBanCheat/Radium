@@ -1,16 +1,6 @@
 #include "Speed.h"
 #include "../pch.h"
 
-bool testOnGround = false;
-int packetsSent = 0;
-int enabledTicks = 0;
-int flareonticks = 0;
-int strafeTime = 0;
-int hivegroundticks = 0;
-float effectiveValue = 0.f;
-float random2 = 0.f;
-float random3 = 0.f;
-float fricspeed = 0.f;
 using namespace std;
 Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerEnumSetting("Mode", &mode, 0);
@@ -117,7 +107,7 @@ void Speed::onTick(C_GameMode* gm) {
 void Speed::onMove(C_MoveInputHandler* input) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-	g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
+	if (!moduleMgr->getModule<Scaffold>()->isEnabled()) g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 	bool pressed = MoveUtil::keyPressed();
 	if (!pressed && fullstop) MoveUtil::stop(false);
 	if (mode.getSelectedValue() != 10) player->setSprinting(true);
@@ -290,7 +280,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 			}
 			else {
 				MoveUtil::setSpeed(speedFriction);
-				g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 			}
 		}
 	}
@@ -430,7 +419,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 
 			if (damageMotion != 0 && damageMotion >= 0.15f) {
 				setSpeed(damageMotion + speed * (damagespeed / 10));
-				g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
 				damageMotion = 0;
 				strafeTime = 0;
 			}
@@ -439,10 +427,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				if (strafeTime <= bypasstime) {
 					strafeTime++;
 					setSpeed(player->velocity.magnitudexz());
-				}
-				else
-				{
-					g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 				}
 			}
 		}
@@ -466,7 +450,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 			if (MoveUtil::isMoving()) {
 				if (strafeTime < bypasstime) {
 					strafeTime++;
-					g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
 					MoveUtil::setSpeed((damageMotion + speed) * damagespeed);
 
 					float calcYaw = (player->yaw + 90) * (PI / 180);
@@ -487,7 +470,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 						player->velocity.x = 0;
 						player->velocity.y = 0;
 						player->velocity.z = 0;
-						g_Data.getClientInstance()->minecraft->setTimerSpeed(timer);
 					}
 				}
 
