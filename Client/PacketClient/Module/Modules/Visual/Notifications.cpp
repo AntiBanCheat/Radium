@@ -8,6 +8,7 @@ Notifications::Notifications() : IModule(0, Category::VISUAL, "Displays notifica
 	registerBoolSetting("ShowToggle", &showToggle, showToggle);
 	registerBoolSetting("Color", &color, color);
 	registerIntSetting("Opacity", &opacity, opacity, 0, 255);
+	registerIntSetting("ColorOpacity", &noticopa, noticopa, 0, 255);
 	shouldHide = true;
 }
 
