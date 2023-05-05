@@ -16,6 +16,15 @@ private:
 	float oldx;
 	float oldz;
 	float animYaw = 0.0;
+	int packetsSent = 0;
+	int enabledTicks = 0;
+	int flareonticks = 0;
+	int strafeTime = 0;
+	int hivegroundticks = 0;
+	float effectiveValue = 0.f;
+	float random2 = 0.f;
+	float random3 = 0.f;
+	float fricspeed = 0.f;
 
 	virtual void setSpeed(float speed);
 public:
