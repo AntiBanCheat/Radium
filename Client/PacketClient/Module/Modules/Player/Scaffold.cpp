@@ -6,8 +6,6 @@ uintptr_t HiveRotations2 = Utils::getBase() + 0x8F87C7;
 uintptr_t HiveRotations3 = Utils::getBase() + 0x8F53B1;
 uintptr_t HiveRotations4 = Utils::getBase() + 0x98AF833C1;
 uintptr_t HiveRotations5 = Utils::getBase() + 0x173ACFA01D; //From Skidders
-
-
 using namespace std;
 Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	registerEnumSetting("Rotations", &rotations, 0);
@@ -28,7 +26,7 @@ Scaffold::Scaffold() : IModule(0, Category::PLAYER, "Places blocks under you") {
 	tower.addEntry("Timer2", 3);
 	tower.addEntry("HighJump", 4);
 	tower.addEntry("Test", 5);
-	tower.addEntry("Slow", 6);
+	tower.addEntry("HiveFast", 6);
 	tower.addEntry("None", 7);
 	registerEnumSetting("Select", &holdType, 0);
 	holdType.addEntry("Switch", 0);
@@ -120,7 +118,8 @@ void Scaffold::onEnable() {
 	fakespoofticks = 0;
 	canspoof = false;
 	rundown = 0;
-
+	countopa = 0;
+	county = 0;
 	auto speedMod = moduleMgr->getModule<Speed>();
 	if (speedMod->isEnabled()) {
 		speedwasenabled = true;
@@ -152,7 +151,8 @@ void Scaffold::onTick(C_GameMode* gm) {
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	jumping = GameData::isKeyDown(*input->spaceBarKey);
 	sneaking = GameData::isKeyDown(*input->sneakKey);
-
+	if (!(countopa > 149)) countopa += 30;
+	if (!(county > 7)) county += 1;
 	if (holdType.getSelectedValue() == 2) {
 		fakespoofticks++;
 		if (1 < fakespoofticks) canspoof = true;
@@ -679,15 +679,14 @@ void Scaffold::onMove(C_MoveInputHandler* input) {
 			}
 			break;
 		case 6: //Slow
+			g_Data.getClientInstance()->minecraft->setTimerSpeed(50.f);
 			if (offGroundTicks < 3) {
-				moveVec.y = 0.4;
+				moveVec.y = 0.37;
 				g_Data.getLocalPlayer()->lerpMotion(moveVec);
 			}
 			else if (offGroundTicks == 3) {
-				player->velocity.y = -0.4;
+				player->velocity.y = -1;
 			}
-
-
 			break;
 		}
 		if (tower.getSelectedValue() != 5) {
@@ -848,12 +847,11 @@ void Scaffold::onSendPacket(C_Packet* packet) {
 void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	auto player = g_Data.getLocalPlayer();
 	if (player == nullptr) return;
-
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	static auto inter = moduleMgr->getModule<Interface>();
 	if (inter->Fonts.selected == 1)
 	{
-		vec4_t testRect = vec4_t(scX, scY, 56 + scX, scY + 16);
+		vec4_t testRect = vec4_t(scX, scY - county, 56 + scX, scY + 16 - county);
 		vec2_t textPos(testRect.x + 20, testRect.y + 5);
 		vec2_t blockPos(testRect.x + 3, testRect.y + 7);
 		if (blockCount && !clickGUI->isEnabled()) {
@@ -868,13 +866,13 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 			}
 			if (totalCount > 99)
 			{
-				vec4_t testRect2 = vec4_t(scX, scY, 61 + scX, scY + 16);
-				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+				vec4_t testRect2 = vec4_t(scX, scY - county, 61 + scX, scY + 16 - county);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, countopa), false);
 			}
 			else
 			{
-				vec4_t testRect2 = vec4_t(scX, scY, 56 + scX, scY + 16);
-				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+				vec4_t testRect2 = vec4_t(scX, scY - county, 56 + scX, scY + 16 - county);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, countopa), false);
 			}
 			for (int s = 0; s < 9; s++) {
 				C_ItemStack* stack = inv->getItemStack(s);
@@ -904,7 +902,7 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	}
 	else
 	{
-		vec4_t testRect = vec4_t(scX, scY, 70 + scX, scY + 16);
+		vec4_t testRect = vec4_t(scX, scY - county, 70 + scX, scY + 16 - county);
 		vec2_t textPos(testRect.x + 20, testRect.y + 5);
 		vec2_t blockPos(testRect.x + 3, testRect.y + 7);
 
@@ -920,13 +918,13 @@ void Scaffold::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 			}
 			if (totalCount > 99)
 			{
-				vec4_t testRect2 = vec4_t(scX, scY, 76 + scX, scY + 16);
-				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+				vec4_t testRect2 = vec4_t(scX, scY - county, 76 + scX, scY + 16 - county);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, countopa), false);
 			}
 			else
 			{
-				vec4_t testRect2 = vec4_t(scX, scY, 70 + scX, scY + 16);
-				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, 150), false);
+				vec4_t testRect2 = vec4_t(scX, scY - county, 70 + scX, scY + 16 - county);
+				DrawUtils::fillRoundRectangle(testRect2, MC_Color(0, 0, 0, countopa), false);
 			}
 			for (int s = 0; s < 9; s++) {
 				C_ItemStack* stack = inv->getItemStack(s);
