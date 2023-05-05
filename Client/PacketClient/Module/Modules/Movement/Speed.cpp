@@ -1,6 +1,6 @@
 #include "Speed.h"
 #include "../pch.h"
-
+bool dmgboost = false;
 using namespace std;
 Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerEnumSetting("Mode", &mode, 0);
@@ -16,8 +16,6 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	//mode.addEntry("Packet", 9);
 	mode.addEntry("TPBoost", 9);
 	mode.addEntry("Flareon", 10);
-	mode.addEntry("DamageSafe", 11);
-	mode.addEntry("DmgFlySpeed", 12); //only beta
 
 	registerFloatSetting("Height", &height, height, 0.000001f, 0.40f);
 	registerFloatSetting("Speed", &speed, speed, 0.2f, 2.f);
@@ -25,6 +23,7 @@ Speed::Speed() : IModule(0, Category::MOVEMENT, "Increases your speed") {
 	registerFloatSetting("Random", &random2, random2, 0.f, 0.5f);
 	registerFloatSetting("Duration", &duration, duration, 0.5f, 1.05f);
 	registerBoolSetting("NoSlabs", &noslabs, noslabs);
+	registerBoolSetting("DamageBoost", &dmgboost, dmgboost);
 	registerIntSetting("BypassTime", &bypasstime, bypasstime, 1, 20);
 	registerIntSetting("DamageSpeed", &damagespeed, damagespeed, 0, 10); //only beta
 	registerIntSetting("DamageTimer", &dmgtimer, dmgtimer, 1, 40);
@@ -111,6 +110,23 @@ void Speed::onMove(C_MoveInputHandler* input) {
 	bool pressed = MoveUtil::keyPressed();
 	if (!pressed && fullstop) MoveUtil::stop(false);
 	if (mode.getSelectedValue() != 10) player->setSprinting(true);
+
+	if (dmgboost)
+	{
+		if (damageMotion != 0 && damageMotion >= 0.15f) {
+			setSpeed(damageMotion + speed * (damagespeed / 10));
+			speedFriction = damageMotion + speed * (damagespeed / 10);
+			damageMotion = 0;
+			strafeTime = 0;
+		}
+		if (MoveUtil::isMoving()) {
+			if (strafeTime <= bypasstime) {
+				strafeTime++;
+				g_Data.getClientInstance()->minecraft->setTimerSpeed(dmgtimer);
+				setSpeed(player->velocity.magnitudexz());
+			}
+		}
+	}
 
 	float yaw = player->yaw;
 
@@ -404,76 +420,6 @@ void Speed::onMove(C_MoveInputHandler* input) {
 				speedFriction = randomFloat(.33f, .45f);
 			}
 			MoveUtil::setSpeed(speedFriction);
-		}
-	}
-
-	//DamageBoost
-	if (mode.getSelectedValue() == 11) {
-		if (pressed) {
-			if (player->onGround) {
-				random3 = 0 - random2;
-				fricspeed = randomFloat(random2, random3);
-				MoveUtil::setSpeed(speed + fricspeed);
-				player->jumpFromGround();
-			}
-
-			if (damageMotion != 0 && damageMotion >= 0.15f) {
-				setSpeed(damageMotion + speed * (damagespeed / 10));
-				damageMotion = 0;
-				strafeTime = 0;
-			}
-
-			if (MoveUtil::isMoving()) {
-				if (strafeTime <= bypasstime) {
-					strafeTime++;
-					setSpeed(player->velocity.magnitudexz());
-				}
-			}
-		}
-	}
-	//DamageFly       only beta
-	if (mode.getSelectedValue() == 12) {
-		if (pressed) {
-			if (player->onGround) {
-				random3 = 0 - random2;
-				fricspeed = randomFloat(random2, random3);
-				MoveUtil::setSpeed(speed + fricspeed);
-				player->jumpFromGround();
-			}
-
-			if (damageMotion != 0 && damageMotion >= 0.15f) {
-				setSpeed((damageMotion + speed) * damagespeed);
-				damageMotion = 0;
-				strafeTime = 0;
-			}
-
-			if (MoveUtil::isMoving()) {
-				if (strafeTime < bypasstime) {
-					strafeTime++;
-					MoveUtil::setSpeed((damageMotion + speed) * damagespeed);
-
-					float calcYaw = (player->yaw + 90) * (PI / 180);
-					float c = cos(calcYaw);
-					float s = sin(calcYaw);
-
-					vec2_t moveVec2D = { input->forwardMovement, -input->sideMovement };
-					moveVec2D = { moveVec2D.x * c - moveVec2D.y * s, moveVec2D.x * s + moveVec2D.y * c };
-					vec3_t moveVec;
-					player->velocity.y = 0;
-				}
-				else
-				{
-					if (strafeTime == bypasstime + 1)
-					{
-						MoveUtil::setSpeed(0);
-						MoveUtil::fullStop(true);
-						player->velocity.x = 0;
-						player->velocity.y = 0;
-						player->velocity.z = 0;
-					}
-				}
-
-			}
 		}
 	}
 }
