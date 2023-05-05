@@ -36,6 +36,7 @@ InvManager::InvManager() : IModule(0, Category::PLAYER, "Manages your inventory"
 	registerIntSetting("Sword", &swordSlot, swordSlot, 1, 9);
 	registerIntSetting("Pickaxe", &pickSlot, pickSlot, 1, 9);
 	registerIntSetting("Axe", &axeSlot, axeSlot, 1, 9);
+	registerIntSetting("Blocks", &blockSlot, blockSlot, 1, 9);
 	registerIntSetting("Delay", &delay, delay, 0, 30);
 }
 const char* InvManager::getRawModuleName() {
@@ -199,6 +200,7 @@ void InvManager::onTick(C_GameMode* gm) {
 		if (Sword != swordSlot - 1) inv->swapSlots(Sword, swordSlot - 1);
 		if (Pickaxe != pickSlot - 1) inv->swapSlots(Pickaxe, pickSlot - 1);
 		if (Axe != axeSlot - 1) inv->swapSlots(Axe, axeSlot - 1);
+		if (Block != blockSlot - 1) inv->swapSlots(Block, blockSlot - 1);
 	}
 
 	if (autoDisable && g_Data.getLocalPlayer() == nullptr) {
