@@ -41,7 +41,7 @@ void ChestStealer::chestScreenController_tick(C_ChestScreenController* c) {
 					}
 				}
 			}
-			else { c->tryExit(); auto notififcation = g_Data.addNotification("ChestStealer:", "Stealing..."); notififcation->duration = 5; }
+			else { c->tryExit(); auto notififcation = g_Data.addNotification("ChestStealer:", "Stealing..."); notififcation->duration = 3; }
 		}
 	}
 	else {
