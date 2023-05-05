@@ -758,7 +758,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			int index = 0;
 			for (auto& notification : notifications) {
 				int curIndex = -index * 10;
-				auto rainbow = ColorUtil::rainbowColortwo(32, 1.f, 1.f, -notification->colorIndex * 30);
+				auto rainbow = ColorUtil::rainbowColorthree(32, 1.f, 1.f, -notification->colorIndex * 30);
 				if (notification->check) {
 
 					notification->fadeVal += (notification->fadeTarget - notification->fadeVal) * 0.08f;
@@ -809,7 +809,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 					vec2_t textPos = vec2_t(rect.x + 11, rect.y + 5.5);
 
 					DrawUtils::drawText(vec2_t(textPos.x, textPos.y), &substring, MC_Color(255, 255, 255), 1, 1, 1);
-					DrawUtils::fillRoundRectangle(rect, MC_Color(0.f, 0.f, 0.f, 100), true);
+					DrawUtils::fillRoundRectangle(rect, MC_Color(0.f, 0.f, 0.f, notificationsMod->opacity), true);
 					DrawUtils::fillRoundRectangle(vec4_t{ rect.x, rect.y, rect.z - duration, rect.w }, rainbow, true);
 				}
 				else {
