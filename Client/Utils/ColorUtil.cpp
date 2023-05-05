@@ -130,3 +130,11 @@ MC_Color ColorUtil::interfaceColortwo(int index) {
 	case 3: color = ColorUtil::RGBWavetwo(i->r, i->g, i->b, i->r2, i->g2, i->b2, index * 3.f); break; /* RGB Wave */ }
 	return MC_Color(color);
 }
+
+MC_Color ColorUtil::rainbowColorthree(float seconds, float saturation, float brightness, long index) {
+	float hue6 = (((TimerUtil::getCurrentMs() + index) % (int)(6000)) / (float)(6000));
+	float r, g, b = 0;
+	Utils::HSVtoRGB(hue6, saturation, brightness, r, g, b);
+	auto noti = moduleMgr->getModule<Notifications>();
+	return MC_Color(r * 255, g * 255, b * 255, noti->noticopa);
+}
