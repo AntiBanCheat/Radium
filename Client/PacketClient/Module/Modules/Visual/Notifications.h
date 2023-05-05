@@ -8,6 +8,7 @@ public:
 	bool showToggle = true;
 	bool color = false;
 	int opacity = 150;
+	int noticopa = 150;
 
 	SettingEnum mode = this;
 
