@@ -7,7 +7,8 @@ private:
 	int offGroundTicks = 0;
 	bool uwu = false;
 	bool awa = false;
-
+	int countopa;
+	int county;
 	int intPosY = 0;
 	bool placeMoreUnder = false;
 	bool shouldSwing = false;
