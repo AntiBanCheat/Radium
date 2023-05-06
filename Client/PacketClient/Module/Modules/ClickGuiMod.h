@@ -22,6 +22,7 @@ public:
 	bool categoryColors = true;
 	bool openAnimation = false;
 	bool showTooltips = false;
+	bool isSettingOpened = false;
 	bool rainbowColor = false;
 	bool animations = true;
 	bool enabled = true;
