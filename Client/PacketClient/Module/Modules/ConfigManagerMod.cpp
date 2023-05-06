@@ -3,7 +3,7 @@
 #include "../../Menu/ConfigManagerMenu.h"
 #include "pch.h"
 
-ConfigManagerMod::ConfigManagerMod() : IModule(0, Category::UNUSED, "Maneg Ur Conf") {
+ConfigManagerMod::ConfigManagerMod() : IModule(VK_HOME, Category::VISUAL, "Manage Your Config") {
 	shouldHide = true;
 }
 
