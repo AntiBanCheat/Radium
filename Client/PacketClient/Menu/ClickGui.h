@@ -74,6 +74,7 @@ private:
 	static void renderTANACategory(Category category, MC_Color categoryColor);
 	static void rendertenaCategory(Category category);
 	static void renderNewCategory(Category category);
+	static void renderNewBadLion();
 	inline static void getModuleListByCategory(Category category, std::vector<std::shared_ptr<IModule>>* modList);
 
 	inline static const char* catToName(Category cat) {
@@ -108,6 +109,9 @@ private:
 				break;
 			case Category::ALL:
 				categoryName = "All";
+				break;
+			case Category::CONFIG:
+				categoryName = "Configs";
 				break;
 			}
 		}
