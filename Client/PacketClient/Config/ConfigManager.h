@@ -20,12 +20,12 @@ class ConfigManager {
 private:
 	std::wstring roamingFolder;
 	static std::wstring GetRoamingFolderPath();
-	void saveConfigWithCustomName(std::string name);
 	json currentConfigObj;
 
 public:
 	ConfigManager();
 	~ConfigManager();
+	void saveConfigWithCustomName(std::string name);
 
 #ifdef _DEBUG
 	std::string currentConfig = "PCBeta";
