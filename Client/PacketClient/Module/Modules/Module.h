@@ -17,7 +17,8 @@ enum class Category {
 	EXPLOIT = 4,
 	OTHER = 5,
 	UNUSED = 6,
-	CUSTOM = 7
+	CUSTOM = 7,
+	ALL = 8
 };
 
 enum class HudEditorCategory {
@@ -79,8 +80,8 @@ enum class ValueType {
 	BOOL_T,
 	TEXT_T,
 	ENUM_T,
-	SETTING_GROUP_T,      
-	BOOL_SETTING_GROUP_T,  
+	SETTING_GROUP_T,
+	BOOL_SETTING_GROUP_T,
 	ENUM_SETTING_GROUP_T
 
 };

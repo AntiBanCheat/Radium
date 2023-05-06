@@ -9,7 +9,9 @@ class ClickGUIMod : public IModule {
 public:
 	bool showHudEditor = true;
 	bool hasOpenedGUI = false; // start with hudeditor
-
+	std::vector<std::filesystem::directory_entry> configs;
+	bool settingOpened = false;
+	bool skipClick = true; // kore nannka insert ositatokino ano modules botan nagaosisuruto sonotokini usironiatta module katteni osareru yatuwo kaihisuruyatu
 	float r1 = 255.f;
 	float g1 = 255.f;
 	float b1 = 255.f;
@@ -25,14 +27,13 @@ public:
 	bool enabled = true;
 	bool sounds = true;
 	bool cFont = false;
-
 	float animation = 1.f;
 	float openAnim = 1.f;
 	int opacity = 175;
 	int t = 0;
 	float txtsize = 0.9f;
 	float txtheight = 9;
-	
+
 	SettingEnum theme = this;
 	SettingEnum color = this;
 

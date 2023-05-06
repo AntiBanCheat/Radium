@@ -9,6 +9,7 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	theme.addEntry("PacketOld", 3);
 	theme.addEntry("Tenacity", 4);
 	theme.addEntry("Rise", 5); //LOL I'm KaeruClient :cold: developed
+	theme.addEntry("Lunar", 6); //Made by rasky1
 	registerEnumSetting("Color", &color, 0);
 	color.addEntry("Rainbow", 0);
 	color.addEntry("Astolfo", 1);
@@ -39,8 +40,18 @@ bool ClickGUIMod::allowAutoStart() {
 }
 
 void ClickGUIMod::onEnable() {
+	skipClick = true;
 	g_Data.getClientInstance()->releaseMouse();
-	openAnim =- 500;
+	openAnim = -500;
+	configs.clear();
+
+	std::string ConfigFolder = (getenv("AppData") + (std::string)"\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState\\PacketSkid\\Configs\\");
+	for (const auto& file : std::filesystem::directory_iterator(ConfigFolder)) {
+		if (!file.is_directory()) {
+			configs.push_back(file);
+		}
+	}
+
 	if (!showHudEditor) hasOpenedGUI = true;
 }
 
@@ -63,10 +74,13 @@ void ClickGUIMod::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 }
 
 void ClickGUIMod::onDisable() {
+	skipClick = true;
 	g_Data.getClientInstance()->grabMouse();
 	openAnimation = false;
 	hasOpenedGUI = false;
 	animation = 1;
+
+	settingOpened = false;
 }
 
 void ClickGUIMod::onLoadConfig(void* conf) {

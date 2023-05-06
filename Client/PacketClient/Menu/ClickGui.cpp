@@ -1,4 +1,4 @@
- #include "ClickGui.h"
+#include "ClickGui.h"
 
 #include <Windows.h>
 #include "../../Utils/Json.hpp"
@@ -12,6 +12,7 @@ bool shouldToggleRightClick = false;
 bool resetStartPos = true;
 bool initialised = false;
 int scrollingDirection = 0;
+int configScrollingDirection = 0;
 
 struct SavedWindowSettings {
 	vec2_t pos = { -1, -1 };
@@ -58,7 +59,7 @@ void ClickGui::getModuleListByCategory(Category category, vector<shared_ptr<IMod
 	vector<shared_ptr<IModule>>* moduleList = moduleMgr->getModuleList();
 
 	for (auto& it : *moduleList) {
-		if (it->getCategory() == category) modList->push_back(it);
+		if (it->getCategory() == category || category == Category::ALL) modList->push_back(it);
 	}
 }
 
@@ -70,7 +71,7 @@ std::shared_ptr<ClickWindow> ClickGui::getWindow(const char* name) {
 		return search->second;
 	}
 	else {  // Create window
-	 // TODO: restore settings for position etc
+		// TODO: restore settings for position etc
 		std::shared_ptr<ClickWindow> newWindow = std::make_shared<ClickWindow>();
 		newWindow->name = name;
 
@@ -94,7 +95,7 @@ std::shared_ptr<ClickModule> ClickGui::getClickModule(std::shared_ptr<ClickWindo
 		return search->second;
 	}
 	else {  // Create window
-	 // TODO: restore settings for position etc
+		// TODO: restore settings for position etc
 		std::shared_ptr<ClickModule> newModule = std::make_shared<ClickModule>();
 
 		window->moduleMap.insert(std::make_pair(id, newModule));
@@ -110,7 +111,7 @@ shared_ptr<ClickModule2> ClickGui::getClickModule2(shared_ptr<ClickWindow2> wind
 		return search->second;
 	}
 	else {  // Create window
-	 // TODO: restore settings for position etc
+		// TODO: restore settings for position etc
 		shared_ptr<ClickModule2> newModule = make_shared<ClickModule2>();
 
 		window->moduleMap2.insert(make_pair(id, newModule));
@@ -125,7 +126,7 @@ shared_ptr<ClickWindow2> ClickGui::getWindow2(const char* name) {
 		return search->second;
 	}
 	else {  // Create window
-	 // TODO: restore settings for position etc
+		// TODO: restore settings for position etc
 		shared_ptr<ClickWindow2> newWindow = make_shared<ClickWindow2>();
 		newWindow->name = name;
 
@@ -152,6 +153,390 @@ void ClickGui::renderTooltip(string* text) {
 	DrawUtils::drawRectangle(rectPos, MC_Color(0, 0, 0), 0.6f, 0.5f);
 	DrawUtils::drawText(textPos, text, MC_Color(255, 255, 255), 1);
 }
+
+
+
+Category selectedCategory = Category::ALL;
+shared_ptr<IModule> selectedModule;
+bool focusConfigRect = false;
+#pragma region Lunar
+void ClickGui::renderLunarCategory() {
+	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
+	auto player = g_Data.getLocalPlayer();
+	PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+	int width = 500;
+	int height = 230;
+	vec2_t screenSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+	int centerX = screenSize.x / 2;
+	int centerY = screenSize.y / 2;
+	int leftOffset = screenSize.x / 2 - width / 2;
+	int topOffset = screenSize.y / 2 - height / 2;
+	int rightOffset = screenSize.x / 2 + width / 2;
+	int bottomOffset = screenSize.y / 2 + height / 2;
+	auto interfaceMod = moduleMgr->getModule<Interface>();
+	vec4_t rect1 = vec4_t(leftOffset, topOffset, rightOffset, bottomOffset);
+	DrawUtils::drawRectangle(vec4_t(rect1.x - 1.5, rect1.y - 1.5, rect1.z + 1.5, rect1.w + 1.5), MC_Color(255, 255, 255), 0.3, 1.0f);
+	DrawUtils::drawRectangle(vec4_t(rect1.x - 0.5, rect1.y - 0.5, rect1.z + 0.5, rect1.w + 0.5), MC_Color(100, 100, 100), 0.2, 1.0f);
+	DrawUtils::fillRectangle(rect1, MC_Color(0, 0, 0), 0.5f);
+	DrawUtils::fillRectangle(vec4_t(leftOffset, topOffset, rightOffset, topOffset + 20), MC_Color(0, 0, 0), 0.5f);
+	DrawUtils::drawGradientText(vec2_t(leftOffset + 6, topOffset + 6), &(string)"Actinium Client", 1.25f);
+	vec4_t configRect = vec4_t(leftOffset, topOffset + 30, leftOffset + 60, bottomOffset);
+	vec2_t mousePos = *g_Data.getClientInstance()->getMousePos();
+	{
+		vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+		vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
+		mousePos = mousePos.div(windowSizeReal);
+		mousePos = mousePos.mul(windowSize);
+	}
+	DrawUtils::fillRectangle(configRect, MC_Color(0, 0, 0), 0.5f);
+	focusConfigRect = configRect.contains(&mousePos);
+	int categoryOffsetX = leftOffset + 65;
+	int categoryOffsetY = topOffset + 30;
+	if (!clickGUI->settingOpened) {
+		//Category
+		{
+			vector<Category> categories = { Category::ALL, Category::COMBAT,Category::VISUAL,Category::MOVEMENT,Category::PLAYER,Category::EXPLOIT,Category::OTHER };
+
+			int textOffset = categoryOffsetX;
+			for (auto category : categories) {
+				const char* categoryName = ClickGui::catToName(category);
+				string str = categoryName;
+				float width = DrawUtils::getTextWidth(&str, textSize, Fonts::SMOOTH);
+				DrawUtils::drawText(vec2_t(textOffset + 2.5, categoryOffsetY + 1), &str, MC_Color(255, 255, 255), textSize, 1.0f, false, Fonts::SMOOTH);
+				vec4_t btnRect = vec4_t(textOffset, categoryOffsetY, textOffset + width + 4.5, categoryOffsetY + 10);
+				DrawUtils::drawRoundRectangle(btnRect, MC_Color(89, 114, 153), false);
+				DrawUtils::fillRoundRectangle(btnRect,
+					selectedCategory == category ? MC_Color(79, 148, 252) :
+					(btnRect.contains(&mousePos) ? MC_Color(79, 148, 252) : MC_Color(69, 103, 117))
+					, false);
+				if (btnRect.contains(&mousePos) && shouldToggleLeftClick) {
+					if (clickGUI->sounds)
+						level->playSound("random.click", *player->getPos(), 1, 1);
+					if (selectedCategory != category) {
+						scrollingDirection = 0;
+						selectedCategory = category;
+					}
+				}
+				textOffset += width + 8;
+			}
+		}
+		std::vector<std::shared_ptr<IModule>> ModuleList;
+		getModuleListByCategory(selectedCategory, &ModuleList);
+		if (scrollingDirection < 0)
+			scrollingDirection = 0;
+		if (scrollingDirection > (floor((ModuleList.size() - 1) / 4)))
+			scrollingDirection = (floor((ModuleList.size() - 1) / 4));
+		{
+			int index = -1;
+			int realIndex = -1;
+			for (auto& module : ModuleList) { //Module
+				realIndex++;
+				if (floor(realIndex / 4) < scrollingDirection)
+					continue;
+				index++;
+				string str = module->getRawModuleName();
+				int width = 103;
+				int height = 18;
+				int margin = 5;
+				if (floor(index / 4) >= 7)
+					break;
+				int offsetX = categoryOffsetX + (index % 4) * (width + margin);
+				int offsetY = categoryOffsetY + 20 + floor(index / 4) * (height + margin + 3);
+				vec4_t rect = vec4_t(offsetX, offsetY, offsetX + width, offsetY + height);
+				DrawUtils::fillRoundRectangle(rect, MC_Color(200, 200, 200,
+					rect.contains(&mousePos) ? 50.f : 20.f), false);
+				DrawUtils::drawRoundRectangle(rect,
+					module->isEnabled() ? MC_Color(47, 133, 66) : MC_Color(126, 54, 49)
+					, false);
+				DrawUtils::drawText(vec2_t(offsetX + 2, offsetY + height / 2 - 3.25), &str, MC_Color(255, 255, 255), textSize, 1.f, false, Fonts::SMOOTH);
+				DrawUtils::fillRectangle(vec4_t(offsetX + width - 18, offsetY + 5, offsetX + width - 17.3, offsetY + height - 5), MC_Color(255, 255, 255), 0.3f);
+
+
+				vec4_t settingRect = vec4_t(offsetX + width - 15, offsetY + 2, offsetX + width - 15 + 15, offsetY + 2 + 15);
+				DrawUtils::drawImage("textures/ui/settings_glyph_color_2x.png", vec2_t(offsetX + width - 15, offsetY + 2), vec2_t(15, 15), vec2_t(0.f, 0.f), vec2_t(1.f, 1.f), settingRect.contains(&mousePos) ? MC_Color(253, 253, 253) : MC_Color(180, 186, 170));
+				if ((settingRect.contains(&mousePos) && shouldToggleLeftClick) || (rect.contains(&mousePos) && shouldToggleRightClick)) {
+					selectedModule = module;
+					clickGUI->skipClick = true;
+					isLeftClickDown = false;
+					clickGUI->settingOpened = true;
+					if (clickGUI->sounds)
+						level->playSound("random.click", *player->getPos(), 1, 1);
+					continue;
+				}
+
+				if (rect.contains(&mousePos) && shouldToggleLeftClick) {
+					module->setEnabled(!module->isEnabled());
+					if (clickGUI->sounds) {
+						level->playSound("random.orb", *player->getPos(), 1, module->isEnabled() ? 1 : 0.9);
+					}
+				}
+			}
+		}
+	}
+	else {
+		//module setting
+		string str = selectedModule->getModuleName();
+		string str2 = selectedModule->getTooltip();
+		if (str2.length() == 0)
+			str2 = "No Description.";
+		DrawUtils::drawText(vec2_t(categoryOffsetX + 15, categoryOffsetY + 4.5), &str, MC_Color(255, 255, 255), 1.25f, 1.f, false, Fonts::SMOOTH);
+		vec4_t rect = vec4_t(categoryOffsetX, categoryOffsetY + 2, rightOffset - 5, bottomOffset - 7);
+		DrawUtils::fillRoundRectangle(rect, MC_Color(0, 0, 0, 70.f), false);
+		DrawUtils::fillRectangle(vec4_t(rect.x, rect.y + 15, rect.z, rect.y + 16), MC_Color(255, 255, 255), 0.5f);
+		vec4_t rect2 = vec4_t(rect.x + 2, rect.y + 2, rect.x + 12, rect.y + 12);
+		if (rect2.contains(&mousePos) && shouldToggleLeftClick) {
+			clickGUI->settingOpened = false;
+			if (clickGUI->sounds)
+				level->playSound("random.click", *player->getPos(), 1, 1);
+			return;
+		}
+		DrawUtils::drawImage("textures/ui/arrow_left.png", vec2_t(rect.x + 2, rect.y + 2), vec2_t(10, 10), vec2_t(0.f, 0.f), vec2_t(1.f, 1.f), rect2.contains(&mousePos) ? MC_Color(150, 150, 150) : MC_Color(200, 200, 200));
+		DrawUtils::drawText(vec2_t(categoryOffsetX + 5, categoryOffsetY + 22), &str2, MC_Color(255, 255, 255), 0.8f, 0.8f, false, Fonts::SMOOTH);
+		DrawUtils::fillRectangle(vec4_t(rect.x, rect.y + 30, rect.z, rect.y + 31), MC_Color(255, 255, 255), 0.3f);
+		auto settings = *selectedModule->getSettings();
+		float topOffset = categoryOffsetY + 40;
+
+		if (scrollingDirection < 0)
+			scrollingDirection = 0;
+		if (scrollingDirection > settings.size() - 2)
+			scrollingDirection = settings.size() - 2;
+		int index = -1;
+		int realIndex = -1;
+		for (auto& setting : settings) {
+			if (!strcmp(setting->name, "enabled"))
+				continue;
+			realIndex++;
+			if (realIndex < scrollingDirection)
+				continue;
+			index++;
+			if (index >= 10)
+				break;
+			DrawUtils::drawText(vec2_t(categoryOffsetX +
+				(setting->valueType == ValueType::BOOL_T ? 35.f : 10.f)
+				, topOffset), &(std::string)setting->name, MC_Color(255, 255, 255), 0.8f);
+
+
+			if (setting->valueType == ValueType::BOOL_T) {
+				vec4_t toggleRect = vec4_t(categoryOffsetX + 10, topOffset, categoryOffsetX + 30, topOffset + 6);
+				DrawUtils::fillRoundRectangle(toggleRect, MC_Color(50, 50, 50, 150), false);
+				DrawUtils::drawRoundRectangle(toggleRect, MC_Color(100, 100, 100, 150), false);
+
+				if (toggleRect.contains(&mousePos) && shouldToggleLeftClick) {
+					setting->value->_bool = !setting->value->_bool;
+					if (clickGUI->sounds)
+						level->playSound("random.click", *player->getPos(), 1, 1);
+				}
+				if (setting->value->_bool) {
+					vec4_t toggleRect2 = vec4_t(toggleRect.x + 8, toggleRect.y, toggleRect.z, toggleRect.w);
+					DrawUtils::fillRoundRectangle(toggleRect2, MC_Color(48, 168, 100), false);
+					DrawUtils::drawRoundRectangle(toggleRect2, MC_Color(91, 186, 132), false);
+					DrawUtils::drawText(vec2_t(toggleRect.x + 10, toggleRect.y + 0.5), &(std::string)"ON", MC_Color(255, 255, 255), 0.65f);
+					DrawUtils::drawText(vec2_t(toggleRect.x + 10.2f, toggleRect.y + 0.5), &(std::string)"ON", MC_Color(255, 255, 255), 0.65f);
+				}
+				else {
+					vec4_t toggleRect2 = vec4_t(toggleRect.x, toggleRect.y, toggleRect.z - 8, toggleRect.w);
+					DrawUtils::fillRoundRectangle(toggleRect2, MC_Color(179, 51, 81), false);
+					DrawUtils::drawRoundRectangle(toggleRect2, MC_Color(204, 102, 126), false);
+					DrawUtils::drawText(vec2_t(toggleRect.x + 0.6f, toggleRect.y + 0.5f), &(std::string)"OFF", MC_Color(255, 255, 255), 0.6f);
+					DrawUtils::drawText(vec2_t(toggleRect.x + 0.8f, toggleRect.y + 0.5f), &(std::string)"OFF", MC_Color(255, 255, 255), 0.6f);
+				}
+
+			}
+			if (setting->valueType == ValueType::FLOAT_T || setting->valueType == ValueType::INT_T) {
+				int width = 150;
+				int offsetX = rightOffset - width - 10;
+				float step;
+				float currentValue;
+				float maxValue;
+				switch (setting->valueType)
+				{
+				case ValueType::FLOAT_T:
+					step = 0.1;
+					currentValue = setting->value->_float;
+					maxValue = setting->maxValue->_float;
+					break;
+				case ValueType::INT_T:
+					step = 1;
+					currentValue = setting->value->_int;
+					maxValue = setting->maxValue->_int;
+					break;
+				}
+
+				std::stringstream ss;
+				ss << std::fixed << std::setprecision(2) << currentValue;
+				std::string s = ss.str();
+				s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+				s.erase(s.find_last_not_of('.') + 1, std::string::npos);
+				int textWidth = DrawUtils::getTextWidth(&s, 0.75);
+				DrawUtils::drawText(vec2_t(offsetX - textWidth - 5.f, topOffset), &s, MC_Color(255, 255, 255), 0.75);
+				vec4_t rect1 = vec4_t(offsetX, topOffset + 0.5f, offsetX + width, topOffset + 4);
+				DrawUtils::fillRectangle(rect1, MC_Color(46, 47, 47), 1.f);
+				vec4_t clickRect = vec4_t(rect1.x - 5, rect1.y - 3, rect1.z + 5, rect1.w + 3);
+				if (clickRect.contains(&mousePos) && isLeftClickDown) {
+					float val = (mousePos.x - rect1.x) / width * maxValue;
+					float newValue = floor(val / step) * step;
+					if (newValue < 0)
+						newValue = 0;
+					if (newValue > maxValue)
+						newValue = maxValue;
+					switch (setting->valueType)
+					{
+					case ValueType::FLOAT_T:
+						setting->value->_float = newValue;
+						break;
+					case ValueType::INT_T:
+						setting->value->_int = (int)newValue;
+						break;
+					}
+				}
+				float circlePosX = offsetX + (currentValue / maxValue) * width;
+				DrawUtils::fillRoundRectangle(vec4_t(circlePosX - 3, topOffset, circlePosX + 3, topOffset + 3), MC_Color(79, 148, 252), true);
+			}
+
+
+			if (setting->valueType == ValueType::ENUM_T) {
+				int width = 100;
+				int offsetX = rightOffset - width - 40;
+				EnumEntry& i = ((SettingEnum*)setting->extraData)->GetSelectedEntry();
+
+				DrawUtils::drawCenteredString(vec2_t(offsetX + width / 2.f, topOffset + 4.f), &i.GetName(), 1.f, MC_Color(255, 255, 255), true);
+
+				vec4_t rect1 = vec4_t(offsetX, topOffset - 2., offsetX + 10, topOffset + 8.);
+				vec4_t rect2 = vec4_t(offsetX + width - 10, topOffset - 2, offsetX + width, topOffset + 8);
+				DrawUtils::drawImage("textures/ui/arrow_left.png", vec2_t(offsetX, topOffset - 2.), vec2_t(10, 10), vec2_t(0.f, 0.f), vec2_t(1.f, 1.f),
+					rect1.contains(&mousePos) ? MC_Color(1, 136, 183) : MC_Color(19, 90, 106));
+				DrawUtils::drawImage("textures/ui/arrow_right.png", vec2_t(offsetX + width - 10, topOffset - 2.), vec2_t(10, 10), vec2_t(0.f, 0.f), vec2_t(1.f, 1.f),
+					rect2.contains(&mousePos) ? MC_Color(1, 136, 183) : MC_Color(19, 90, 106));
+				if (rect1.contains(&mousePos) && shouldToggleLeftClick) {
+					((SettingEnum*)setting->extraData)->SelectNextValue(true);
+					if (clickGUI->sounds)
+						level->playSound("random.click", *player->getPos(), 1, 1);
+				}
+				if (rect2.contains(&mousePos) && shouldToggleLeftClick) {
+					((SettingEnum*)setting->extraData)->SelectNextValue(false);
+					if (clickGUI->sounds)
+						level->playSound("random.click", *player->getPos(), 1, 1);
+				}
+
+			}
+
+			if (setting->valueType == ValueType::KEYBIND_T) {
+				int width = 50;
+				int offsetX = rightOffset - width - 16;
+				vec4_t rect = vec4_t(offsetX - width, topOffset, offsetX, topOffset + 6);
+				DrawUtils::fillRoundRectangle(rect,
+					rect.contains(&mousePos) ? MC_Color(120, 120, 120, 200) : MC_Color(120, 120, 120, 100), false);
+				DrawUtils::drawRoundRectangle(rect,
+					rect.contains(&mousePos) ? MC_Color(200, 200, 200, 255) : MC_Color(200, 200, 200, 200), false);
+
+				string str = Utils::getKeybindName(setting->value->_int);
+
+				if (!isCapturingKey || (keybindMenuCurrent != setting && isCapturingKey)) {
+					char name[0x21];
+					sprintf_s(name, 0x21, "%s:", setting->name);
+					if (name[0] != 0)
+						name[0] = toupper(name[0]);
+
+					if (setting->value->_int > 0 && setting->value->_int < 190)
+						str = Utils::getKeybindName(setting->value->_int);
+					else if (setting->value->_int == 0x0)
+						str = "None";
+					else
+						str = "???";
+				}
+				else {
+					str = "?";
+				}
+				DrawUtils::drawCenteredString(vec2_t(offsetX - width / 2.f, topOffset + 5), &str, 0.8f, MC_Color(255, 255, 255), false);
+
+
+
+				{ //logic from risegui
+					bool isFocused = rect.contains(&mousePos);
+
+					if (isFocused && shouldToggleLeftClick && !(isCapturingKey && keybindMenuCurrent != setting)) {
+						if (clickGUI->sounds)
+							level->playSound("random.click", *player->getPos(), 1, 1);
+
+						keybindMenuCurrent = setting;
+						isCapturingKey = true;
+					}
+
+					if (isFocused && shouldToggleRightClick && !(isCapturingKey && keybindMenuCurrent != setting)) {
+						if (clickGUI->sounds)
+							level->playSound("random.click", *player->getPos(), 1, 1);
+
+						setting->value->_int = 0x0;  // Clear
+						isCapturingKey = false;
+					}
+
+					if (shouldStopCapturing && keybindMenuCurrent == setting) {  // The user has selected a key
+						if (clickGUI->sounds)
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						shouldStopCapturing = false;
+						isCapturingKey = false;
+						setting->value->_int = newKeybind;
+					}
+				}
+
+
+
+			}
+
+			topOffset += 15;
+		}
+	}
+
+	{
+		if (configScrollingDirection < 0)
+			configScrollingDirection = 0;
+		if (configScrollingDirection > clickGUI->configs.size() - 1)
+			configScrollingDirection = clickGUI->configs.size() - 1;
+		float offsetY = topOffset + 30;
+		int index = -1;
+		int realIndex = -1;
+		for (const auto& config : clickGUI->configs) {
+			realIndex++;
+			if (realIndex < configScrollingDirection)
+				continue;
+			index++;
+			if (index >= 16)
+				break;
+			vec4_t rect1 = vec4_t(leftOffset, offsetY, leftOffset + 60, offsetY + 12);
+			std::string str = std::string(config.path().filename().string());
+			size_t lastindex = str.find_last_of(".");
+			string rawname = str.substr(0, lastindex);
+			vec4_t rect2 = vec4_t(leftOffset + 52, offsetY, leftOffset + 56, offsetY + 12);
+			DrawUtils::drawText(vec2_t(leftOffset + 52, offsetY + 3.2), &(std::string)"x", rect2.contains(&mousePos) ? MC_Color(255, 255, 255) : MC_Color(200, 200, 200), 0.7, 1.0, true);
+			if (rect2.contains(&mousePos) && shouldToggleLeftClick) {
+				clickGUI->setEnabled(false);
+				filesystem::remove(config.path().string());
+				return;
+			}
+			DrawUtils::drawText(vec2_t(leftOffset + 3, offsetY + 3.5), &rawname, MC_Color(255, 255, 255), 0.7, 1.0, true);
+			string config = configMgr->currentConfig;
+			DrawUtils::drawRectangle(rect1, MC_Color(255, 255, 255), 0.4f);
+			if (!rawname.compare(config))
+				DrawUtils::fillRectangle(rect1, MC_Color(255, 255, 255), 0.3f);
+			if (rect1.contains(&mousePos) && shouldToggleLeftClick) {
+				clickGUI->setEnabled(false);
+				return configMgr->loadConfig(rawname, false);
+			}
+			offsetY += 12.51;
+
+		}
+	}
+
+
+
+
+}
+
+#pragma endregion
+
+
+
+
 #pragma region PacketOld
 void ClickGui::renderPacketOldCategory(Category category, MC_Color categoryColor) {
 	static constexpr float textHeight = textSize * 9.f;
@@ -4313,16 +4698,16 @@ void ClickGui::rendertenaCategory(Category category) {///
 			if (clickGUI->color.getSelectedValue() == 1) arrayColor = ColorUtil::astolfoRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
 			if (clickGUI->color.getSelectedValue() == 2) arrayColor = ColorUtil::waveColor(clickGUI->r1, clickGUI->g1, clickGUI->b1, clickGUI->r2, clickGUI->g2, clickGUI->b2, ModuleList.size() * 1 * 3); // Wave
 			if (clickGUI->color.getSelectedValue() == 3) arrayColor = ColorUtil::RGBWave(clickGUI->r1, clickGUI->g1, clickGUI->b1, clickGUI->r2, clickGUI->g2, clickGUI->b2, ModuleList.size() * 1 * 3); // Wave
-		//	if (clickGUI->color.getSelectedValue() == 4) arrayColor = ColorUtil::asxRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
-			//if (clickGUI->color.getSelectedValue() == 5) arrayColor = ColorUtil::WeatherRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
+			//	if (clickGUI->color.getSelectedValue() == 4) arrayColor = ColorUtil::asxRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
+				//if (clickGUI->color.getSelectedValue() == 5) arrayColor = ColorUtil::WeatherRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
 
 			auto arrayColor22 = ColorUtil::rainbowColor(8, 1.F, 1.F, 1);
 			if (clickGUI->color.getSelectedValue() == 0) arrayColor = ColorUtil::rainbowColor(5, 1, 1, ModuleList.size() * 1); // Rainbow Colors
 			if (clickGUI->color.getSelectedValue() == 1) arrayColor = ColorUtil::astolfoRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
 			if (clickGUI->color.getSelectedValue() == 2) arrayColor = ColorUtil::waveColor(clickGUI->r1, clickGUI->g1, clickGUI->b1, clickGUI->r2, clickGUI->g2, clickGUI->b2, ModuleList.size() * 1 * 3); // Wave
 			if (clickGUI->color.getSelectedValue() == 3) arrayColor = ColorUtil::RGBWave(clickGUI->r1, clickGUI->g1, clickGUI->b1, clickGUI->r2, clickGUI->g2, clickGUI->b2, ModuleList.size() * 1 * 3); // Wave
-		//	if (clickGUI->color.getSelectedValue() == 4) arrayColor = ColorUtil::asxRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
-		//	if (clickGUI->color.getSelectedValue() == 5) arrayColor = ColorUtil::WeatherRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
+			//	if (clickGUI->color.getSelectedValue() == 4) arrayColor = ColorUtil::asxRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
+			//	if (clickGUI->color.getSelectedValue() == 5) arrayColor = ColorUtil::WeatherRainbow(ModuleList.size() * 1 / 2, 1000); // Astolfo Colors
 
 
 			float probableYOffset = (moduleIndex - ourWindow->yOffset) * (textHeight + (textPadding * 2));
@@ -4370,7 +4755,7 @@ void ClickGui::rendertenaCategory(Category category) {///
 			{
 				shared_ptr<ClickModule> clickMod = getClickModule(ourWindow, mod->getRawModuleName());
 				if (!clickMod->isExtended) DrawUtils::fillRectangleA(rectPos, !mod->isEnabled() ? MC_Color(57, 57, 57) : arrayColor);
-				if (allowRender) DrawUtils::drawCenteredString(textPos, &textStr, clickGUI->txtsize, mod->isEnabled() ? MC_Color(255,255,255) : MC_Color(255, 255, 255), false);
+				if (allowRender) DrawUtils::drawCenteredString(textPos, &textStr, clickGUI->txtsize, mod->isEnabled() ? MC_Color(255, 255, 255) : MC_Color(255, 255, 255), false);
 				string len = "saturation              ";
 				float lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 20.5f;
 				if (!clickGUI->cFont) len = "saturation      ";
@@ -5100,7 +5485,7 @@ void ClickGui::renderNewCategory(Category category) {
 
 	//DrawUtils::drawRoundRectangle(clickGUIRect, MC_Color(255, 255, 255), true);
 	//DrawUtils::drawRoundRectangle(vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 - (35 * yoko) + 1 + DrawUtils::getTextWidth(&ltx, 1.f, Fonts::SMOOTH), windowSize2.y / 2 + (8 * tate)), MC_Color(255, 255, 255),true);
-        zrs = 25;
+	zrs = 25;
 	zrsx = 4;
 	DrawUtils::drawText(vec2_t(windowSize2.x / 2 - (35 * yoko) + 1 + zrsx - 1, windowSize2.y / 2 - (8 * tate) + 05), &string("Radium"), MC_Color(0, 170, 0), 2.f, 1.f, true);
 	DrawUtils::drawText(vec2_t(windowSize2.x / 2 - (35 * yoko) + 1 + zrsx, windowSize2.y / 2 - (8 * tate) + 00 + zrs), &string("   Combat"), MC_Color(255, 255, 255));
@@ -5211,8 +5596,8 @@ void ClickGui::renderNewCategory(Category category) {
 
 			vec2_t textPos = vec2_t(surenobugX + textPadding, surenobugY + textPadding);
 			vec4_t rectPos = vec4_t(
-				surenobugX, surenobugY, xEnd*1.7,
-				surenobugY + textHeight + (textPadding * 2)*5.5);
+				surenobugX, surenobugY, xEnd * 1.7,
+				surenobugY + textHeight + (textPadding * 2) * 5.5);
 
 			float animation = 0.f;
 
@@ -5246,13 +5631,13 @@ void ClickGui::renderNewCategory(Category category) {
 
 				vec2_t textPos2 = vec2_t(surenobugX + textPadding, surenobugY + textPadding + 13.5);
 				std::string tooltip = mod->getTooltip();
-//				xEnd = fmax(fmax(DrawUtils::getTextWidth(&tooltip, textSize, Fonts::SMOOTH), DrawUtils::getTextWidth(&tooltip, textSize, Fonts::SMOOTH)), fmax(DrawUtils::getTextWidth(&textStr, textSize, Fonts::SMOOTH), DrawUtils::getTextWidth(&textStr, textSize, Fonts::SMOOTH)));
-				DrawUtils::drawText(textPos, &textStr, mod->isEnabled() ? MC_Color(buttoncolor) : MC_Color(255,255,255), 1.15f, true);
+				//				xEnd = fmax(fmax(DrawUtils::getTextWidth(&tooltip, textSize, Fonts::SMOOTH), DrawUtils::getTextWidth(&tooltip, textSize, Fonts::SMOOTH)), fmax(DrawUtils::getTextWidth(&textStr, textSize, Fonts::SMOOTH), DrawUtils::getTextWidth(&textStr, textSize, Fonts::SMOOTH)));
+				DrawUtils::drawText(textPos, &textStr, mod->isEnabled() ? MC_Color(buttoncolor) : MC_Color(255, 255, 255), 1.15f, true);
 				DrawUtils::drawText(textPos2, &tooltip, MC_Color(100, 100, 100), 1, true);
 			}
 			float startYsettings = surenobugY;
 			int itemIndex = 0;
-			surenobugY += textHeight + (textPadding * 2)* 5.5;
+			surenobugY += textHeight + (textPadding * 2) * 5.5;
 
 			// Settings
 			{
@@ -5291,13 +5676,13 @@ void ClickGui::renderNewCategory(Category category) {
 							case ValueType::KEYBIND_T: {
 								surenobugYfake += textHeight + (textPadding * 2);
 							} break;
+							}
+							float endYsettings = surenobugYfake;
+							DrawUtils::fillRoundRectangle(vec4_t(surenobugX, startYsettings, xEnd * 1.7, endYsettings), MC_Color(18, 20, 25), true);
 						}
-						float endYsettings = surenobugYfake;
-						DrawUtils::fillRoundRectangle(vec4_t(surenobugX, startYsettings, xEnd*1.7, endYsettings), MC_Color(18, 20, 25), true);
 					}
 				}
 			}
-		}
 
 
 			// Settings
@@ -5761,14 +6146,14 @@ void ClickGui::renderNewCategory(Category category) {
 	}
 	std::string ltx;
 	float zrs = 25;
-	float zrsx = 4;	
+	float zrsx = 4;
 	static auto clickmod = moduleMgr->getModule<ClickGUIMod>();
 	if (clickmod->Fonts.getSelectedValue()==1)ltx = ("          Movement");
 	else ltx = ("      Movement");
 	float tate = 12;
 	float yoko = 5.7;
 	float sizejack = 1.2f;
- 	vec2_t windowSize2 = g_Data.getClientInstance()->getGuiData()->windowSize;
+	vec2_t windowSize2 = g_Data.getClientInstance()->getGuiData()->windowSize;
 	vec4_t clickGUIRect = vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 + (35 * yoko), windowSize2.y / 2 + (8 * tate));
 	DrawUtils::fillRoundRectangle(clickGUIRect, MC_Color(23, 28, 35), true);
 	DrawUtils::fillRoundRectangle(vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 - (35 * yoko) + 1 + DrawUtils::getTextWidth(&ltx, 1.f, Fonts::SMOOTH)-10, windowSize2.y / 2 + (8 * tate)), MC_Color(18, 20, 25), true);
@@ -5879,7 +6264,7 @@ void ClickGui::renderNewCategory(Category category) {
 		}
 	}
 	DrawUtils::drawImage("textures/Movement.png", vec2_t(windowSize2.x / 2 - (35 * yoko) + 1, windowSize2.y / 2 - (8 * tate) + -2 + zrs), vec2_t(10.f,10.f), vec2_t(0.f,0.f), vec2_t(1.f, 1.f));
-	
+
 	//DrawUtils::drawRoundRectangle(clickGUIRect, MC_Color(255, 255, 255), true);
 	//DrawUtils::drawRoundRectangle(vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 - (35 * yoko) + 1 + DrawUtils::getTextWidth(&ltx, 1.f, Fonts::SMOOTH), windowSize2.y / 2 + (8 * tate)), MC_Color(255, 255, 255),true);
 
@@ -6886,14 +7271,6 @@ void ClickGui::render() {
 		renderTenacityCategory(Category::EXPLOIT, MC_Color(52, 152, 219), MC_Color(52 - 20, 152 - 20, 219 - 20));
 		renderTenacityCategory(Category::OTHER, MC_Color(243, 156, 18), MC_Color(243 - 20, 156 - 20, 20 - 20));
 		break;
-	case 6: // TANA
-		renderTANACategory(Category::COMBAT, MC_Color(255, 255, 255));
-		renderTANACategory(Category::VISUAL, MC_Color(255, 255, 255));
-		renderTANACategory(Category::MOVEMENT, MC_Color(255, 255, 255));
-		renderTANACategory(Category::PLAYER, MC_Color(255, 255, 255));
-		renderTANACategory(Category::EXPLOIT, MC_Color(255, 255, 255));
-		renderTANACategory(Category::OTHER, MC_Color(255, 255, 255));
-		break;
 	case 5: // tena2
 		if (combatc)renderNewCategory(Category::COMBAT);
 		if (renderc)renderNewCategory(Category::VISUAL);
@@ -6901,6 +7278,9 @@ void ClickGui::render() {
 		if (playerc)renderNewCategory(Category::PLAYER);
 		if (exploitc)renderNewCategory(Category::EXPLOIT);
 		if (otherc)renderNewCategory(Category::OTHER);
+		break;
+	case 6: // Lunar
+		renderLunarCategory();
 		break;
 	}
 
@@ -6917,22 +7297,40 @@ void ClickGui::onMouseClickUpdate(int key, bool isDown) {
 	if (clickGUI->isEnabled() && g_Data.isInGame()) {
 		switch (key) {
 		case 1:  // Left Click
-			isLeftClickDown = isDown;
-			if (isDown)
-				shouldToggleLeftClick = true;
+			if (!clickGUI->skipClick) {
+				isLeftClickDown = isDown;
+				if (isDown)
+					shouldToggleLeftClick = true;
+			}
+			else
+				isLeftClickDown = false;
+			if (!isDown)
+				clickGUI->skipClick = false;
 			break;
 		case 2:  // Right Click
-			isRightClickDown = isDown;
-			if (isDown)
-				shouldToggleRightClick = true;
-			break;
+			if (!clickGUI->skipClick) {
+				isRightClickDown = isDown;
+				if (!isDown)
+					shouldToggleRightClick = true;
+			}
+			else
+				isRightClickDown = false;
+			if (!isDown)
+				clickGUI->skipClick = false;
 		}
 	}
 }
 
 void ClickGui::onWheelScroll(bool direction) {
-	if (!direction) scrollingDirection++;
-	else scrollingDirection--;
+	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
+	if (clickGUI->theme.getSelectedValue() == 6 && focusConfigRect) {
+		if (!direction) configScrollingDirection++;
+		else configScrollingDirection--;
+	}
+	else {
+		if (!direction) scrollingDirection++;
+		else scrollingDirection--;
+	}
 }
 
 void ClickGui::onKeyUpdate(int key, bool isDown) {

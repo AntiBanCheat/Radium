@@ -65,7 +65,7 @@ private:
 
 	static void renderLabel(const char* text);
 	static void renderTooltip(std::string* text);
-
+	static void renderLunarCategory();
 	static void renderPacketCategory(Category category, MC_Color categoryColor);
 	static void renderPacketOldCategory(Category category, MC_Color categoryColor);
 	static void renderVapeCategory(Category category);
@@ -105,6 +105,9 @@ private:
 				break;
 			case Category::CUSTOM:
 				categoryName = "Scripts";
+				break;
+			case Category::ALL:
+				categoryName = "All";
 				break;
 			}
 		}
