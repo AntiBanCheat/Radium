@@ -46,6 +46,7 @@
 #include "Modules/Visual/Interface.h"
 #include "Modules/Visual/TargetHUD.h"
 #include "Modules/Visual/Watermark.h"
+#include "Modules/Visual/SwingSpeed.h"
 #include "Modules/Visual/Ambience.h"
 #include "Modules/Visual/BlockESP.h"
 #include "Modules/Visual/ChestESP.h"
