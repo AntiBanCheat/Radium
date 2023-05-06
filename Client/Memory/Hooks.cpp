@@ -1327,6 +1327,7 @@ __int64 Hooks::LevelRenderer_renderLevel(__int64 _this, __int64 a2, __int64 a3) 
 void Hooks::ClickFunc(__int64 a1, char mouseButton, char isDown, __int16 mouseX, __int16 mouseY, __int16 relativeMovementX, __int16 relativeMovementY, char a8) {
 	static auto oFunc = g_Hooks.ClickFuncHook->GetFastcall<void, __int64, char, char, __int16, __int16, __int16, __int16, char>();
 	static auto configMenu = moduleMgr->getModule<ConfigManagerMod>();
+	static auto cfgMgr = moduleMgr->getModule<ConfigManagerMod>();
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 
 	// MouseButtons
@@ -1345,6 +1346,11 @@ void Hooks::ClickFunc(__int64 a1, char mouseButton, char isDown, __int16 mouseX,
 
 	if (clickGUI->isEnabled() || configMenu->isEnabled()) {
 		if (mouseButton == 4) ClickGui::onWheelScroll(isDown > 0);
+		if (mouseButton != 0) return; // Mouse click event
+	}
+	
+	if (cfgMgr->isEnabled()) {
+		if (mouseButton == 4) ConfigManagerMenu::onWheelScroll(isDown > 0);
 		if (mouseButton != 0) return; // Mouse click event
 	}
 	return oFunc(a1, mouseButton, isDown, mouseX, mouseY, relativeMovementX, relativeMovementY, a8);
