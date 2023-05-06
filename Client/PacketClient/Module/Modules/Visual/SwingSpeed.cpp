@@ -1,7 +1,7 @@
 #include "SwingSpeed.h"
 
 SlowSwing::SlowSwing() : IModule(0x0, Category::VISUAL, "Slows down swing speed") {
-	registerFloatSetting("Speed", &swingspeed, swingspeed, 1.f, 10.f);
+	registerFloatSetting("Speed", &swingspeed, swingspeed, 1.f, 20.f);
 }
 
 SlowSwing::~SlowSwing() {
@@ -13,7 +13,7 @@ const char* SlowSwing::getModuleName() {
 
 void* SmoothSwing2 = (void*)FindSignature("0F 84 ? ? ? ? 48 8B 56 ? 48 85 D2 74 ? 48 8B 02");
 void SlowSwing::onTick(C_GameMode* gm) {
-	SwingSpeedIndex += swingspeed;
+	if (useSwong) SwingSpeedIndex += swingspeed;
 }
 
 void SlowSwing::onPlayerTick(C_Player* plr) {
