@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "../../Utils/Json.hpp"
 #include "../../Utils/Logger.h"
+#include <regex>
 
 using namespace std;
 bool isLeftClickDown = false;
@@ -7218,12 +7219,7 @@ void ClickGui::renderNewCategory(Category category) {
 float spacing2 = 45.f;
 
 #pragma region newBadlion
-
-Category selectedCategory = Category::ALL;
 int itemIndex = 0;
-
-shared_ptr<IModule> selectedModule;
-
 void ClickGui::renderNewBadLion() {
 
 	static constexpr float textHeight = textSize * 9.f;
