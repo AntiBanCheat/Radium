@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../../ModuleManager.h"
 #include "../../../../Utils/DrawUtils.h"
 #include "../Module.h"
 
