@@ -1,10 +1,12 @@
 #pragma once
-#include "../../ModuleManager.h"
+
 #include "../../../../Utils/DrawUtils.h"
 #include "../Module.h"
 
 class SlowSwing : public IModule {
 public:
+	SlowSwing();
+	~SlowSwing();
 	bool useSwong = false;
 	int SwingSpeedIndex = 0;
 	float swingspeed = 50;
@@ -14,5 +16,4 @@ public:
 	virtual void onPlayerTick(C_Player* plr) override;
 	virtual void onTick(C_GameMode* gm) override;
 	virtual void onSendPacket(C_Packet* packet) override;
-	SlowSwing();
 };
