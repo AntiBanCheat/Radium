@@ -5201,7 +5201,7 @@ void ClickGui::rendertenaCategory(Category category) {///
 			//Draw a bit more then just the HudEditor button
 			{
 				std::vector<SettingEntry*>* settings = clickGUI->getSettings();
-				string textStr = "Radium";
+				string textStr = "Actinium";
 				float textStrLen = DrawUtils::getTextWidth(&string("------------")) - 2.f;
 				float textStrLen2 = DrawUtils::getTextWidth(&string("--------------"));
 				float stringLen = DrawUtils::getTextWidth(&textStr) + 2;
@@ -8058,6 +8058,9 @@ void ClickGui::render() {
 		break;
 	case 6: // Lunar
 		renderLunarCategory();
+		break;
+	case 7: // Lunar
+		renderNewBadLion();
 		break;
 	}
 
