@@ -24,7 +24,7 @@ void ConfigManagerMenu::render() {
 
 	auto interfaceMod = moduleMgr->getModule<Interface>();
 
-	vector<std::string> configs = moduleMgr->getModule<ConfigManagerMod>()->configs;
+	vector<std::string> configs = configManager->configs;
 
 	std::string dir_path = (getenv("AppData") + (std::string)"\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState\\PacketSkid\\Configs\\");
 
@@ -66,6 +66,11 @@ void ConfigManagerMenu::render() {
 	string sub_title = string(GRAY) + "Press ESC to exit";
 	float width = DrawUtils::getTextWidth(&string("-----------------------------------------------------------------"));
 	float height = DrawUtils::getTextWidth(&string("----------------------------------"));
+	if (moduleMgr->getModule<Interface>()->Fonts.getSelectedValue() == 1)
+	{
+		width *= 2.3;
+		height *= 2.3;
+	}
 	vec4_t rectPos = vec4_t(60, 40, 160 + width, 100 + height);
 
 	vec2_t textPos = vec2_t(rectPos.x + 6, rectPos.y + 9);
