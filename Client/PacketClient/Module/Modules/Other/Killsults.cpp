@@ -6,7 +6,7 @@ Killsults::Killsults() : IModule(0, Category::OTHER, "Insults people you kill lo
 	mode.addEntry("Normal", 0);
 	mode.addEntry("Sigma", 1);
 	mode.addEntry("Funny", 2);
-	mode.addEntry("Japanese", 3);
+	mode.addEntry(u8"メスガキ", 3);
 	mode.addEntry("Japanese810", 4);
 	mode.addEntry("UwUSpeak", 5);
 	mode.addEntry("Health", 6);
@@ -22,7 +22,7 @@ const char* Killsults::getModuleName() {
 	if (mode.getSelectedValue() == 0) name = string("Killsults ") + string(GRAY) + string("Normal");
 	if (mode.getSelectedValue() == 1) name = string("Killsults ") + string(GRAY) + string("Sigma");
 	if (mode.getSelectedValue() == 2) name = string("Killsults ") + string(GRAY) + string("Funny");
-	if (mode.getSelectedValue() == 3) name = string("Killsults ") + string(GRAY) + string("Japanese");
+	if (mode.getSelectedValue() == 3) name = string("Killsults ") + string(GRAY) + string(u8"メスガキ");
 	if (mode.getSelectedValue() == 4) name = string("Killsults ") + string(GRAY) + string("Japanese810");
 	if (mode.getSelectedValue() == 5) name = string("Killsults ") + string(GRAY) + string("UwUSpeak");
 	return name.c_str();
@@ -103,12 +103,12 @@ string sigmaMessages[2] = {
 };
 
 string japaneseMessages[13] = {
-	"縺顔夢繧型^",
-	"莉翫☆縺審adium繧剃ｽｿ縺翫≧!",
-	"繧｢繝ｳ繝√メ繝ｼ繝医←縺薙↓縺ゅｋ???",
-	"繧ゅ▲縺ｨ鬆ｭ繧剃ｽｿ縺翫≧!",
-	"Alt + F4縺ｧ遨ｺ繧帝｣帙∋繧九ｈ!!!",
-	"縺ゅ↑縺溘▲縺ｦ縺壹▲縺ｨHive縺励※縺ｾ縺吶ｈ縺ｭ",
+	u8"Aeolus勢ざぁーこ♡",
+        u8"ざぁーーこ！♡",
+	u8"Zephyrとか使ってる情弱居るんだぁ♡",
+        u8"ざぁこ♡",
+	u8"Aeolus使ってるとか情けないね〜♡"
+	u8"レポートしてやってもいいのよ？",
 	"繧上≠",
 	"蠑ｱ縺吶℃縺ｾ縺帙ｓ?",
 	"諤偵ｋ縺ｪ縺｣縺ｦw",
