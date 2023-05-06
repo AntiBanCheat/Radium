@@ -18,7 +18,8 @@ enum class Category {
 	OTHER = 5,
 	UNUSED = 6,
 	CUSTOM = 7,
-	ALL = 8
+	ALL = 8,
+	CONFIG = 9
 };
 
 enum class HudEditorCategory {
