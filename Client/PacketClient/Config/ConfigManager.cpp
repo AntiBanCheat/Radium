@@ -87,6 +87,26 @@ void ConfigManager::saveConfig() {
 	delete[] fullPath;
 }
 
+void ConfigManager::saveConfigWithCustomName(std::string name) {
+	logF("Saving config %s", name.c_str());
+	size_t allocSize = name.size() + roamingFolder.size() + 20;
+	char* fullPath = new char[allocSize];
+	sprintf_s(fullPath, allocSize, "%S\\%s.txt", roamingFolder.c_str(), name.c_str());
+
+	moduleMgr->onSaveConfig(&currentConfigObj);
+	std::string prefix;
+	prefix.push_back(cmdMgr->prefix);
+	currentConfigObj["prefix"] = prefix;
+
+	std::ofstream o(fullPath, std::ifstream::binary);
+
+	o << std::setw(4) << currentConfigObj << std::endl;
+	o.flush();
+	o.close();
+
+	delete[] fullPath;
+}
+
 void ConfigManager::init() {
 	logF("Initializing config");
 	loadConfig(currentConfig, true);
