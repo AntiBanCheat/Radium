@@ -45,6 +45,7 @@ void ClickGUIMod::onEnable() {
 	g_Data.getClientInstance()->releaseMouse();
 	openAnim = -500;
 	configs.clear();
+	isSettingOpened = false;
 
 	std::string ConfigFolder = (getenv("AppData") + (std::string)"\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState\\PacketSkid\\Configs\\");
 	for (const auto& file : std::filesystem::directory_iterator(ConfigFolder)) {
@@ -80,7 +81,7 @@ void ClickGUIMod::onDisable() {
 	openAnimation = false;
 	hasOpenedGUI = false;
 	animation = 1;
-
+	isSettingOpened = false;
 	settingOpened = false;
 }
 
