@@ -118,16 +118,17 @@ int SettingEnum::SelectNextValue(bool back) {
 	else
 		selected++;
 
-	if (Entrys.size() <= selected) {
-		selected = 0;
+	if (selected < 0) {
+		selected = (int)Entrys.size() - 1;
 		return selected;
 	}
-	else if (selected < 0) {
-		selected = (int)Entrys.size() - 1;
+	else if (Entrys.size() <= selected) {
+		selected = 0;
 		return selected;
 	}
 	return selected;
 }
+
 #pragma endregion
 
 IModule::IModule(int key, Category c, const char* tooltip) {
