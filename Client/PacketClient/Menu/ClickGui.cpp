@@ -7215,6 +7215,787 @@ void ClickGui::renderNewCategory(Category category) {
 	DrawUtils::flush();
 }*/
 #pragma endregion
+float spacing2 = 45.f;
+
+#pragma region newBadlion
+
+Category selectedCategory = Category::ALL;
+int itemIndex = 0;
+
+shared_ptr<IModule> selectedModule;
+
+void ClickGui::renderNewBadLion() {
+
+	static constexpr float textHeight = textSize * 9.f;
+	const char* categoryName = catToName(selectedCategory);
+	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
+	const std::shared_ptr<ClickWindow2> ourWindow = getWindow2(categoryName);
+
+	if (GameData::isKeyDown(VK_ESCAPE)) clickGUI->isSettingOpened = false;
+
+	vec2_t mousePos = *g_Data.getClientInstance()->getMousePos();
+	{
+		vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
+		vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
+		mousePos = mousePos.div(windowSizeReal);
+		mousePos = mousePos.mul(windowSize);
+	}
+
+	std::string ltx;
+	float zrs = 25;
+	float zrsx = 4;
+	static auto clickmod = moduleMgr->getModule<ClickGUIMod>();
+
+	float tate = 12;
+	float yoko = 5.7;
+	float sizejack = 1.2f;
+	vec2_t windowSize2 = g_Data.getClientInstance()->getGuiData()->windowSize;
+
+	float xEnd = windowSize2.x / 2 - 20;
+
+	vec4_t clickGUIRect = vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 + (35 * yoko), windowSize2.y / 2 + (10 * tate));
+	//module
+	std::vector<std::shared_ptr<IModule>> ModuleList;
+	getModuleListByCategory(selectedCategory, &ModuleList);
+
+	// Get max width of all text
+	{
+		for (auto& it : ModuleList) {
+			std::string label = "-------------";
+			windowSize2.x = fmax(windowSize2.x, DrawUtils::getTextWidth(&label, textSize, Fonts::SMOOTH));
+		}
+	}
+
+	vector<shared_ptr<IModule>> moduleList;
+	{
+		vector<int> toIgniore;
+		int moduleCount = (int)ModuleList.size();
+		for (int i = 0; i < moduleCount; i++) {
+			float bestWidth = 1.f;
+			int bestIndex = 1;
+
+			for (int j = 0; j < ModuleList.size(); j++) {
+				bool stop = false;
+				for (int bruhwth = 0; bruhwth < toIgniore.size(); bruhwth++)
+					if (j == toIgniore[bruhwth]) {
+						stop = true;
+						break;
+					}
+				if (stop)
+					continue;
+
+				string t = ModuleList[j]->getRawModuleName();
+				float textWidthRn = DrawUtils::getTextWidth(&t, textSize, Fonts::SMOOTH);
+				if (textWidthRn > bestWidth) {
+					bestWidth = textWidthRn;
+					bestIndex = j;
+				}
+			}
+			moduleList.push_back(ModuleList[bestIndex]);
+			toIgniore.push_back(bestIndex);
+		}
+	}
+	//
+
+	DrawUtils::drawText(vec2_t(clickGUIRect.x + 10, clickGUIRect.y - 20), &string("Actinium"), MC_Color(255, 255, 255), 1.4f, 1.f, true);
+	vec2_t textPos = vec2_t(clickGUIRect.x + 92, clickGUIRect.y + 9);
+
+	DrawUtils::fillRectangleA(clickGUIRect, MC_Color(0, 0, 0, 40));
+	DrawUtils::fillRectangleA(vec4_t(clickGUIRect.x, clickGUIRect.y - 30, clickGUIRect.z, clickGUIRect.y), MC_Color(0, 0, 0, 90));
+	DrawUtils::fillRectangleA(vec4_t(windowSize2.x / 2 - (35 * yoko), windowSize2.y / 2 - (8 * tate), windowSize2.x / 2 - (35 * yoko) + 30 * 2.5f, windowSize2.y / 2 + (10 * tate)), MC_Color(0, 0, 0, 65));
+
+	vec4_t rectPos = vec4_t(
+		textPos.x,
+		textPos.y,
+		textPos.x + 86,
+		textPos.y + 86
+	);
+
+	const float xOffset = ourWindow->pos.x;
+	const float yOffset = ourWindow->pos.y;
+
+	float surenobugX = xOffset;
+	float surenobugY = yOffset;
+
+	currentYOffset = yOffset;
+
+
+
+	vector<std::string> configList;
+
+	if (scrollingDirection < 0)
+		scrollingDirection = 0;
+	if (scrollingDirection > configList.size() - 3)
+		scrollingDirection = configList.size() - 3;
+	int index1 = -1;
+	int realIndex1 = -1;
+
+	int index2 = -1;
+	int realIndex2 = -1;
+
+	float categoryHeaderYOffset = currentYOffset;
+
+	bool allowRender = currentYOffset >= categoryHeaderYOffset;
+
+	bool overflowing = false;
+
+	int moduleIndex = 0;
+
+	const float cutoffHeight = roundf((windowSize2.y / 2 + (8 * 12) - 17) * 0.7) + 0.5f;
+
+	vector<Category> categories = {
+		Category::ALL,
+		Category::COMBAT,
+		Category::VISUAL,
+		Category::MOVEMENT,
+		Category::PLAYER,
+		Category::EXPLOIT,
+		Category::OTHER,
+		Category::CONFIG,
+	};
+
+	vec2_t categoryPos = vec2_t(windowSize2.x / 2 - (35 * yoko) + 6, windowSize2.y / 2 - (8 * tate) + 6);
+
+	for (auto& cs : categories) {
+
+		vec4_t categoryRect = vec4_t(categoryPos.x - 6, categoryPos.y + 10, categoryPos.x + 69, categoryPos.y + 25);
+
+		const char* categoryName = ClickGui::catToName(cs);
+
+		string cat = categoryName;
+
+		DrawUtils::drawText(vec2_t(categoryPos.x + 1, categoryPos.y + 12), &cat, MC_Color(255, 255, 255), 1.f, 1.f);
+
+		if (categoryRect.contains(&mousePos)) {
+			DrawUtils::fillRectangleA(vec4_t(categoryRect), MC_Color(255, 255, 255, 45));
+			if (isLeftClickDown && shouldToggleLeftClick) {
+				selectedCategory = cs;
+				clickGUI->isSettingOpened = false;
+				shouldToggleLeftClick = false;
+			}
+		}
+
+		categoryPos.y += 16.5f;
+	}
+
+	for (auto& mod : moduleList) {
+
+		realIndex1++;
+		if (realIndex1 < scrollingDirection)
+			continue;
+		index1++;
+		if (index1 >= 10)
+			break;
+
+		if (!clickGUI->isSettingOpened) {
+			if (rectPos.w <= clickGUIRect.w) {
+				std::string moduleName = mod->getRawModuleName();
+
+
+				DrawUtils::drawCenteredString(vec2_t(rectPos.x + 43, rectPos.y + 17), &moduleName, 0.92f, MC_Color(255, 255, 255, 60), 1.f);
+				DrawUtils::fillRectangleA(rectPos, MC_Color(0, 0, 0, 60));
+				DrawUtils::drawRectangle(rectPos, MC_Color(96, 104, 119), 0.8f, 0.5f);
+
+				//toggle
+				if (!ourWindow->isInAnimation && !isDragging && rectPos.contains(&mousePos)) {
+					std::string tooltip = mod->getTooltip();
+					static auto clickGuiMod = moduleMgr->getModule<ClickGUIMod>();
+					if (clickGuiMod->showTooltips && !tooltip.empty()) renderTooltip(&tooltip);
+					if (shouldToggleLeftClick && !ourWindow->isInAnimation) {
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+						mod->toggle();
+						selectedModule = mod;
+						shouldToggleLeftClick = false;
+					}
+				}
+				//
+
+				DrawUtils::fillRoundRectangle(vec4_t(rectPos.x + 32, rectPos.y + 65, rectPos.x + 52, rectPos.y + 70), mod->isEnabled() ? MC_Color(44, 173, 220) : MC_Color(2, 15, 14), true);
+
+				DrawUtils::drawCircle(mod->isEnabled() ? vec4_t(rectPos.x + 43, rectPos.y + 65, rectPos.x + 51, rectPos.y + 70) : vec4_t(rectPos.x + 33, rectPos.y + 65, rectPos.x + 41, rectPos.y + 70), MC_Color(255, 255, 255));
+
+			}
+
+			if (rectPos.contains(&mousePos) && shouldToggleRightClick && !ourWindow->isInAnimation) {
+				if (clickGUI->sounds) {
+					auto player = g_Data.getLocalPlayer();
+					PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+					level->playSound("random.click", *player->getPos(), 1, 1);
+				}
+				shouldToggleRightClick = false;
+				selectedModule = mod;
+				clickGUI->isSettingOpened = true;
+			}
+
+			rectPos.x += spacing2 * 2.2f;
+			rectPos.z += spacing2 * 2.2f;
+
+			if (rectPos.z >= clickGUIRect.z) {
+				rectPos.x = textPos.x;
+				rectPos.z = textPos.x + 86;
+
+				rectPos.y += textPos.y + 11.6f;
+				rectPos.w += textPos.y + 11.6f;
+			}
+		}
+	}
+
+	vec4_t settingRect = vec4_t(
+		clickGUIRect.x + 75,
+		clickGUIRect.y,
+		clickGUIRect.z,
+		clickGUIRect.w
+	);
+
+	auto inter = moduleMgr->getModule<Interface>();
+
+	int indexC = 0;
+	indexC++; int curIndex = -indexC * inter->spacing;
+	auto interfaceColor = ColorUtil::interfaceColor(curIndex);
+
+	vec2_t configPos = vec2_t(settingRect.x + 12, settingRect.y + 8);
+
+	std::string dir_path = (getenv("AppData") + (std::string)"\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState\\PacketSkid\\Configs\\");
+
+	if (selectedCategory == Category::CONFIG) {
+
+		configList.clear();
+
+		for (const auto& entry : std::filesystem::directory_iterator(dir_path))
+		{
+			if (!entry.is_directory())
+			{
+				std::string filename = entry.path().filename().string();
+				configList.push_back(filename);
+			}
+		}
+
+		for (auto& config : configList) {
+			realIndex1++;
+			if (realIndex1 < scrollingDirection)
+				continue;
+			index1++;
+			if (index1 >= 10)
+				break;
+
+			DrawUtils::drawText(configPos, &config, MC_Color(255, 255, 255), 1.f, 0.9f, true);
+			DrawUtils::drawText(vec2_t(configPos.x + 240, configPos.y), &string("Load"), MC_Color(255, 255, 255), 1.f, 0.83f, true);
+			DrawUtils::drawText(vec2_t(configPos.x + 270, configPos.y), &string("Delete"), MC_Color(255, 255, 255), 1.f, 0.83f, true);
+
+			vec4_t loadRect = vec4_t(configPos.x + 237, configPos.y, configPos.x + 264, configPos.y + 9);
+			vec4_t delRect = vec4_t(configPos.x + 268, configPos.y, configPos.x + 298, configPos.y + 9);
+
+			if (loadRect.contains(&mousePos) && isLeftClickDown && shouldToggleLeftClick) {
+
+				clickGUI->setEnabled(false);
+				g_Data.getClientInstance()->grabMouse();
+
+				std::string filename = config;
+
+				std::regex re("\\.txt$");
+
+				std::string replaced = std::regex_replace(filename, re, "");
+
+				configMgr->loadConfig(replaced, false);
+				shouldToggleLeftClick = false;
+			}
+
+			if (delRect.contains(&mousePos) && isLeftClickDown && shouldToggleLeftClick) {
+
+				if (configMgr->currentConfig != config) {
+					clickGUI->setEnabled(false);
+					g_Data.getClientInstance()->grabMouse();
+
+					string filepath = dir_path + config;
+
+					config.pop_back();
+
+					std::filesystem::remove(filepath);
+
+					shouldToggleLeftClick = false;
+				}
+			}
+
+			configPos.y += 30.f;
+		}
+	}
+
+	if (clickGUI->isSettingOpened) {
+
+		std::vector<SettingEntry*>* settings = selectedModule->getSettings();
+		if (settings->size() > 2 && allowRender) {
+			std::shared_ptr<ClickModule2> clickMod = getClickModule2(ourWindow, selectedModule->getModuleName());
+		}
+		float startYOffset = settingRect.y;
+
+		if (scrollingDirection < 0)
+			scrollingDirection = 0;
+		if (scrollingDirection > settings->size() - 2)
+			scrollingDirection = settings->size() - 2;
+
+		int index3 = -1;
+		int realIndex3 = -1;
+
+		for (auto setting : *settings) {
+			if (!strcmp(setting->name, "enabled"))
+				continue;
+			realIndex3++;
+			if (realIndex3 < scrollingDirection)
+				continue;
+			index3++;
+			if (index3 >= 10)
+				break;
+
+			if (!strcmp(setting->name, "enabled") || strcmp(setting->name, "keybind") == 0) continue;
+
+			vec2_t textPos2 = vec2_t(settingRect.x + 20, settingRect.y + 45);
+			vec4_t rectPos2 = vec4_t(settingRect.x + 20, settingRect.y + 45, xEnd + 180, 80);
+			vec4_t sliderRect = vec4_t(settingRect.x + 180, settingRect.y + 150, xEnd + 180, 200);
+
+			if ((settingRect.y - ourWindow->pos.y) > cutoffHeight) {
+				overflowing = true;
+				break;
+			}
+
+			DrawUtils::drawText(vec2_t(clickGUIRect.x + 94, clickGUIRect.y + 7), &string(selectedModule->getModuleName()), MC_Color(255, 255, 255), 1.1f, 1.f);
+			DrawUtils::drawText(vec2_t(clickGUIRect.x + 94, clickGUIRect.y + 19), &string(string(GRAY) + selectedModule->getTooltip()), MC_Color(255, 255, 255), 0.86f, 1.f);
+
+			DrawUtils::setColor(0.1f, 0.1f, 0.1f, 0.1f);
+			DrawUtils::drawLine(vec2_t(clickGUIRect.x + 83, clickGUIRect.y + 29), vec2_t(clickGUIRect.z - 10, clickGUIRect.y + 29), 0.35f);
+
+			vec4_t lineRect = vec4_t(clickGUIRect.x + 80, clickGUIRect.y + 12.5f, clickGUIRect.x + 84, clickGUIRect.y + 12.5f);
+
+			vec4_t exitRect = vec4_t(lineRect.x + 1.95f, lineRect.y - 3.68f, lineRect.x + 7.7f, lineRect.y + 2.7f);
+
+			if (exitRect.contains(&mousePos) && isLeftClickDown && shouldToggleLeftClick) {
+				clickGUI->isSettingOpened = false;
+				shouldToggleLeftClick = false;
+			}
+
+			DrawUtils::drawText(vec2_t(lineRect.x + 2.4f, lineRect.y - 3.48f), &string("<"), exitRect.contains(&mousePos) ? MC_Color(100, 100, 100) : MC_Color(255, 255, 255), 0.76f, 1.f);
+
+
+			switch (setting->valueType) {
+
+			case ValueType::BOOL_T: {
+				rectPos2.w = settingRect.y + textHeight + (textPadding * 2);
+				string len = "saturation              ";
+				float lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 20.5f;
+				if (!clickGUI->cFont) len = "saturation      ";
+				if (!clickGUI->cFont)lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 17.5f;
+				vec4_t selectableSurface = vec4_t(
+					rectPos2.x + textPadding,
+					rectPos2.y + textPadding,
+					rectPos2.z + textHeight - textPadding - 15,
+					rectPos2.y + textHeight - textPadding);
+
+				vec4_t boxPos = vec4_t(
+					rectPos2.x + textPadding + 270.5f,
+					textPos2.y - 15,
+					rectPos2.z + textHeight - textPadding,
+					rectPos2.y + textHeight + 2.5f);
+
+				bool isFocused = selectableSurface.contains(&mousePos);
+				bool isFocused2 = vec4_t(boxPos.x, boxPos.y + 15, boxPos.x + 20, boxPos.y + 20).contains(&mousePos);
+				// Logic
+				{
+					if (isFocused && shouldToggleLeftClick && !ourWindow->isInAnimation || isFocused2 && shouldToggleLeftClick && !ourWindow->isInAnimation) {
+						shouldToggleLeftClick = false;
+						setting->value->_bool = !setting->value->_bool;
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+					}
+				}
+				// Checkbox
+				{
+					DrawUtils::fillRoundRectangle(vec4_t(boxPos.x, boxPos.y + 15, boxPos.x + 20, boxPos.y + 20), setting->value->_bool ? MC_Color(44, 173, 220) : MC_Color(2, 15, 14), true);
+
+					DrawUtils::drawCircle(setting->value->_bool ? vec4_t(boxPos.x + 11, boxPos.y + 15, boxPos.x + 19, boxPos.y + 20) : vec4_t(boxPos.x + 1, boxPos.y + 15, boxPos.x + 9, boxPos.y + 20), MC_Color(255, 255, 255));
+				}
+
+				// Text
+				{
+					char name[0x21];
+					sprintf_s(name, 0x21, "%s", setting->name);
+					string elTexto = name;
+					DrawUtils::toLower(elTexto);
+					DrawUtils::drawText(textPos2, &elTexto, MC_Color(255, 255, 255));
+					settingRect.y += textHeight + (textPadding * 10);
+				}
+				break;
+			}
+			case ValueType::ENUM_T: {  // Click setting
+				float settingStart = settingRect.y;
+				{
+					char name[0x21];
+					sprintf_s(name, +"%s:", setting->name);
+					string elTexto = string(GRAY) + name;
+					DrawUtils::toLower(elTexto);
+					EnumEntry& i = ((SettingEnum*)setting->extraData)->GetSelectedEntry();
+					char name2[0x21];
+					sprintf_s(name2, 0x21, " %s", i.GetName().c_str());
+					string elTexto2 = name2;
+					DrawUtils::toUpper(elTexto2);
+					float lenth2 = DrawUtils::getTextWidth(&elTexto2, clickGUI->txtsize) + 2;
+					elTexto2 = string(RESET) + elTexto2;
+					rectPos2.w = settingRect.y + textHeight + 2 + (textPadding * 3);
+					DrawUtils::drawText(textPos2, &elTexto, MC_Color(255, 255, 255), clickGUI->txtsize, 1.f); //enum aids
+					DrawUtils::drawRightAlignedString(&elTexto2, rectPos2, MC_Color(255, 255, 255), false);
+					string len = "saturation  ";
+					float lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 20.5f;
+					if (!clickGUI->cFont) len = "saturation  ";
+					if (!clickGUI->cFont)lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 17.5f;
+					settingRect.y += textHeight + (textPadding * 2 - 11.5);
+				}
+				int e = 0;
+
+				bool isEven = e % 2 == 0;
+
+				rectPos2.w = settingRect.y + textHeight + (textPadding * 2);
+				EnumEntry& i = ((SettingEnum*)setting->extraData)->GetSelectedEntry();
+				textPos2.y = settingRect.y * textPadding;
+				vec4_t selectableSurface = vec4_t(settingRect.x + 1, settingRect.y + 47, settingRect.z, settingRect.y + 57);
+				// logic
+
+				if (!ourWindow->isInAnimation && selectableSurface.contains(&mousePos)) {
+					if (shouldToggleLeftClick) {
+						shouldToggleLeftClick = false;
+						((SettingEnum*)setting->extraData)->SelectNextValue(false);
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+					}
+					else if (shouldToggleRightClick) {
+						shouldToggleRightClick = false;
+						((SettingEnum*)setting->extraData)->SelectNextValue(true);
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+					}
+				}
+				settingRect.y += textHeight + (textPadding * 12);
+
+				break;
+			}
+			case ValueType::KEYBIND_T: {
+
+				vec4_t r = vec4_t(textPos2.x, textPos2.y, textPos2.x + 220, textPos2.y + 10);
+
+				vec2_t textPos2 = vec2_t(rectPos2.x + ((rectPos2.z - rectPos2.x) / 2), rectPos2.y + 2);
+
+				char name[0x21];
+				sprintf_s(name, 0x21, "%s:", setting->name);
+				if (name[0] != 0)
+					name[0] = toupper(name[0]);
+
+				std::string text = name;
+
+				DrawUtils::drawText(vec2_t(r.x, r.y), &text, MC_Color(255, 255, 255), textSize);
+
+				if (!isCapturingKey || (keybindMenuCurrent != setting && isCapturingKey)) {
+
+					const char* key;
+
+					if (setting->value->_int > 0 && setting->value->_int < 190)
+						key = KeyNames[setting->value->_int];
+					else if (setting->value->_int == 0x0)
+						key = "NONE";
+					else
+						key = "???";
+
+					if (keybindMenuCurrent == setting && isCapturingKey) {
+						key = "...";
+					}
+					else if (keybindMenuCurrent == setting && isConfirmingKey) {
+						if (newKeybind > 0 && newKeybind < 190)
+							key = KeyNames[newKeybind];
+						else if (newKeybind == 0x0)
+							key = "N/A";
+						else
+							key = "???";
+					}
+
+					std::string keyb = key;
+					float keybSz = textHeight * 0.8f;
+
+					float length = 10.f;  // because we add 5 to text padding + keybind name
+					length += DrawUtils::getTextWidth(&text, textSize);
+					length += DrawUtils::getTextWidth(&keyb, textSize);
+
+					//windowSize.x = fmax(windowSize.x, length + offset);
+
+					DrawUtils::drawText(vec2_t(r.z, r.y), &text, MC_Color(255, 255, 255), textSize);
+
+					DrawUtils::drawText(vec2_t(r.z + 50, r.y), &keyb, MC_Color(255, 255, 255), textSize);
+				}
+				else {
+					std::string text = "Press new bind...";
+					//windowSize.x = fmax(windowSize.x, DrawUtils::getTextWidth(&text, textSize));
+
+					DrawUtils::drawText(vec2_t(r.z, r.y), &text, MC_Color(255, 255, 255), textSize);
+				}
+
+				//DrawUtils::fillRectangle(rectPos, FILLCOLOR, OPACITY);
+
+				if ((surenobugY - ourWindow->pos.y) > (g_Data.getGuiData()->heightGame * 0.75)) {
+					overflowing = true;
+					break;
+				}
+
+				// Logic
+				{
+					bool isFocused = vec4_t(r.x, r.y, r.z + 50, r.w).contains(&mousePos);
+
+					if (isFocused && shouldToggleLeftClick && !(isCapturingKey && keybindMenuCurrent != setting /*don't let the user click other stuff while changing a keybind*/)) {
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+
+						keybindMenuCurrent = setting;
+						isCapturingKey = true;
+					}
+
+					if (isFocused && shouldToggleRightClick && !(isCapturingKey && keybindMenuCurrent != setting)) {
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+
+						setting->value->_int = 0x0;  // Clear
+
+						isCapturingKey = false;
+					}
+
+					if (shouldStopCapturing && keybindMenuCurrent == setting) {  // The user has selected a key
+						if (clickGUI->sounds) {
+							auto player = g_Data.getLocalPlayer();
+							PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+							level->playSound("random.click", *player->getPos(), 1, 1);
+						}
+
+						shouldStopCapturing = false;
+						isCapturingKey = false;
+						setting->value->_int = newKeybind;
+					}
+				}
+				settingRect.y += textHeight + (textPadding * 12);
+			} break;
+			case ValueType::FLOAT_T: {
+				// Text and background
+				{
+					vec2_t textPos2 = vec2_t(rectPos2.x + ((rectPos2.z - rectPos2.x) / 2), rectPos2.y + 2);
+					char str[10];
+					sprintf_s(str, 10, "%.2f", setting->value->_float);
+					string text = str;
+					char name[0x22];
+					sprintf_s(name, "%s: ", setting->name);
+					string elTexto = name;
+					string texto = str;
+					DrawUtils::toLower(elTexto);
+					textPos2.x = rectPos2.x + 5;
+					DrawUtils::drawText(vec2_t(textPos2.x, textPos2.y - 10), &elTexto, MC_Color(255, 255, 255), clickGUI->txtsize, 1.f);
+					DrawUtils::drawRightAlignedString(&texto, vec4_t(rectPos2.x, rectPos2.y - 10, rectPos2.z, rectPos2.w), MC_Color(255, 255, 255), false);
+					settingRect.y += textPadding + textHeight - 9;
+					rectPos2.w = settingRect.y;
+					string len = "saturation           ";
+					float lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 20.5f;
+					if (!clickGUI->cFont) len = "saturation      ";
+					if (!clickGUI->cFont)lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 17.5f;
+				}
+
+				if ((settingRect.y - ourWindow->pos.y) > cutoffHeight) {
+					overflowing = true;
+					break;
+				}
+				// Slider
+				{
+
+					vec4_t rect = vec4_t(
+						rectPos2.x + textPadding + 2.5f,
+						rectPos2.y,
+						rectPos2.z + textHeight - textPadding - 1.5f,
+						rectPos2.y + textHeight + 4.f);
+					// Visuals & Logic
+					{
+
+						rectPos2.w += textHeight;
+
+						rect.z = rect.z - 10;
+
+						rect.y = rect.y + 3;
+						rect.w = rect.w - 3;
+
+						const bool areWeFocused = rect.contains(&mousePos);
+						DrawUtils::fillRectangleA(rect, MC_Color(0, 0, 0, 80));
+
+						const float minValue = setting->minValue->_float;
+						const float maxValue = setting->maxValue->_float - minValue;
+						float value = (float)fmax(0, setting->value->_float - minValue);  // Value is now always > 0 && < maxValue
+						if (value > maxValue) value = maxValue;
+						value /= maxValue;  // Value is now in range 0 - 1
+						//const float endXlol = settingRect.z - 246.4f;
+						const float endXlol = settingRect.z - 251.6f;
+						value *= endXlol;  // Value is now pixel diff between start of bar and end of progress
+						{
+							rect.z = rect.x + value;
+
+							vec4_t circle = vec4_t(rect.z, rect.y - 1.7f, rect.z + 3.7f, rect.y + 7.8f);
+
+							DrawUtils::fillRectangleA(circle, MC_Color(230, 230, 230));
+						}
+
+						// Drag Logic
+						{
+							if (setting->isDragging) {
+								if (isLeftClickDown && !isRightClickDown)
+									value = mousePos.x - rect.x;
+								else
+									setting->isDragging = false;
+							}
+							else if (areWeFocused && shouldToggleLeftClick && !ourWindow->isInAnimation) {
+								shouldToggleLeftClick = false;
+								setting->isDragging = true;
+								if (clickGUI->sounds) {
+									auto player = g_Data.getLocalPlayer();
+									PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+									level->playSound("random.click", *player->getPos(), 1, 1);
+								}
+							}
+						}
+
+						// Save Value
+						{
+							value /= endXlol;  // Now in range 0 - 1
+							value *= maxValue;
+							value += minValue;
+
+							setting->value->_float = value;
+							setting->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+						}
+					}
+					settingRect.y += textHeight + (textPadding * 12);
+				}
+			} break;
+			case ValueType::INT_T: {
+				// Text and background
+				{
+					vec2_t textPos2 = vec2_t(rectPos2.x + ((rectPos2.z - rectPos2.x) / 2), rectPos2.y);
+					char name[0x22];
+					sprintf_s(name, "%s: ", setting->name);
+					vec2_t textPos = vec2_t(rectPos2.x + 10, rectPos2.y + 10);
+					char str[10];
+					sprintf_s(str, 10, "%i", setting->value->_int);
+					string text = str;
+					string elTexto = name;
+					DrawUtils::toLower(elTexto);
+					textPos2.x -= DrawUtils::getTextWidth(&text, clickGUI->txtsize) / 2;
+					textPos2.y += 2.5f;
+					textPos2.x = rectPos2.x + 5;
+					DrawUtils::drawText(vec2_t(textPos2.x, textPos2.y - 10), &elTexto, MC_Color(255, 255, 255), clickGUI->txtsize, 1.f);
+					DrawUtils::drawRightAlignedString(&text, vec4_t(rectPos2.x, rectPos2.y - 10, rectPos2.z, rectPos2.w), MC_Color(255, 255, 255), false);
+					settingRect.y += textPadding + textHeight - 7;
+					rectPos2.w = settingRect.y;
+					string len = "saturation  ";
+					float lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 20.5f;
+					if (!clickGUI->cFont) len = "saturation  ";
+					if (!clickGUI->cFont)lenth = DrawUtils::getTextWidth(&len, clickGUI->txtsize) + 17.5f;
+				}
+				if ((settingRect.y - ourWindow->pos.y) > (g_Data.getGuiData()->heightGame * 0.75)) {
+					overflowing = true;
+					break;
+				}
+				// Slider
+				{
+					vec4_t rect = vec4_t(
+						rectPos2.x + textPadding + 2.5f,
+						rectPos2.y,
+						rectPos2.z + textHeight - textPadding - 1.5f,
+						rectPos2.y + textHeight + 4.f);
+
+
+					// Visuals & Logic
+					{
+						rectPos2.w += textHeight;
+
+						rect.z = rect.z - 10;
+
+						rect.y = rect.y + 3;
+						rect.w = rect.w - 3;
+
+						const bool areWeFocused = rect.contains(&mousePos);
+						DrawUtils::fillRectangleA(rect, MC_Color(0, 0, 0, 80));
+
+						const float minValue = (float)setting->minValue->_int;
+						const float maxValue = (float)setting->maxValue->_int - minValue;
+						float value = (float)fmax(0, setting->value->_int - minValue);  // Value is now always > 0 && < maxValue
+						if (value > maxValue)
+							value = maxValue;
+						value /= maxValue;  // Value is now in range 0 - 1
+						const float endXlol = settingRect.z - 251.6;
+						value *= endXlol;  // Value is now pixel diff between start of bar and end of progress
+						{
+							rect.z = rect.x + value;
+							vec4_t circle = vec4_t(rect.z, rect.y - 1.7f, rect.z + 3.7f, rect.y + 7.8f);
+
+							DrawUtils::fillRectangleA(circle, MC_Color(230, 230, 230));
+						}
+
+						// Drag Logic
+						{
+							if (setting->isDragging) {
+								if (isLeftClickDown && !isRightClickDown)
+									value = mousePos.x - rect.x;
+								else
+									setting->isDragging = false;
+							}
+							else if (areWeFocused && shouldToggleLeftClick && !ourWindow->isInAnimation) {
+								shouldToggleLeftClick = false;
+								setting->isDragging = true;
+								if (clickGUI->sounds) {
+									auto player = g_Data.getLocalPlayer();
+									PointingStruct* level = g_Data.getLocalPlayer()->pointingStruct;
+									level->playSound("random.click", *player->getPos(), 1, 1);
+								}
+							}
+						}
+
+						// Save Value
+						{
+							value /= endXlol;  // Now in range 0 - 1
+							value *= maxValue;
+							value += minValue;
+
+							setting->value->_int = (int)roundf(value);
+							setting->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();
+						}
+					}
+					settingRect.y += textHeight + (textPadding * 12);
+				}
+			} break;
+			}
+		}
+		float endYOffset = settingRect.y;
+	}
+
+	vec4_t winRectPos = clickGUIRect;
+
+	DrawUtils::drawRectangle(winRectPos, MC_Color(255, 255, 255), 0.8f, 0.5f);
+}
+#pragma endregion
 void ClickGui::render() {
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	if (!moduleMgr->isInitialized()) return;
