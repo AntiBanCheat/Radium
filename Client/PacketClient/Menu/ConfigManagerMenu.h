@@ -9,6 +9,7 @@
 class ConfigManagerMenu {
 public:
 	static void onKeyUpdate(int key, bool isDown);
+	static void onWheelScroll(bool direction);
 	static void render();
 	static void init();
 };
