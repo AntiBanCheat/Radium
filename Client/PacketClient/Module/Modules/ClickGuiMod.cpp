@@ -10,6 +10,7 @@ ClickGUIMod::ClickGUIMod() : IModule(VK_INSERT, Category::VISUAL, "A GUI that di
 	theme.addEntry("Tenacity", 4);
 	theme.addEntry("Rise", 5); //LOL I'm KaeruClient :cold: developed
 	theme.addEntry("Lunar", 6); //Made by rasky1
+	theme.addEntry("Badlion", 7); //ika turai kanasii
 	registerEnumSetting("Color", &color, 0);
 	color.addEntry("Rainbow", 0);
 	color.addEntry("Astolfo", 1);
