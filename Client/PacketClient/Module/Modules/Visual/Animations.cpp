@@ -82,7 +82,7 @@ void Animations::onTick(C_GameMode* gm) {
 		if (!swing) *player->getSwingState() = 0.f;
 	}
 
-	if (slowSwing) *player->getSwingState() = 0.f;
+	if (isslowSwing) *player->getSwingState() = 0.f;
 
 	if (reset) { 
 		xScale = 1.f; yScale = 1.f; zScale = 1.f; 
@@ -104,7 +104,7 @@ void Animations::onPlayerTick(C_Player* plr) {
 	}
 
 	if (requireswing) {
-		if (slowSwing) {
+		if (isslowSwing) {
 			if (swingticks > 2005) {
 				swingticks = 340;
 				requireswing = false;

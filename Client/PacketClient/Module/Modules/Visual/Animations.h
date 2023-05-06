@@ -16,7 +16,7 @@ public:
     bool isAttacking = false;
     bool smoothSwing = false;
     bool tapswing = false;
-    bool slowSwing = false;
+    bool isslowSwing = false;
     bool noswing = false;
     float swingticks;
     // Unused
