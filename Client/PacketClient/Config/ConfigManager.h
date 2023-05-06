@@ -20,6 +20,7 @@ class ConfigManager {
 private:
 	std::wstring roamingFolder;
 	static std::wstring GetRoamingFolderPath();
+	void saveConfigWithCustomName(std::string name);
 	json currentConfigObj;
 
 public:
