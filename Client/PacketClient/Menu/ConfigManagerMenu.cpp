@@ -10,13 +10,13 @@ static bool rightClickDown = false;
 
 static bool hasInitializedCM = false;
 static int timesRenderedCM = 0;
-
-int scrollingDirection2 = 0;
+int scrollingDirectionA = 0;
 
 int spacing = 26;
 
 using namespace std;
 void ConfigManagerMenu::render() {
+
 	auto player = g_Data.getLocalPlayer();
 	auto configManager = moduleMgr->getModule<ConfigManagerMod>();
 	vec2_t mousePos = *g_Data.getClientInstance()->getMousePos();
@@ -47,7 +47,7 @@ void ConfigManagerMenu::render() {
 			configs.push_back(filename);
 		}
 	}
-	
+
 	{
 		vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 		vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
@@ -56,21 +56,18 @@ void ConfigManagerMenu::render() {
 		mousePos = mousePos.mul(windowSize);
 	}
 
-	int index = 0;
-	index++; int curIndex = -index * interfaceMod->spacing;
+	int indexI = 0;
+	indexI++; int curIndex = -indexI * interfaceMod->spacing;
 	auto interfaceColor = ColorUtil::interfaceColor(curIndex);
 
 	vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 	rightClickDown = g_Data.isRightClickDown();
 	string sub_title = string(GRAY) + "Press ESC to exit";
-	float width = DrawUtils::getTextWidth(&string("-----------------------------------------------------------------"));
-	float height = DrawUtils::getTextWidth(&string("----------------------------------"));
-	if (moduleMgr->getModule<Interface>()->Fonts.getSelectedValue() == 1)
-	{
-		width *= 2.3;
-		height *= 2.3;
-	}
+	float width = 161;
+	float height = 95;
+	width *= 2.45;
+	height *= 2.3;
 	vec4_t rectPos = vec4_t(60, 40, 160 + width, 100 + height);
 
 	vec2_t textPos = vec2_t(rectPos.x + 6, rectPos.y + 9);
@@ -102,30 +99,26 @@ void ConfigManagerMenu::render() {
 
 	string a = "mouse pos here";
 
-	if (scrollingDirection2 < 0)
-		scrollingDirection2 = 0;
-	if (scrollingDirection2 > configs.size() - 3)
-		scrollingDirection2 = configs.size() - 3;
-	int index2 = -1;
-	int realIndex2 = -1;
+	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
+
+	if (scrollingDirectionA < 0)
+		scrollingDirectionA = 0;
+	if (scrollingDirectionA > configs.size() - 3)
+		scrollingDirectionA = configs.size() - 3;
+	int index = -1;
+	int realIndex = -1;
 
 	for (int i = 0; i < configs.size(); i++)
 	{
 
-		realIndex2++;
-		if (realIndex2 < scrollingDirection2)
+		realIndex++;
+		if (realIndex < scrollingDirectionA)
 			continue;
-		index2++;
-		if (index2 >= 10)
+		index++;
+		if (index >= 10)
 			break;
 
 		textPosRect = vec4_t(textPos.x, textPos.y, textPos.x + 100, textPos.y + 18);
-
-		if (rectPos.contains(&mousePos)) {
-			if (textPosRect.contains(&textPos)) {
-				textPos.y += scrollingDirection2;
-			}
-		}
 
 		string load = "load";
 		string save = "save";
@@ -146,6 +139,7 @@ void ConfigManagerMenu::render() {
 
 			std::string replaced = std::regex_replace(filename, re, "");
 			configMgr->loadConfig(replaced, false);
+			SettingMgr->loadSettings("Settings", false);
 		}
 		if (btnRect2.contains(&mousePos) && g_Data.isLeftClickDown()) {
 			configManager->setEnabled(false);
@@ -155,6 +149,7 @@ void ConfigManagerMenu::render() {
 
 			std::string replaced = std::regex_replace(filename, re, "");
 			configMgr->saveConfigWithCustomName(replaced);
+			SettingMgr->loadSettings("Settings", true);
 		}
 
 		//	DrawUtils::fillRectangleA(textPosRect, MC_Color(100, 100, 110, 100));
@@ -208,8 +203,8 @@ void ConfigManagerMenu::render() {
 }
 
 void ConfigManagerMenu::onWheelScroll(bool direction) {
-	if (!direction) scrollingDirection2++;
-	else scrollingDirection2--;
+	if (!direction) scrollingDirectionA++;
+	else scrollingDirectionA--;
 }
 
 void ConfigManagerMenu::init() { hasInitializedCM = true; }

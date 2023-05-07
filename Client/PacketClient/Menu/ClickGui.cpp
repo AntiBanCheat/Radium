@@ -352,7 +352,7 @@ void ClickGui::renderLunarCategory() {
 				switch (setting->valueType)
 				{
 				case ValueType::FLOAT_T:
-					step = 0.1;
+					step = 0.01;
 					currentValue = setting->value->_float;
 					maxValue = setting->maxValue->_float;
 					break;
@@ -448,7 +448,9 @@ void ClickGui::renderLunarCategory() {
 				else {
 					str = "?";
 				}
-				DrawUtils::drawCenteredString(vec2_t(offsetX - width / 2.f, topOffset + 5), &str, 0.8f, MC_Color(255, 255, 255), false);
+				static auto inter = moduleMgr->getModule<Interface>();
+				DrawUtils::drawCenteredString(vec2_t(offsetX - width / 2.f, topOffset +
+					(inter->Fonts.getSelectedValue() == 1 ? 3.5 : 5)), &str, 0.8f, MC_Color(255, 255, 255), false);
 
 
 
@@ -521,6 +523,7 @@ void ClickGui::renderLunarCategory() {
 				DrawUtils::fillRectangle(rect1, MC_Color(255, 255, 255), 0.3f);
 			if (rect1.contains(&mousePos) && shouldToggleLeftClick) {
 				clickGUI->setEnabled(false);
+				SettingMgr->loadSettings("Settings", true);
 				return configMgr->loadConfig(rawname, false);
 			}
 			offsetY += 12.51;
@@ -7315,14 +7318,8 @@ void ClickGui::renderNewBadLion() {
 
 	currentYOffset = yOffset;
 
-
-
 	vector<std::string> configList;
 
-	if (scrollingDirection < 0)
-		scrollingDirection = 0;
-	if (scrollingDirection > configList.size() - 3)
-		scrollingDirection = configList.size() - 3;
 	int index1 = -1;
 	int realIndex1 = -1;
 
@@ -7350,6 +7347,11 @@ void ClickGui::renderNewBadLion() {
 		Category::CONFIG,
 	};
 
+	if (scrollingDirection < 0)
+		scrollingDirection = 0;
+	if (scrollingDirection > ModuleList.size() - 1)
+		scrollingDirection = ModuleList.size() - 1;
+
 	vec2_t categoryPos = vec2_t(windowSize2.x / 2 - (35 * yoko) + 6, windowSize2.y / 2 - (8 * tate) + 6);
 
 	for (auto& cs : categories) {
@@ -7366,6 +7368,7 @@ void ClickGui::renderNewBadLion() {
 			DrawUtils::fillRectangleA(vec4_t(categoryRect), MC_Color(255, 255, 255, 45));
 			if (isLeftClickDown && shouldToggleLeftClick) {
 				selectedCategory = cs;
+				scrollingDirection = 0;
 				clickGUI->isSettingOpened = false;
 				shouldToggleLeftClick = false;
 			}
@@ -7470,12 +7473,17 @@ void ClickGui::renderNewBadLion() {
 			}
 		}
 
+		if (scrollingDirection < 0)
+			scrollingDirection = 0;
+		if (scrollingDirection > clickGUI->configs.size() - 1)
+			scrollingDirection = clickGUI->configs.size() - 1;
+
 		for (auto& config : configList) {
 			realIndex1++;
 			if (realIndex1 < scrollingDirection)
 				continue;
 			index1++;
-			if (index1 >= 10)
+			if (index1 > 6)
 				break;
 
 			DrawUtils::drawText(configPos, &config, MC_Color(255, 255, 255), 1.f, 0.9f, true);
@@ -7503,8 +7511,8 @@ void ClickGui::renderNewBadLion() {
 			if (delRect.contains(&mousePos) && isLeftClickDown && shouldToggleLeftClick) {
 
 				if (configMgr->currentConfig != config) {
-					clickGUI->setEnabled(false);
-					g_Data.getClientInstance()->grabMouse();
+			//		clickGUI->setEnabled(false);
+			//		g_Data.getClientInstance()->grabMouse();
 
 					string filepath = dir_path + config;
 
@@ -7543,7 +7551,7 @@ void ClickGui::renderNewBadLion() {
 			if (realIndex3 < scrollingDirection)
 				continue;
 			index3++;
-			if (index3 >= 10)
+			if (index3 > 10)
 				break;
 
 			if (!strcmp(setting->name, "enabled") || strcmp(setting->name, "keybind") == 0) continue;
@@ -8104,7 +8112,7 @@ void ClickGui::onMouseClickUpdate(int key, bool isDown) {
 void ClickGui::onWheelScroll(bool direction) {
 	static auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
 	if (clickGUI->theme.getSelectedValue() == 6 && focusConfigRect) {
-		if (!direction) configScrollingDirection++;
+		if (!direction) scrollingDirection++;
 		else configScrollingDirection--;
 	}
 	else {
