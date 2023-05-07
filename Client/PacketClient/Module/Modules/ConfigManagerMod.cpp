@@ -14,12 +14,9 @@ const char* ConfigManagerMod::getModuleName() {
 bool ConfigManagerMod::allowAutoStart() {
 	return false;
 }
-bool clickguiEnabled;
+
 void ConfigManagerMod::onEnable() {
 	g_Data.getClientInstance()->releaseMouse();
-	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	clickguiEnabled = clickGUI->enabled;
-	clickGUI->setEnabled(false);
 }
 
 void ConfigManagerMod::onTick(C_GameMode* gm) {
@@ -35,8 +32,6 @@ void ConfigManagerMod::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 
 void ConfigManagerMod::onDisable() {
 	g_Data.getClientInstance()->grabMouse();
-	auto clickGUI = moduleMgr->getModule<ClickGUIMod>();
-	clickGUI->setEnabled(clickguiEnabled);
 }
 
 void ConfigManagerMod::onLoadConfig(void* conf) {

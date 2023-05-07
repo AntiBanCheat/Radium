@@ -352,7 +352,7 @@ void ClickGui::renderLunarCategory() {
 				switch (setting->valueType)
 				{
 				case ValueType::FLOAT_T:
-					step = 0.01;
+					step = 0.1;
 					currentValue = setting->value->_float;
 					maxValue = setting->maxValue->_float;
 					break;
@@ -448,9 +448,7 @@ void ClickGui::renderLunarCategory() {
 				else {
 					str = "?";
 				}
-				static auto inter = moduleMgr->getModule<Interface>();
-				DrawUtils::drawCenteredString(vec2_t(offsetX - width / 2.f, topOffset +
-					(inter->Fonts.getSelectedValue() == 1 ? 3.5 : 5)), &str, 0.8f, MC_Color(255, 255, 255), false);
+				DrawUtils::drawCenteredString(vec2_t(offsetX - width / 2.f, topOffset + 5), &str, 0.8f, MC_Color(255, 255, 255), false);
 
 
 
@@ -523,7 +521,6 @@ void ClickGui::renderLunarCategory() {
 				DrawUtils::fillRectangle(rect1, MC_Color(255, 255, 255), 0.3f);
 			if (rect1.contains(&mousePos) && shouldToggleLeftClick) {
 				clickGUI->setEnabled(false);
-				SettingMgr->loadSettings("Settings", true);
 				return configMgr->loadConfig(rawname, false);
 			}
 			offsetY += 12.51;
