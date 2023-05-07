@@ -47,7 +47,7 @@ void ConfigManagerMenu::render() {
 			configs.push_back(filename);
 		}
 	}
-	
+
 	{
 		vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 		vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
@@ -146,6 +146,7 @@ void ConfigManagerMenu::render() {
 
 			std::string replaced = std::regex_replace(filename, re, "");
 			configMgr->loadConfig(replaced, false);
+			SettingMgr->loadSettings("Settings", false);
 		}
 		if (btnRect2.contains(&mousePos) && g_Data.isLeftClickDown()) {
 			configManager->setEnabled(false);
@@ -155,6 +156,7 @@ void ConfigManagerMenu::render() {
 
 			std::string replaced = std::regex_replace(filename, re, "");
 			configMgr->saveConfigWithCustomName(replaced);
+			SettingMgr->loadSettings("Settings", true);
 		}
 
 		//	DrawUtils::fillRectangleA(textPosRect, MC_Color(100, 100, 110, 100));
