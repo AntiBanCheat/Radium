@@ -8,7 +8,7 @@ Derp::Derp() : IModule(0, Category::OTHER, "Makes you look retarded") {
 	registerBoolSetting("Twerk", &twerk, twerk);
 	registerBoolSetting("Spin", &spin, spin);
 	registerBoolSetting("Silent", &silent, silent);
-	registerFloatSetting("Speed", &speed, speed, 1, 50);
+	registerFloatSetting("Speed", &speed, speed, 1, 100);
 	registerIntSetting("Delay", &delay, delay, 0, 10);
 }
 
@@ -45,6 +45,7 @@ void Derp::onPlayerTick(C_Player* plr) {
 	if (spin) {
 		plr->bodyYaw = b;
 		plr->yawUnused1 = b;
+		plr->pitch = 80;
 	}
 }
 
@@ -65,11 +66,19 @@ void Derp::onSendPacket(C_Packet* packet) {
 					authPacket->pitch = -180;
 				}
 				if (spin) {
+					movePacket->yaw = b;
+					movePacket->headYaw = b;
+					movePacket->pitch = 80;
+					authPacket->pos.y = b;
+					authPacket->pos.x = 80;
 				}
 			}
 			else if (spin) {
 				movePacket->yaw = b;
 				movePacket->headYaw = b;
+				movePacket->pitch = 80;
+				authPacket->pos.y = b;
+				authPacket->pos.x = 80;
 			}
 		}
 	}
