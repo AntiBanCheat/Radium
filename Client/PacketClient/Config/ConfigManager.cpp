@@ -37,7 +37,8 @@ void ConfigManager::loadConfig(std::string name, bool create) {
 			try {
 				currentConfigObj.clear();
 				confFile >> currentConfigObj;
-			} catch (json::parse_error& e) {
+			}
+			catch (json::parse_error& e) {
 				logF("Config Load Exception!: %s", e.what());
 			}
 			currentConfigObj["from"] = "PacketSkid";
@@ -51,14 +52,15 @@ void ConfigManager::loadConfig(std::string name, bool create) {
 			}
 		}
 
-		if (create) 
+		if (create)
 			saveConfig();
 
 		if (g_Data.getLocalPlayer() != nullptr) {
 			g_Data.getGuiData()->displayClientMessageF("[Actinium] %sSuccessfully %s config %s%s%s!", GREEN, !configExists ? "created" : "loaded", GRAY, name.c_str(), GREEN);
 		}
-	} else {
-		if (g_Data.getLocalPlayer() != nullptr) 
+	}
+	else {
+		if (g_Data.getLocalPlayer() != nullptr)
 			g_Data.getGuiData()->displayClientMessageF("[Actinium] %sCould not load config %s%s%s!", RED, GRAY, name.c_str(), RED);
 		auto notification = g_Data.addNotification("", "Couldn't load config!");
 		notification->duration = 10;
